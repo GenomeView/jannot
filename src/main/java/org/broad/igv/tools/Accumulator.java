@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.math.stat.Percentile;
+import org.apache.commons.math.stat.descriptive.rank.Percentile;
 import org.broad.igv.track.WindowFunction;
 import org.broad.igv.util.collections.DoubleArrayList;
 
