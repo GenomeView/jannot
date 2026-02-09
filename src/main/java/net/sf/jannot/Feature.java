@@ -29,8 +29,9 @@ import net.sf.jannot.event.FeatureEvent;
 public class Feature implements Comparable<Feature>, Located {
 
 	private Logger log = Logger.getLogger(Feature.class.getCanonicalName());
+	
+	// either location or singleLocation are to be set.
 	private Location[] location = null;
-
 	private Location singleLocation = null;
 
 	private byte[] phase = null;
@@ -41,10 +42,20 @@ public class Feature implements Comparable<Feature>, Located {
 
 	private Map<String, String> qualifiers = new HashMap<String, String>();
 
+	
+	// cache
+	private boolean scoreBuffer = false; // true if score was already calculated
+	private double score = Double.NaN;
+
 	/**
 	 * Add a new qualifier to this Feature.
+	 * The key,value pair will override the existing one
 	 * 
-	 * The value should not contain line-breaks.
+	 * Exception: If key ="score", the score key will be extended with ","+value
+	 * and then also scoreBuffer is set false.
+	 * 
+	 * All line breaks in value will be removed before storage in 
+	 * {@link #qualifiers}.
 	 * 
 	 * @param key
 	 *            of the qualifier
@@ -71,6 +82,13 @@ public class Feature implements Comparable<Feature>, Located {
 
 	}
 
+	/**
+	 * same as {@link #addQualifier(String, String)} 
+	 * @param key
+	 *            of the qualifier
+	 * @param value
+	 *            value
+	 */
 	public void setQualifier(String key, String value) {
 		if(key!=null)
 			qualifiers.remove(key);
@@ -110,6 +128,10 @@ public class Feature implements Comparable<Feature>, Located {
 		}
 	}
 
+	/**
+	 * Sets a singlelocation.
+	 * @param l the single {@link Location} of this feature.
+	 */
 	public void setLocation(Location l) {
 		location = null;
 		phase = null;
@@ -250,9 +272,16 @@ public class Feature implements Comparable<Feature>, Located {
 
 	}
 
+	/**
+	 * 
+	 * @return list,either {@link #location} list,
+	 * or list containing {@link #singleLocation},
+	 * or Location[0] if both are null
+	 */
 	public Location[] location() {
 		if (location == null) {
 			assert singleLocation != null;
+			// bug? we just asserted it's not null
 			if(singleLocation==null)
 				return new Location[0];
 			else 
@@ -287,11 +316,21 @@ public class Feature implements Comparable<Feature>, Located {
 		qualifiers.remove(key);
 	}
 	
+	/**
+	 * @param key indexing the qualifiers
+	 * @return qualifiers.get(key) or null if no such key
+	 */
 	public String qualifier(String key) {
 		return qualifiers.get(key);
 
 	}
 
+	/**
+	 * 
+	 * @return set of all qualifier keys. WARNING
+	 * modifications to this set are reflected
+	 * into the  qualifiers map private to this class,
+	 */
 	public Set<String> getQualifiersKeys() {
 		return qualifiers.keySet();
 	}
@@ -328,9 +367,11 @@ public class Feature implements Comparable<Feature>, Located {
 	
 	}
 
-	private boolean scoreBuffer = false;
-	private double score = Double.NaN;
 
+	/**
+	 * 
+	 * @return the value in the "score" qualifier.
+	 */
 	public double getScore() {
 		if (scoreBuffer) {
 			return score;
@@ -342,6 +383,7 @@ public class Feature implements Comparable<Feature>, Located {
 				scoreBuffer = true;
 				double tmpScore = 0;
 				try {
+					// bug? score may be a list
 					tmpScore = Double.parseDouble(val);
 				} catch (Exception e) {
 					log.log(Level.WARNING, "Could not parse score: " + val, e);

@@ -8,7 +8,9 @@ import net.sf.jannot.event.ChangeEvent;
 public class Location implements Comparable<Location> {
 
 	/**
-	 * These fields are public for efficient getter access. If you want to set these fields, please use the proper setters.
+	 * These fields are public for efficient getter access. 
+	 * If you want to set these fields, please use the proper setters.
+	 * FIXME apparently these should not be public.
 	 */
 	public int start, end;
 
@@ -17,10 +19,12 @@ public class Location implements Comparable<Location> {
 	private boolean fuzzyStart;
 
 	/**
-	 * Create a location from a String that comes out of the toString method
+	 * Parses a location from a String. Inverse of the toString method
 	 * 
-	 * @param s
-	 * @return
+	 * @param s string of the form "a..b".
+	 * If a starts with "<" the start is fuzzy
+	 * If b ends with ">" the end is fuzzy
+	 * @return Location made from the string
 	 */
 	public static Location fromString(String s){
 		String[]arr=s.replace('<', ' ').replace('>', ' ').trim().split("..");
@@ -33,6 +37,13 @@ public class Location implements Comparable<Location> {
 				+ end;
 	}
 
+	/**
+	 * The main constructor
+	 * @param start One endpoint of the interval. Can be negative
+	 * @param end the other endpoint of the interval. Can be negative.
+	 * @param fuzzyStart true iff start is fuzzy. NOTE this has no meaning anywhere.
+	 * @param fuzzyEnd true iff end is fuzzy. NOTE this has no meaning anywhere.
+	 */
 	public Location(int start, int end, boolean fuzzyStart, boolean fuzzyEnd) {
 		if (end > start) {
 			this.start = start;
@@ -45,6 +56,11 @@ public class Location implements Comparable<Location> {
 		this.fuzzyEnd = fuzzyEnd;
 	}
 
+	/**
+	 * Shortcut to create non-fuzzy interval.
+	 * @param x one endpoint of the interval
+	 * @param y the other endpoint of the interval.
+	 */
 	public Location(int x, int y) {
 		this(x, y, false, false);
 	}
@@ -69,6 +85,12 @@ public class Location implements Comparable<Location> {
 		return e;
 	}
 
+	/**
+	 * {@inheritDoc}.
+	 * the start position is compared first. If equal, 
+	 * the ordering is determined by the end position.
+	 * {@link #fuzzyEnd} and {@link #fuzzyStart} have no effect here. 
+	 */
 	@Override
 	public int compareTo(Location arg0) {
 		int comp = new Integer(start).compareTo(arg0.start());
@@ -136,6 +158,10 @@ public class Location implements Comparable<Location> {
 		this.parent = f;
 	}
 
+	/**
+	 * @return the {@link Feature} that is the unique parent of this location,
+	 * or null.	
+	 */
 	public Feature getParent() {
 		return parent;
 	}
