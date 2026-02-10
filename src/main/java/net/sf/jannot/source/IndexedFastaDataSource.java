@@ -18,8 +18,8 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.refseq.FaidxData;
 import net.sf.jannot.refseq.FaidxIndex;
-import net.sf.samtools.seekablestream.SeekableFileStream;
-import net.sf.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.seekablestream.SeekableFileStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 import be.abeel.net.URIFactory;
 
 /**

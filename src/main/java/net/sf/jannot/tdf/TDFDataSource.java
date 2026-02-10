@@ -20,8 +20,8 @@ import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
 import net.sf.jannot.tabix.PileupWrapper;
-import net.sf.samtools.seekablestream.SeekableFileStream;
-import net.sf.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.seekablestream.SeekableFileStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 
 import org.broad.igv.tdf.TDFReader;
 

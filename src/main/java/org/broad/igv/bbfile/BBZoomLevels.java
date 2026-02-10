@@ -21,7 +21,7 @@ package org.broad.igv.bbfile;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import net.sf.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 
 
 

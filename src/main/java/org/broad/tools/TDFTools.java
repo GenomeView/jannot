@@ -23,9 +23,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collection;
 
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMSequenceDictionary;
-import net.sf.samtools.SAMSequenceRecord;
+import htsjdk.samtools.SAMSequenceDictionary;
+import htsjdk.samtools.SAMSequenceRecord;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 
 import org.broad.igv.track.WindowFunction;
 
@@ -59,7 +60,7 @@ public class TDFTools {
 			Collection<WindowFunction> windowFunctions)
 			throws IOException, URISyntaxException {
 		System.out.println("Computing coverage.  File = " + ifile);
-		SAMFileReader sfr=new SAMFileReader(new File(ifile));
+		SamReader sfr= SamReaderFactory.makeDefault().open(new File(ifile));
 		SAMSequenceDictionary dict=sfr.getFileHeader().getSequenceDictionary();
 		long max=0;
 		for(SAMSequenceRecord ssr:dict.getSequences()){

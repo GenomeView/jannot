@@ -29,7 +29,7 @@ import java.util.Map;
 
 
 
-import net.sf.samtools.seekablestream.SeekableFileStream;
+import htsjdk.samtools.seekablestream.SeekableFileStream;
 
 import org.broad.igv.track.WindowFunction;
 

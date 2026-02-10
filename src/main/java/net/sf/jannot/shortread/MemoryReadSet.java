@@ -11,7 +11,7 @@ import java.util.TreeSet;
 
 import net.sf.jannot.Data;
 import net.sf.jannot.Location;
-import net.sf.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecord;
 import be.abeel.util.FrequencyMap;
 
 /**

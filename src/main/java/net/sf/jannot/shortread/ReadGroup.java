@@ -4,7 +4,7 @@
 package net.sf.jannot.shortread;
 
 import net.sf.jannot.Data;
-import net.sf.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecord;
 
 /**
  * 

@@ -15,11 +15,13 @@ import net.sf.jannot.indexing.Faidx;
 import net.sf.jannot.mafix.MafixFactory;
 import net.sf.jannot.tabix.TabixWriter;
 import net.sf.jannot.tabix.TabixWriter.Conf;
-import net.sf.samtools.BAMIndexer;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
+import htsjdk.samtools.BAMIndexer;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.SamInputResource;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory; 
 
 /**
  * @author Thomas Abeel
@@ -123,9 +125,8 @@ public class IndexManager {
 		if (locator.isBAM()) {
 
 			InputStream ios = locator.stream();
-
-			SAMFileReader sfr = new SAMFileReader(ios);
-			sfr.enableFileSource(true);
+			SamReader sfr = SamReaderFactory.makeDefault().open(SamInputResource.of(ios));
+			//sfr.enableFileSource(true); // CHECK do we still need this?
 
 			SAMFileHeader head = sfr.getFileHeader();
 

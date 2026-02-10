@@ -30,12 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.samtools.AlignmentBlock;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.SAMSequenceDictionary;
-import net.sf.samtools.SAMSequenceRecord;
+import htsjdk.samtools.AlignmentBlock;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.SAMSequenceDictionary;
+import htsjdk.samtools.SAMSequenceRecord;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 
 /**
  *   TODO -- normalize option
@@ -88,7 +89,7 @@ class CoverageCounter {
 
 		int tolerance = (int) (windowSize * (Math.floor(extFactor / windowSize) + 2));
 
-		SAMFileReader sfr = new SAMFileReader(new File(alignmentFile));
+		SamReader sfr = SamReaderFactory.makeDefault().open(new File(alignmentFile));
 
 		// DataSourceFactory.createFile(new File(alignmentFile +
 		// ".bai")).read(genome);

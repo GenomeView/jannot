@@ -42,10 +42,10 @@ import java.util.logging.Logger;
 
 import net.sf.jannot.picard.LineBlockCompressedInputStream;
 import net.sf.jannot.source.Locator;
-import net.sf.samtools.util.BlockCompressedInputStream;
-import net.sf.samtools.util.BlockCompressedOutputStream;
-import net.sf.samtools.seekablestream.SeekableFileStream;
-import net.sf.samtools.seekablestream.SeekableHTTPStream;
+import htsjdk.samtools.util.BlockCompressedInputStream;
+import htsjdk.samtools.util.BlockCompressedOutputStream;
+import htsjdk.samtools.seekablestream.SeekableFileStream;
+import htsjdk.samtools.seekablestream.SeekableHTTPStream;
 
 /**
  * Tabix writer, based on Heng Li's C implementation.

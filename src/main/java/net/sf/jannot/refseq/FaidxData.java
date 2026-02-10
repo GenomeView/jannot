@@ -4,7 +4,7 @@
 package net.sf.jannot.refseq;
 
 import net.sf.jannot.refseq.FaidxIndex.IndexEntry;
-import net.sf.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 
 
 /**

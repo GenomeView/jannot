@@ -19,7 +19,7 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.LineBlockCompressedInputStream;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
-import net.sf.samtools.util.BlockCompressedInputStream;
+import htsjdk.samtools.util.BlockCompressedInputStream;
 import be.abeel.util.LRUCache;
 
 /**

@@ -19,14 +19,16 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.shortread.BAMreads;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileReader.ValidationStringency;
-import net.sf.samtools.SAMSequenceDictionary;
-import net.sf.samtools.SAMSequenceRecord;
-import net.sf.samtools.seekablestream.SeekableFileStream;
-import net.sf.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.SAMSequenceDictionary;
+import htsjdk.samtools.SAMSequenceRecord;
+import htsjdk.samtools.SamInputResource;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.seekablestream.SeekableFileStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 import be.abeel.net.URIFactory;
-
+import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.SamReaderFactory;
+import htsjdk.samtools.SamReaderFactory.Option;
 /**
  * 
  * @author Thomas Abeel
@@ -95,16 +97,17 @@ public class SAMDataSource extends DataSource {
 	/* Display name for this data */
 	private DataKey sourceKey;
 
-	private SAMFileReader sfr = null;
+	private SamReader sfr = null;
 	private long size;
 
-	public SAMFileReader getReader() {
+	public SamReader getReader() {
 		// System.out.println(content);
 		// System.out.println(content.getSource());
 		if (sfr == null) {
-			SAMFileReader.setDefaultValidationStringency(ValidationStringency.SILENT);
+			SamReaderFactory.setDefaultValidationStringency(ValidationStringency.SILENT);
 			System.out.println("SDS: "+content+"\t"+index);
-			sfr = new SAMFileReader(content, index, false);
+			sfr = SamReaderFactory.makeDefault().enable(Option.EAGERLY_DECODE)
+					.open(SamInputResource.of(content).index(index));
 			Cleaner.register(sfr, content, deleteIndex ? index : null);
 
 		}
@@ -231,7 +234,7 @@ public class SAMDataSource extends DataSource {
 	public EntrySet read(EntrySet set) throws ReadFailedException {
 		if (set == null)
 			set = new EntrySet();
-		SAMFileReader inputSam = getReader();
+		SamReader inputSam = getReader();
 
 		SAMSequenceDictionary tmpDic = inputSam.getFileHeader().getSequenceDictionary();
 		for (int i = 0; i < tmpDic.size(); i++) {
@@ -251,7 +254,11 @@ public class SAMDataSource extends DataSource {
 
 	@Override
 	public void finalize() {
-		sfr.close();
+		try {
+			sfr.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		if (content instanceof SeekableFileCachedHTTPStream)
 			((SeekableFileCachedHTTPStream) content).closeAll();
 

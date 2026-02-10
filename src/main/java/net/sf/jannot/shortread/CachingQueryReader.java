@@ -28,8 +28,8 @@ import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 import net.sf.jannot.source.SAMDataSource;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.util.CloseableIterator;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.util.CloseableIterator;
 import be.abeel.util.LRUCache;
 
 /**

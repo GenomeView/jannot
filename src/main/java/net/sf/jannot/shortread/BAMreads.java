@@ -12,10 +12,10 @@ import java.util.logging.Logger;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.SAMDataSource;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMFileReader.ValidationStringency;
-import net.sf.samtools.util.CloseableIterator;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SamReaderFactory;
+import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.util.CloseableIterator;
 
 /**
  * 
@@ -186,7 +186,7 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 
 	public BAMreads(SAMDataSource source, String key) {
 		this.source = source;
-		SAMFileReader.setDefaultValidationStringency(ValidationStringency.SILENT);
+		SamReaderFactory.setDefaultValidationStringency(ValidationStringency.SILENT);
 		this.keyIndex = source.getReader().getFileHeader().getSequenceIndex(key.toString());
 		cqr = CachingQueryReader.create(source);
 		this.key = key;

@@ -3,7 +3,7 @@ package org.broad.tribble;
 import java.io.EOFException;
 import java.io.IOException;
 
-import net.sf.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 /**
  * 
  * @author Thomas Abeel

@@ -18,7 +18,7 @@ import net.sf.jannot.alignment.maf.AbstractMAFMultipleAlignment;
 import net.sf.jannot.alignment.maf.LazyAlignmentBlock;
 import net.sf.jannot.alignment.maf.LazyAlignmentSequence;
 import net.sf.jannot.picard.LineBlockCompressedInputStream;
-import net.sf.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 
 import org.broad.LRUCache;
 

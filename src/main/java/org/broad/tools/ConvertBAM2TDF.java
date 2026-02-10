@@ -23,11 +23,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileReader.ValidationStringency;
 
 import org.broad.igv.track.WindowFunction;
 
+import htsjdk.samtools.SamReaderFactory;
+import htsjdk.samtools.ValidationStringency;
 /**
  * Program to create tdf files from bam files.
  * 
@@ -68,7 +68,7 @@ public class ConvertBAM2TDF {
 		Collection<WindowFunction> wfs = new ArrayList<WindowFunction>();
 		for (WindowFunction wf : WindowFunction.values())
 			wfs.add(wf);
-		SAMFileReader
+		SamReaderFactory
 				.setDefaultValidationStringency(ValidationStringency.SILENT);
 		TDFTools igvTools = new TDFTools();
 		igvTools.doCount(ifile, ifile + ".tdf", wfs);

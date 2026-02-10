@@ -3,7 +3,7 @@
  */
 package net.sf.jannot.shortread;
 
-import net.sf.samtools.util.CloseableIterator;
+import htsjdk.samtools.util.CloseableIterator;
 /**
  * 
  * @author Thomas Abeel

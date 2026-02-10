@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.seekablestream.SeekableStream;
 
 /**
  * 
@@ -29,9 +29,9 @@ public class Cleaner {
 	private static ArrayList<RandomAccessFile> rafs = new ArrayList<RandomAccessFile>();
 	private static ArrayList<File> files = new ArrayList<File>();
 	private static ArrayList<SeekableStream> streams = new ArrayList<SeekableStream>();
-	private static ArrayList<SAMFileReader> sfrs = new ArrayList<SAMFileReader>();
+	private static ArrayList<SamReader> sfrs = new ArrayList<SamReader>();
 
-	public static void register(SAMFileReader sfr, SeekableStream content, File f) {
+	public static void register(SamReader sfr, SeekableStream content, File f) {
 		sfrs.add(sfr);
 		if(f!=null)
 			files.add(f);
@@ -56,9 +56,8 @@ public class Cleaner {
 			}
 		}
 
-		for (SAMFileReader sfr : sfrs) {
+		for (SamReader sfr : sfrs) {
 			try {
-				sfr.getIndex().close();
 				sfr.close();
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Failed to close SAMFileReader "+sfr, e);

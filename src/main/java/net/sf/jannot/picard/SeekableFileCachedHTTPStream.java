@@ -18,14 +18,14 @@ import java.util.logging.Logger;
 import net.sf.jannot.Cleaner;
 import net.sf.jannot.exception.ReadFailedException;
 
-import net.sf.samtools.seekablestream.SeekableHTTPStream;
-import net.sf.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.seekablestream.SeekableHTTPStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 import be.abeel.net.URIFactory;
 
 /**
  * @author Thomas Abeel
  */
-public class SeekableFileCachedHTTPStream extends net.sf.samtools.seekablestream.SeekableHTTPStream {
+public class SeekableFileCachedHTTPStream extends htsjdk.samtools.seekablestream.SeekableHTTPStream {
 
 	private Logger log = Logger.getLogger(SeekableFileCachedHTTPStream.class.getCanonicalName());
 

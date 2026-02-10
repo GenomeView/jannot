@@ -38,8 +38,8 @@ import org.broad.tribble.LittleEndianInputStream;
 
 import net.sf.jannot.source.Locator;
 
-import net.sf.samtools.seekablestream.SeekableFileStream;
-import net.sf.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.seekablestream.SeekableFileStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 
 /*
  *   Broad Institute Interactive Genome Viewer Big Binary File (BBFile) Reader

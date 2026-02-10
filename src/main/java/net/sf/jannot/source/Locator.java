@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 import net.sf.jannot.tabix.TabixWriter;
 import net.sf.jannot.tabix.TabixWriter.Conf;
 
-import net.sf.samtools.seekablestream.SeekableStream;
-import net.sf.samtools.seekablestream.SeekableStreamFactory;
+import htsjdk.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.seekablestream.SeekableStreamFactory;
 import be.abeel.net.URIFactory;
 
 /**

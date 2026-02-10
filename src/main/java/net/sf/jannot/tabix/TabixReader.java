@@ -38,9 +38,9 @@ import java.util.Set;
 
 import net.sf.jannot.picard.LineBlockCompressedInputStream;
 import net.sf.jannot.source.Locator;
-import net.sf.samtools.util.BlockCompressedInputStream;
-import net.sf.samtools.seekablestream.SeekableFileStream;
-import net.sf.samtools.seekablestream.SeekableHTTPStream;
+import htsjdk.samtools.util.BlockCompressedInputStream;
+import htsjdk.samtools.seekablestream.SeekableFileStream;
+import htsjdk.samtools.seekablestream.SeekableHTTPStream;
 
 /**
  * @author tarkvara
