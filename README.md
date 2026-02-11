@@ -11,7 +11,7 @@ You can use this from maven with the following dependency.
   <dependency>
 	<groupId>net.sf</groupId>
 	<artifactId>jannot</artifactId>
-	<version>2.0.0</version> 
+	<version>2.0.2</version> 
   </dependency>
 ```
 
