@@ -12,6 +12,15 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import htsjdk.samtools.SAMSequenceDictionary;
+import htsjdk.samtools.SAMSequenceRecord;
+import htsjdk.samtools.SamInputResource;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
+import htsjdk.samtools.SamReaderFactory.Option;
+import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.seekablestream.SeekableFileStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Cleaner;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
@@ -19,16 +28,7 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.shortread.BAMreads;
-import htsjdk.samtools.SAMSequenceDictionary;
-import htsjdk.samtools.SAMSequenceRecord;
-import htsjdk.samtools.SamInputResource;
-import htsjdk.samtools.SamReader;
-import htsjdk.samtools.seekablestream.SeekableFileStream;
-import htsjdk.samtools.seekablestream.SeekableStream;
-import be.abeel.net.URIFactory;
-import htsjdk.samtools.ValidationStringency;
-import htsjdk.samtools.SamReaderFactory;
-import htsjdk.samtools.SamReaderFactory.Option;
+
 /**
  * 
  * @author Thomas Abeel
@@ -61,6 +61,7 @@ public class SAMDataSource extends DataSource {
 	}
 
 	private SeekableStream content;
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -100,13 +101,21 @@ public class SAMDataSource extends DataSource {
 	private SamReader sfr = null;
 	private long size;
 
+	/**
+	 * @return a {@link SamReader} of the data source, set at index and with
+	 *         {@link ValidationStringency#SILENT} and
+	 *         {@link Option#EAGERLY_DECODE}
+	 */
 	public SamReader getReader() {
 		// System.out.println(content);
 		// System.out.println(content.getSource());
 		if (sfr == null) {
-			SamReaderFactory.setDefaultValidationStringency(ValidationStringency.SILENT);
-			System.out.println("SDS: "+content+"\t"+index);
+			// FIXME we should not change the default strategy.
+			SamReaderFactory.setDefaultValidationStringency(
+					ValidationStringency.SILENT);
+			System.out.println("SDS: " + content + "\t" + index);
 			sfr = SamReaderFactory.makeDefault().enable(Option.EAGERLY_DECODE)
+					.validationStringency(ValidationStringency.SILENT)
 					.open(SamInputResource.of(content).index(index));
 			Cleaner.register(sfr, content, deleteIndex ? index : null);
 
@@ -124,7 +133,8 @@ public class SAMDataSource extends DataSource {
 	 * @throws ReadFailedException
 	 * @throws URISyntaxException
 	 */
-	private void init(URL url, URL idx) throws IOException, ReadFailedException, URISyntaxException {
+	private void init(URL url, URL idx)
+			throws IOException, ReadFailedException, URISyntaxException {
 		setSourceKey(new SAMKey(url.toString()));
 		/* BAM file */
 		// content =new SeekableHTTPStream(url);
@@ -149,7 +159,8 @@ public class SAMDataSource extends DataSource {
 	 * @throws ReadFailedException
 	 * @throws URISyntaxException
 	 */
-	private void init(URL url, File idx) throws IOException, ReadFailedException, URISyntaxException {
+	private void init(URL url, File idx)
+			throws IOException, ReadFailedException, URISyntaxException {
 		setSourceKey(new SAMKey(url.toString()));
 		/* BAM file */
 		// content =new SeekableHTTPStream(url);
@@ -158,9 +169,8 @@ public class SAMDataSource extends DataSource {
 
 		index = idx;
 
-
 	}
-	
+
 	private boolean deleteIndex = false;
 
 	private static void copy(InputStream in, File file) throws IOException {
@@ -185,11 +195,11 @@ public class SAMDataSource extends DataSource {
 	 * @param file
 	 * @throws IOException
 	 */
-	private void init(File file,File index) throws IOException {
+	private void init(File file, File index) throws IOException {
 		setSourceKey(new SAMKey(file.toString()));
 		size = file.length();
 		content = new SeekableFileStream(file);
-		this.index =index;
+		this.index = index;
 	}
 
 	/**
@@ -199,12 +209,13 @@ public class SAMDataSource extends DataSource {
 	public SAMDataSource(Locator data, Locator index) {
 		super(data);
 		if (data == null || index == null)
-			throw new RuntimeException("Either data or index are not provided: " + data + "; " + index);
+			throw new RuntimeException("Either data or index are not provided: "
+					+ data + "; " + index);
 		if (data.isURL()) {
 			try {
-				if(index.isURL())
+				if (index.isURL())
 					init(data.url(), index.url());
-				else 
+				else
 					init(data.url(), index.file());
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
@@ -221,7 +232,7 @@ public class SAMDataSource extends DataSource {
 			}
 		} else {
 			try {
-				init(data.file(),index.file());
+				init(data.file(), index.file());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -236,7 +247,8 @@ public class SAMDataSource extends DataSource {
 			set = new EntrySet();
 		SamReader inputSam = getReader();
 
-		SAMSequenceDictionary tmpDic = inputSam.getFileHeader().getSequenceDictionary();
+		SAMSequenceDictionary tmpDic = inputSam.getFileHeader()
+				.getSequenceDictionary();
 		for (int i = 0; i < tmpDic.size(); i++) {
 			SAMSequenceRecord org = inputSam.getFileHeader().getSequence(i);
 			Entry e = set.getOrCreateEntry(org.getSequenceName());

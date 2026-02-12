@@ -9,13 +9,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.sf.jannot.Entry;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.util.CloseableIterator;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.SAMDataSource;
-import htsjdk.samtools.SAMRecord;
-import htsjdk.samtools.SamReaderFactory;
-import htsjdk.samtools.ValidationStringency;
-import htsjdk.samtools.util.CloseableIterator;
 
 /**
  * 
@@ -27,7 +24,7 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 	private String key;
 
 	private synchronized Iterable<SAMRecord> get(Location r) {
-		return qFast( r);
+		return qFast(r);
 
 	}
 
@@ -38,19 +35,20 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 	private HashMap<String, SAMRecord> qFastSecond = new HashMap<String, SAMRecord>();
 	private int qFastMaxPairedLenght;
 
-	private Logger log=Logger.getLogger(BAMreads.class.getCanonicalName());
-	
+	private Logger log = Logger.getLogger(BAMreads.class.getCanonicalName());
+
 	private synchronized Iterable<SAMRecord> qFast(Location r) {
-		if (r.start() != qFastBufferLocation.start() || r.end() != qFastBufferLocation.end()) {
+		if (r.start() != qFastBufferLocation.start()
+				|| r.end() != qFastBufferLocation.end()) {
 			qFastBuffer.clear();
 			qFastFirst.clear();
 			qFastSecond.clear();
-			//System.out.println("QFAST");
+			// System.out.println("QFAST");
 			int start = r.start() - 500;
 			int end = r.end() + 500;
 			CloseableIterator<SAMRecord> it = cqr.query(key, start, end, false);
-			if(cqr==null||key==null)
-			log.warning("NullPointerDetected: key="+key+"\tcqr="+cqr);
+			if (cqr == null || key == null)
+				log.warning("NullPointerDetected: key=" + key + "\tcqr=" + cqr);
 			while (it.hasNext()) {
 				try {
 					SAMRecord tmp = it.next();
@@ -66,15 +64,24 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 					// ExtendedShortRead esr = new ExtendedShortRead(tmp);
 					// qFastBuffer.add(esr);
 					String name = tmp.getReadName();
-					if (ShortReadTools.isPaired(tmp) && tmp.getFirstOfPairFlag())
+					if (ShortReadTools.isPaired(tmp)
+							&& tmp.getFirstOfPairFlag())
 						qFastFirst.put(name, tmp);
-					if (ShortReadTools.isPaired(tmp) && tmp.getSecondOfPairFlag())
+					if (ShortReadTools.isPaired(tmp)
+							&& tmp.getSecondOfPairFlag())
 						qFastSecond.put(name, tmp);
 
-					if (qFastFirst.containsKey(name) && qFastSecond.containsKey(name)) {
-						int len = Math.max(qFastFirst.get(name).getAlignmentEnd()
-								- qFastSecond.get(name).getAlignmentStart() + 1, qFastSecond.get(name)
-								.getAlignmentEnd() - qFastFirst.get(name).getAlignmentStart() + 1);
+					if (qFastFirst.containsKey(name)
+							&& qFastSecond.containsKey(name)) {
+						int len = Math.max(
+								qFastFirst.get(name).getAlignmentEnd()
+										- qFastSecond.get(name)
+												.getAlignmentStart()
+										+ 1,
+								qFastSecond.get(name).getAlignmentEnd()
+										- qFastFirst.get(name)
+												.getAlignmentStart()
+										+ 1);
 						if (len > qFastMaxPairedLenght)
 							qFastMaxPairedLenght = len;
 					}
@@ -134,7 +141,8 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 				while (!found) {
 					try {
 						SAMRecord tmp = it.next();
-						if (tmp == null || tmp.getReferenceIndex() == keyIndex) {
+						if (tmp == null
+								|| tmp.getReferenceIndex() == keyIndex) {
 							next = tmp;
 							found = true;
 						} else {
@@ -182,12 +190,15 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 	private int keyIndex;
 	private SAMDataSource source;
 
-	private static final Logger logger = Logger.getLogger(BAMreads.class.getCanonicalName());
+	private static final Logger logger = Logger
+			.getLogger(BAMreads.class.getCanonicalName());
 
 	public BAMreads(SAMDataSource source, String key) {
 		this.source = source;
-		SamReaderFactory.setDefaultValidationStringency(ValidationStringency.SILENT);
-		this.keyIndex = source.getReader().getFileHeader().getSequenceIndex(key.toString());
+		// returned reader is already silent. Changing default here is indirect.
+		// SamReaderFactory.setDefaultValidationStringency(ValidationStringency.SILENT);
+		this.keyIndex = source.getReader().getFileHeader()
+				.getSequenceIndex(key.toString());
 		cqr = CachingQueryReader.create(source);
 		this.key = key;
 

@@ -23,11 +23,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-
 import org.broad.igv.track.WindowFunction;
 
 import htsjdk.samtools.SamReaderFactory;
 import htsjdk.samtools.ValidationStringency;
+
 /**
  * Program to create tdf files from bam files.
  * 
@@ -43,31 +43,32 @@ public class ConvertBAM2TDF {
 		for (String s : args) {
 			if (!new File(s + ".bai").exists()) {
 				System.err.println("WARNING: Could not find BAI file for " + s);
-				System.err
-						.println("\ttdformat needs a BAI file for each BAM file.");
+				System.err.println(
+						"\ttdformat needs a BAI file for each BAM file.");
 			} else {
 				try {
 					createFile(s);
 				} catch (Exception e) {
-					System.err.println("ERROR: Failed to create TDF file for "
-							+ s);
+					System.err.println(
+							"ERROR: Failed to create TDF file for " + s);
 				}
 			}
 		}
 	}
 
 	private static void printUsage() {
-		System.out
-				.println("Usage: java -jar tdformat-<version>.jar <bam file 1> [<bam file 2> ...]");
+		System.out.println(
+				"Usage: java -jar tdformat-<version>.jar <bam file 1> [<bam file 2> ...]");
 		System.out.println("\ttdformat needs a BAI file for each BAM file.");
 
 	}
 
-	private static void createFile(String ifile) throws IOException,
-			URISyntaxException {
+	private static void createFile(String ifile)
+			throws IOException, URISyntaxException {
 		Collection<WindowFunction> wfs = new ArrayList<WindowFunction>();
 		for (WindowFunction wf : WindowFunction.values())
 			wfs.add(wf);
+		// FIXME we should not set the default validation stringency
 		SamReaderFactory
 				.setDefaultValidationStringency(ValidationStringency.SILENT);
 		TDFTools igvTools = new TDFTools();
