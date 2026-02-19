@@ -7,6 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
@@ -15,15 +19,7 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import net.sf.jannot.variation.Variation;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import support.DataManager;
-
-import java.io.File;
 
 /**
  * IMPORTANT!!!: This test requires the data in test/resource to be prepared.
@@ -57,7 +53,6 @@ public class TestVCF {
 		log.info("END test_dummyTest");
 	}
 
-	@Ignore
 	@Test
 	public void test_loadEntries() {
 		log.info("BEGIN test_loadEntries");
@@ -76,15 +71,18 @@ public class TestVCF {
 			// File indexData = new File(indexFile);
 
 			log.info("------ Sample # " + i + " ---------");
-			log.info("	> fileData: " + fData.file() + "( " + fData.file().length() + " KB)");
-			log.info("	> indexData: " + fIndex.file() + "( " + fIndex.file().length() + " KB)");
+			log.info("	> fileData: " + fData.file() + "( "
+					+ fData.file().length() + " KB)");
+			log.info("	> indexData: " + fIndex.file() + "( "
+					+ fIndex.file().length() + " KB)");
 			i++;
 			log.info("	> Reading source:" + ds);
 			try {
 				long t1 = System.currentTimeMillis();
 				ds.read(entries);
 				long t2 = System.currentTimeMillis();
-				log.info("		> Time consumed loading files: " + Math.abs(t2 - t1));
+				log.info("		> Time consumed loading files: "
+						+ Math.abs(t2 - t1));
 				log.info("		> Number of entries: " + entries.size());
 				// assertTrue(entries.size() > 0);
 				// We build an ArrayList to access randonmly to a entry
@@ -92,7 +90,8 @@ public class TestVCF {
 				for (Entry entry : entries) {
 					list.add(entry);
 				}
-				int selectedIndex = Math.max(0, (int) Math.round(Math.random() * list.size()) - 1);
+				int selectedIndex = Math.max(0,
+						(int) Math.round(Math.random() * list.size()) - 1);
 				Entry selectedEntry = list.get(selectedIndex);
 
 				Iterator<DataKey> it = selectedEntry.iterator();
@@ -100,7 +99,8 @@ public class TestVCF {
 				while (it.hasNext()) {
 					list2.add(it.next());
 				}
-				int keyIndex = Math.max(0, (int) Math.round(Math.random() * list2.size()) - 1);
+				int keyIndex = Math.max(0,
+						(int) Math.round(Math.random() * list2.size()) - 1);
 
 				/* retrieve some data from some entry */
 				long t3 = System.currentTimeMillis();
@@ -109,7 +109,8 @@ public class TestVCF {
 				// System.out.println("DD: " + data);
 				Iterable<?> resultSet = data.get(500000, 2000000);
 				long t4 = System.currentTimeMillis();
-				log.info("		> Time consumed fetching data: " + Math.abs(t4 - t3));
+				log.info("		> Time consumed fetching data: "
+						+ Math.abs(t4 - t3));
 				for (Object o : resultSet) {
 					// System.out.println(o);
 					Variation v = (Variation) o;
