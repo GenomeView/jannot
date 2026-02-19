@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import net.sf.jannot.Data;
@@ -84,7 +83,6 @@ public class TestVCFParser {
 		}
 	}
 
-	@Ignore
 	@Test
 	public void testRegularSize() {
 
