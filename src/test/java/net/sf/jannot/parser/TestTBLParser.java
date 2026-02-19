@@ -32,11 +32,6 @@ import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import support.DataManager;
 
-/**
- * 
- * @author Thomas Abeel
- * 
- */
 public class TestTBLParser {
 	private static Logger log = Logger
 			.getLogger(TestTBLParser.class.toString());
