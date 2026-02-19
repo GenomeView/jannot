@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.map.Flat3Map;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
@@ -21,7 +22,6 @@ import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
-import be.abeel.io.LineIterator;
 
 /**
  * 
@@ -62,8 +62,9 @@ public class GTFParser extends Parser {
 				quals.clear();
 				parseQualifiers(arr[8], quals);
 
-				Location l = new Location(Integer.parseInt(arr[3]), Integer.parseInt(arr[4]));
-				String parent = extractParent(quals, arr[2],arr[0]);
+				Location l = new Location(Integer.parseInt(arr[3]),
+						Integer.parseInt(arr[4]));
+				String parent = extractParent(quals, arr[2], arr[0]);
 
 				/* Add to existing feature */
 				if (parent != null && parentMap.containsKey(parent)) {
@@ -71,8 +72,7 @@ public class GTFParser extends Parser {
 					parentMap.get(parent).addLocation(l);
 
 				} else {/* Add as a new feature */
-					Feature f = new Feature();
-					f.setLocation(l);
+					Feature f = new Feature(l);
 					char strand = arr[6].charAt(0);
 					switch (strand) {
 					case '-':
@@ -89,9 +89,11 @@ public class GTFParser extends Parser {
 					// f.addQualifier(new Qualifier("seqid", arr[0]));
 					f.addQualifier("source", arr[1]);
 					f.setType(Type.get(arr[2]));
-					if (!(arr[5].length() == 1 && arr[5].charAt(0) == '.') && arr[5].length() != 0)
+					if (!(arr[5].length() == 1 && arr[5].charAt(0) == '.')
+							&& arr[5].length() != 0)
 						f.setScore(Double.parseDouble(arr[5]));
-					for (java.util.Map.Entry<String, String> me : quals.entrySet()) {
+					for (java.util.Map.Entry<String, String> me : quals
+							.entrySet()) {
 						f.addQualifier(me.getKey(), me.getValue());
 					}
 					// String[] attributes = arr[8].split(";");
@@ -111,13 +113,15 @@ public class GTFParser extends Parser {
 					// assert(id!=null);
 					// idMap.put(id, f);
 					// set.getOrCreateEntry(arr[0]).annotation.add(f);
-					MemoryFeatureAnnotation fa = set.getOrCreateEntry(arr[0]).getMemoryAnnotation(f.type());
+					MemoryFeatureAnnotation fa = set.getOrCreateEntry(arr[0])
+							.getMemoryAnnotation(f.type());
 					fa.add(f);
 				}
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.err.println("Could not parse line: " + Arrays.toString(arr));
+				System.err.println(
+						"Could not parse line: " + Arrays.toString(arr));
 			}
 
 		}
@@ -164,12 +168,13 @@ public class GTFParser extends Parser {
 		return newArray;
 	}
 
-	public static String extractParent(Map<String, String> quals, String type, String chromosome) {
+	public static String extractParent(Map<String, String> quals, String type,
+			String chromosome) {
 		String out = quals.get("transcript_id");
 //		if (out == null)
 //			out = quals.get("gene_id");
 		if (out != null)
-			out = chromosome+"$$"+type + "$$" + out;
+			out = chromosome + "$$" + type + "$$" + out;
 		return out;
 
 	}
@@ -187,21 +192,21 @@ public class GTFParser extends Parser {
 
 	@Override
 	public void write(OutputStream os, Entry entry, DataKey[] dks) {
-		
+
 		PrintWriter out = new PrintWriter(os);
 		for (DataKey dk : dks) {
 			if (entry.get(dk) instanceof FeatureAnnotation) {
 				FeatureAnnotation fa = (FeatureAnnotation) entry.get(dk);
 				for (Feature f : fa.get()) {
-					for(int i=0;i<f.location().length;i++)
-						out.println(line(entry, f, entry.getID(),i));
+					for (int i = 0; i < f.location().length; i++)
+						out.println(line(entry, f, entry.getID(), i));
 				}
 			}
 		}
 		out.flush();
 	}
 
-	private String line(Entry e, Feature f, String acc,int idx) {
+	private String line(Entry e, Feature f, String acc, int idx) {
 		StringBuffer out = new StringBuffer();
 		out.append(e.getID() + "\t");
 		out.append(f.qualifier("source") + "\t");
@@ -214,8 +219,7 @@ public class GTFParser extends Parser {
 		for (String s : f.getQualifiersKeys()) {
 			if (!s.equals("source") && !s.equals("seqid")) {
 				qualifiers.append(";" + s + " ");
-				qualifiers.append("\""+f.qualifier(s)+"\"");
-				
+				qualifiers.append("\"" + f.qualifier(s) + "\"");
 
 			}
 
@@ -226,6 +230,5 @@ public class GTFParser extends Parser {
 			out.append("no qualifiers");
 		return out.toString();
 	}
-	
 
 }

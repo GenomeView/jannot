@@ -5,6 +5,7 @@ package net.sf.jannot.parser.software;
 
 import java.io.InputStream;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
@@ -13,7 +14,6 @@ import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
-import be.abeel.io.LineIterator;
 
 /**
  * @author Thomas Abeel
@@ -51,14 +51,13 @@ public class TRNAscanParser extends Parser {
 		for (String line : it) {
 			String[] arr = line.split("[ \t]+");
 			Entry e = set.getOrCreateEntry(arr[0]);
-			Feature f = new Feature();
 			int start = Integer.parseInt(arr[2]);
 			int end = Integer.parseInt(arr[3]);
+			Feature f = new Feature(new Location(start, end));
 			f.setType(t);
 			f.addQualifier("type", arr[4]);
 			f.addQualifier("anti-codon", arr[5]);
 			f.setScore(Double.parseDouble(arr[8]));
-			f.addLocation(new Location(start, end));
 			if (start > end) {
 				f.setStrand(Strand.REVERSE);
 			} else {

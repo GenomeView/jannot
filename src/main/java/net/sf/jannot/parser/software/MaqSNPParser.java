@@ -5,6 +5,7 @@ package net.sf.jannot.parser.software;
 
 import java.io.InputStream;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
@@ -12,7 +13,6 @@ import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
-import be.abeel.io.LineIterator;
 
 /**
  * 
@@ -49,34 +49,31 @@ public class MaqSNPParser extends Parser {
 		LineIterator it = new LineIterator(is);
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
-		Type t=Type.get("SNP");
-		
-		for(String line:it){
-			String[]arr=line.split("\t");
-			Entry e=set.getOrCreateEntry(arr[0]);
-			MemoryFeatureAnnotation fa=e.getMemoryAnnotation(t);
-			Feature f=new Feature();
-			int pos=Integer.parseInt(arr[1]);
-			f.addLocation(new Location(pos,pos));
-			f.addQualifier("reference",arr[2]);
-			f.addQualifier("consensus",arr[3]);
-			f.addQualifier("phred-like consensus quality",arr[4]);
-			f.addQualifier("read depth",arr[5]);
-			f.addQualifier("average coverage",arr[6]);
-			f.addQualifier("highests mapping quality",arr[7]);
-			f.addQualifier("minimum consensus quality",arr[8]);
-			f.addQualifier("second best call",arr[9]);
-			f.addQualifier("log likelihood ratio second and third best call",arr[10]);
-			f.addQualifier("third best call",arr[11]);
+		Type t = Type.get("SNP");
+
+		for (String line : it) {
+			String[] arr = line.split("\t");
+			Entry e = set.getOrCreateEntry(arr[0]);
+			MemoryFeatureAnnotation fa = e.getMemoryAnnotation(t);
+			int pos = Integer.parseInt(arr[1]);
+			Feature f = new Feature(new Location(pos, pos));
+			f.addQualifier("reference", arr[2]);
+			f.addQualifier("consensus", arr[3]);
+			f.addQualifier("phred-like consensus quality", arr[4]);
+			f.addQualifier("read depth", arr[5]);
+			f.addQualifier("average coverage", arr[6]);
+			f.addQualifier("highests mapping quality", arr[7]);
+			f.addQualifier("minimum consensus quality", arr[8]);
+			f.addQualifier("second best call", arr[9]);
+			f.addQualifier("log likelihood ratio second and third best call",
+					arr[10]);
+			f.addQualifier("third best call", arr[11]);
 			f.setType(t);
 			fa.add(f);
-			
+
 		}
 		return set;
-		
-		
-	}
 
-	
+	}
 
 }

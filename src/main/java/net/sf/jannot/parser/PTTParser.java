@@ -5,16 +5,14 @@ package net.sf.jannot.parser;
 
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
-import be.abeel.io.LineIterator;
 
 public class PTTParser extends Parser {
 
@@ -42,11 +40,9 @@ public class PTTParser extends Parser {
 			try {
 
 				String[] loc = arr[0].trim().split("\\.\\.");
-				Location l = new Location(Integer.parseInt(loc[0]), Integer.parseInt(loc[1]));
-				Feature f = new Feature();
-				SortedSet<Location> tmp = new TreeSet<Location>();
-				tmp.add(l);
-				f.setLocation(tmp);
+				Location l = new Location(Integer.parseInt(loc[0]),
+						Integer.parseInt(loc[1]));
+				Feature f = new Feature(l);
 				char strand = arr[1].charAt(0);
 				switch (strand) {
 				case '-':
@@ -71,18 +67,18 @@ public class PTTParser extends Parser {
 				f.setType(t);
 
 				// set.getEntry().annotation.add(f);
-				MemoryFeatureAnnotation fa = set.iterator().next().getMemoryAnnotation(t);
+				MemoryFeatureAnnotation fa = set.iterator().next()
+						.getMemoryAnnotation(t);
 				fa.add(f);
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.err.println("Could not parse line: " + Arrays.toString(arr));
+				System.err.println(
+						"Could not parse line: " + Arrays.toString(arr));
 			}
 
 		}
 		return set;
 	}
-
-
 
 }

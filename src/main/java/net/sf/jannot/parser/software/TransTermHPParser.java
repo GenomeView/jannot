@@ -5,6 +5,7 @@ package net.sf.jannot.parser.software;
 
 import java.io.InputStream;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
@@ -13,7 +14,6 @@ import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
-import be.abeel.io.LineIterator;
 
 /**
  * Parser for the output of the TransTermHP program as described in
@@ -52,9 +52,9 @@ public class TransTermHPParser extends Parser {
 				id = line.substring(9);
 			if (line.startsWith("TERM")) {
 				String[] arr = line.split("[ \t\n\f\r]+");
-				Feature f = new Feature();
+				Feature f = new Feature(new Location(Integer.parseInt(arr[2]),
+						Integer.parseInt(arr[4])));
 				f.setType(t);
-				f.addLocation(new Location(Integer.parseInt(arr[2]), Integer.parseInt(arr[4])));
 				f.setStrand(Strand.fromSymbol(arr[5].charAt(0)));
 				f.addQualifier("source", "TransTermHP");
 				f.addQualifier("location", loc(arr[6].charAt(0)));

@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.apache.commons.collections.map.Flat3Map;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
@@ -23,7 +24,6 @@ import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
-import be.abeel.io.LineIterator;
 
 /**
  * 
@@ -37,7 +37,7 @@ public class GFF3Parser extends Parser {
 	 */
 	GFF3Parser() {
 		super(null);
-	
+
 	}
 
 	/**
@@ -64,7 +64,8 @@ public class GFF3Parser extends Parser {
 				quals.clear();
 				parseQualifiers(arr[8], quals);
 
-				Location l = new Location(Integer.parseInt(arr[3]), Integer.parseInt(arr[4]));
+				Location l = new Location(Integer.parseInt(arr[3]),
+						Integer.parseInt(arr[4]));
 				String parent = extractParent(quals, arr[2], arr[0]);
 
 				/* Add to existing feature */
@@ -73,8 +74,7 @@ public class GFF3Parser extends Parser {
 					parentMap.get(parent).addLocation(l);
 
 				} else {/* Add as a new feature */
-					Feature f = new Feature();
-					f.setLocation(l);
+					Feature f = new Feature(l);
 					char strand = arr[6].charAt(0);
 					switch (strand) {
 					case '-':
@@ -91,9 +91,11 @@ public class GFF3Parser extends Parser {
 					// f.addQualifier(new Qualifier("seqid", arr[0]));
 					f.addQualifier("source", arr[1]);
 					f.setType(Type.get(arr[2]));
-					if (!(arr[5].length() == 1 && arr[5].charAt(0) == '.') && arr[5].length() != 0)
+					if (!(arr[5].length() == 1 && arr[5].charAt(0) == '.')
+							&& arr[5].length() != 0)
 						f.setScore(Double.parseDouble(arr[5]));
-					for (java.util.Map.Entry<String, String> me : quals.entrySet()) {
+					for (java.util.Map.Entry<String, String> me : quals
+							.entrySet()) {
 						f.addQualifier(me.getKey(), me.getValue());
 					}
 					// String[] attributes = arr[8].split(";");
@@ -113,13 +115,15 @@ public class GFF3Parser extends Parser {
 					// assert(id!=null);
 					// idMap.put(id, f);
 					// set.getOrCreateEntry(arr[0]).annotation.add(f);
-					MemoryFeatureAnnotation fa = set.getOrCreateEntry(arr[0]).getMemoryAnnotation(f.type());
+					MemoryFeatureAnnotation fa = set.getOrCreateEntry(arr[0])
+							.getMemoryAnnotation(f.type());
 					fa.add(f);
 				}
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.err.println("Could not parse line: " + Arrays.toString(arr));
+				System.err.println(
+						"Could not parse line: " + Arrays.toString(arr));
 			}
 
 		}
@@ -163,7 +167,8 @@ public class GFF3Parser extends Parser {
 		return newArray;
 	}
 
-	public static String extractParent(Map<String, String> quals, String type, String chr) {
+	public static String extractParent(Map<String, String> quals, String type,
+			String chr) {
 		String out = quals.get("ID");
 		if (out == null)
 			out = quals.get("Parent");
@@ -231,9 +236,8 @@ public class GFF3Parser extends Parser {
 	 * value to be used for assigning random IDs. Initialized randomly and then
 	 * incremented with one with every next ID.
 	 */
-	private int randomID=new Random(System.currentTimeMillis()).nextInt();
+	private int randomID = new Random(System.currentTimeMillis()).nextInt();
 
-	
 	/**
 	 * Set a temporary ID if needed, to make sure multi-exon CDS's have a common
 	 * ID to refer to.

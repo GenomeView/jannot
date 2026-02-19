@@ -4,6 +4,7 @@
 package net.sf.jannot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -29,9 +30,10 @@ import net.sf.jannot.event.FeatureEvent;
 public class Feature implements Comparable<Feature>, Located {
 
 	private Logger log = Logger.getLogger(Feature.class.getCanonicalName());
-	
+
 	// either location or singleLocation are to be set.
 	private Location[] location = null;
+	// FIXME why not put singleLocation in the location list?
 	private Location singleLocation = null;
 
 	private byte[] phase = null;
@@ -42,25 +44,41 @@ public class Feature implements Comparable<Feature>, Located {
 
 	private Map<String, String> qualifiers = new HashMap<String, String>();
 
-	
 	// cache
 	private boolean scoreBuffer = false; // true if score was already calculated
 	private double score = Double.NaN;
 
+	public Feature(Set<Location> location) {
+		setLocation(location);
+	}
+
+	public Feature(Location[] location) {
+		setLocation(Arrays.asList(location));
+	}
+
+	public Feature(Location location) {
+		setLocation(Arrays.asList(location));
+	}
+
+	public Feature(List<Location> locations) {
+		if (location == null || locations.size() == 0)
+			throw new NullPointerException(
+					"location must contain at least 1 element");
+		setLocation(locations);
+	}
+
 	/**
-	 * Add a new qualifier to this Feature.
-	 * The key,value pair will override the existing one
+	 * Add a new qualifier to this Feature. The key,value pair will override the
+	 * existing one
 	 * 
 	 * Exception: If key ="score", the score key will be extended with ","+value
 	 * and then also scoreBuffer is set false.
 	 * 
-	 * All line breaks in value will be removed before storage in 
+	 * All line breaks in value will be removed before storage in
 	 * {@link #qualifiers}.
 	 * 
-	 * @param key
-	 *            of the qualifier
-	 * @param value
-	 *            value
+	 * @param key   of the qualifier
+	 * @param value value
 	 */
 	public void addQualifier(String key, String value) {
 		if (value != null) {
@@ -72,7 +90,7 @@ public class Feature implements Comparable<Feature>, Located {
 		if (value != null)
 			value = value.replaceAll("\n", "");
 
-		if (!key.equals("score")&&qualifiers.containsKey(key))
+		if (!key.equals("score") && qualifiers.containsKey(key))
 			qualifiers.put(key, qualifiers.get(key) + "," + value);
 		else
 			qualifiers.put(key, value);
@@ -83,18 +101,16 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	/**
-	 * same as {@link #addQualifier(String, String)} 
-	 * @param key
-	 *            of the qualifier
-	 * @param value
-	 *            value
+	 * same as {@link #addQualifier(String, String)}
+	 * 
+	 * @param key   of the qualifier
+	 * @param value value
 	 */
 	public void setQualifier(String key, String value) {
-		if(key!=null)
+		if (key != null)
 			qualifiers.remove(key);
 		addQualifier(key, value);
-		
-	
+
 	}
 
 	@Override
@@ -107,13 +123,24 @@ public class Feature implements Comparable<Feature>, Located {
 
 	}
 
-	public void setLocation(Collection<Location> tmp) {
-		if (tmp.size() == 1) {
-			setLocation(tmp.iterator().next());
+	/**
+	 * @param locations the locations for this feature. Must contain at least 1
+	 *                  location.
+	 */
+	public void setLocation(Collection<Location> locations) {
+		if (locations == null || locations.size() == 0)
+			throw new IllegalArgumentException(
+					"at least 1 location required for feature");
+		// FIXME we'd like to check but some implementations of Collection
+		// don't support contains(null)
+		// if (locations.contains(null))
+		// throw new IllegalArgumentException("null location in locations");
+		if (locations.size() == 1) {
+			setLocation(locations.iterator().next());
 		} else {
 			singleLocation = null;
 			SortedSet<Location> set = new TreeSet<Location>();
-			for (Location l : tmp)
+			for (Location l : locations)
 				set.add(l);
 			location = new Location[set.size()];
 			int idx = 0;
@@ -130,6 +157,7 @@ public class Feature implements Comparable<Feature>, Located {
 
 	/**
 	 * Sets a singlelocation.
+	 * 
 	 * @param l the single {@link Location} of this feature.
 	 */
 	public void setLocation(Location l) {
@@ -166,6 +194,12 @@ public class Feature implements Comparable<Feature>, Located {
 		return thisLoc.overlaps(otherFeat.fStart, otherFeat.fEnd);
 	}
 
+	/**
+	 * Set the direction
+	 * 
+	 * @param s the Strand
+	 * @return a {@link ChangeEvent}
+	 */
 	public ChangeEvent setStrand(Strand s) {
 		ChangeEvent ce = new ChangeStrandEvent(this, this.strand, s);
 		ce.doChange();
@@ -274,17 +308,16 @@ public class Feature implements Comparable<Feature>, Located {
 
 	/**
 	 * 
-	 * @return list,either {@link #location} list,
-	 * or list containing {@link #singleLocation},
-	 * or Location[0] if both are null
+	 * @return list,either {@link #location} list, or list containing
+	 *         {@link #singleLocation}, or Location[0] if both are null
 	 */
 	public Location[] location() {
 		if (location == null) {
 			assert singleLocation != null;
 			// bug? we just asserted it's not null
-			if(singleLocation==null)
+			if (singleLocation == null)
 				return new Location[0];
-			else 
+			else
 				return new Location[] { singleLocation };
 		} else
 			return location;
@@ -312,10 +345,10 @@ public class Feature implements Comparable<Feature>, Located {
 		return strand;
 	}
 
-	public void removeQualifier(String key){
+	public void removeQualifier(String key) {
 		qualifiers.remove(key);
 	}
-	
+
 	/**
 	 * @param key indexing the qualifiers
 	 * @return qualifiers.get(key) or null if no such key
@@ -327,9 +360,8 @@ public class Feature implements Comparable<Feature>, Located {
 
 	/**
 	 * 
-	 * @return set of all qualifier keys. WARNING
-	 * modifications to this set are reflected
-	 * into the  qualifiers map private to this class,
+	 * @return set of all qualifier keys. WARNING modifications to this set are
+	 *         reflected into the qualifiers map private to this class,
 	 */
 	public Set<String> getQualifiersKeys() {
 		return qualifiers.keySet();
@@ -338,21 +370,20 @@ public class Feature implements Comparable<Feature>, Located {
 	/**
 	 * Creates a deep copy of this feature.
 	 * 
-	 * @return
+	 * @return copy of this
 	 */
 	public Feature copy() {
-		Feature out = new Feature();
 		SortedSet<Location> loc = new TreeSet<Location>();
 		for (Location l : this.location()) {
 			loc.add(l.copy());
 		}
-		out.setLocation(loc);
-		out.setStrand(this.strand());
+		Feature f = new Feature(loc);
+		f.setStrand(this.strand());
 
 		for (String key : qualifiers.keySet())
-			out.addQualifier(key, qualifiers.get(key));
-		out.type = this.type();
-		return out;
+			f.addQualifier(key, qualifiers.get(key));
+		f.type = this.type();
+		return f;
 	}
 
 	// private double bufferedScore = Double.NaN;
@@ -360,13 +391,12 @@ public class Feature implements Comparable<Feature>, Located {
 	public void setScore(double score) {
 		// if(score!=bufferedScore){
 		setQualifier("score", "" + score);
-		scoreBuffer=false;
+		scoreBuffer = false;
 		// bufferedScore=score;
 		// }
 		// this.score = score;
-	
-	}
 
+	}
 
 	/**
 	 * 
@@ -388,7 +418,7 @@ public class Feature implements Comparable<Feature>, Located {
 				} catch (Exception e) {
 					log.log(Level.WARNING, "Could not parse score: " + val, e);
 				}
-				score=tmpScore;
+				score = tmpScore;
 				return score;
 			}
 		}
@@ -431,7 +461,8 @@ public class Feature implements Comparable<Feature>, Located {
 		private Strand from, to;
 
 		public ChangeStrandEvent(Feature f, Strand from, Strand to) {
-			super(f, "Change strand from " + from.symbol() + " to " + to.symbol());
+			super(f, "Change strand from " + from.symbol() + " to "
+					+ to.symbol());
 			this.from = from;
 			this.to = to;
 		}
@@ -486,6 +517,11 @@ public class Feature implements Comparable<Feature>, Located {
 	@Override
 	public int end() {
 		return fEnd;
+	}
+
+	public void addLocations(Collection<Location> locs) {
+		for (Location l : locs)
+			addLocation(l);
 	}
 
 	/**

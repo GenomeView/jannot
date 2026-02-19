@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 
- * I must improve this documentation
+ * TODO improve this documentation
  * 
  * Class 'Type' contains list of group names which features can be classified.
  * e.g. CDS, intergenic.
@@ -78,8 +78,8 @@ public class Type implements DataKey {
 	}
 
 	/**
- *     
- */
+	*     
+	*/
 	public String toString() {
 		return name;
 	}

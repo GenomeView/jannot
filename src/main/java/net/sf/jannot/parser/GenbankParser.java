@@ -5,6 +5,7 @@ package net.sf.jannot.parser;
 
 import java.io.InputStream;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
@@ -12,7 +13,6 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
 import net.sf.jannot.refseq.MemorySequence;
-import be.abeel.io.LineIterator;
 
 /*
  * http://www.ncbi.nlm.nih.gov/Sitemap/samplerecord.html
@@ -26,14 +26,15 @@ public class GenbankParser extends Parser {
 	 */
 	public GenbankParser() {
 		this(null);
-		
+
 	}
+
 	/**
 	 * @param dataKey
 	 */
 	public GenbankParser(DataKey key) {
 		super(key);
-		
+
 	}
 
 	private Feature lastFeature = null;
@@ -44,9 +45,9 @@ public class GenbankParser extends Parser {
 			set = new EntrySet();
 		Entry e = null;
 		LineIterator it = new LineIterator(is);
-		String locus=null;
-		String definition=null;
-		String version=null;
+		String locus = null;
+		String definition = null;
+		String version = null;
 		boolean featureMode = false;
 		boolean seqMode = false;
 		for (String line : it) {
@@ -64,51 +65,50 @@ public class GenbankParser extends Parser {
 
 			if (featureMode) {
 				if (line.startsWith("BASE COUNT")) {
-					//Ignore line
-				}else{
-					processFeatureLine(line, e,it);
+					// Ignore line
+				} else {
+					processFeatureLine(line, e, it);
 				}
-				
+
 			}
 			if (line.startsWith("FEATURES")) {
 				featureMode = true;
 				seqMode = false;
 			}
 
-			
 			if (line.startsWith("LOCUS")) {
 				String[] arr = line.trim().split("[ ]+");
 //				e = set.getOrCreateEntry(arr[1]);
-				locus=arr[1];
-				
+				locus = arr[1];
+
 			}
 			if (line.startsWith("DEFINITION")) {
-				definition=line.substring(10).trim();
-				
+				definition = line.substring(10).trim();
+
 			}
 			if (line.startsWith("VERSION")) {
-				String[] arr = line.trim().split("\\s+",2);
+				String[] arr = line.trim().split("\\s+", 2);
 //				e = set.getOrCreateEntry(arr[1]);
-				version=arr[1];
+				version = arr[1];
 //				if(version!=null)
 				e.description.put("VERSION", version);
-				
+
 			}
 			if (line.startsWith("ACCESSION")) {
-				
+
 				String[] arr = line.trim().split("[ ]+");
 				// e.description.setID(arr[1]);
-				if(arr.length==1){
-					arr=new String[2];
-					arr[1]=locus;
+				if (arr.length == 1) {
+					arr = new String[2];
+					arr[1] = locus;
 				}
 				e = set.getOrCreateEntry(arr[1]);
 //				
-				if(locus!=null)
+				if (locus != null)
 					e.description.put("LOCUS", locus);
-				if(definition!=null)
+				if (definition != null)
 					e.description.put("DEFINITION", definition);
-				
+
 			}
 
 		}
@@ -120,32 +120,34 @@ public class GenbankParser extends Parser {
 	private void processFeatureLine(String line, Entry e, LineIterator it) {
 
 		if (line.startsWith("                     ")) {
-			if(line.trim().startsWith("/"))
+			if (line.trim().startsWith("/"))
 				qualifierBuffer.append("\n");
 			qualifierBuffer.append(line.trim());
 		} else {
 			if (lastFeature != null) {
 				addQualifiers(e);
 			}
-			lastFeature = new Feature();
-			String nl=it.peek();
-			while(nl.startsWith("                     ")&&!nl.trim().startsWith("/")){
-				line+=it.next().trim();
-				nl=it.peek();
+			String nl = it.peek();
+			while (nl.startsWith("                     ")
+					&& !nl.trim().startsWith("/")) {
+				line += it.next().trim();
+				nl = it.peek();
 			}
-			
+
 			String[] arr = line.trim().split(" [ ]+");
-			try{
-			lastFeature.setType(Type.get(arr[0]));
-			lastFeature.setStrand(ParserTools.getStrand(arr[1]));
-			// System.out.println(arr[1]+"\t"+e.annotation.noFeatures());
-			lastFeature.setLocation(ParserTools.parseLocation(arr[1]));
-			}catch(ArrayIndexOutOfBoundsException aei){
+			try {
+				lastFeature = new Feature(ParserTools.parseLocation(arr[1]));
+				lastFeature.setType(Type.get(arr[0]));
+				lastFeature.setStrand(ParserTools.getStrand(arr[1]));
+				// System.out.println(arr[1]+"\t"+e.annotation.noFeatures());
+			} catch (ArrayIndexOutOfBoundsException aei) {
 				aei.printStackTrace();
-				System.err.println("Offending line: "+line +" for entry "+e);
-			}catch(NumberFormatException nfe){
+				System.err
+						.println("Offending line: " + line + " for entry " + e);
+			} catch (NumberFormatException nfe) {
 				nfe.printStackTrace();
-				System.err.println("Offending line: "+line +" for entry "+e);
+				System.err
+						.println("Offending line: " + line + " for entry " + e);
 			}
 
 		}
@@ -162,7 +164,7 @@ public class GenbankParser extends Parser {
 			}
 
 			else
-				lastFeature.addQualifier(arr[i].substring(1),null);
+				lastFeature.addQualifier(arr[i].substring(1), null);
 
 		}
 		qualifierBuffer = new StringBuffer();

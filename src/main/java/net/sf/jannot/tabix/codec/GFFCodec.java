@@ -22,12 +22,12 @@ public class GFFCodec extends Codec<Feature> {
 	private FeatureWrapper wrapper;
 
 	/**
-	 * @param wrapper 
+	 * @param wrapper
 	 * @param in
 	 */
 	public GFFCodec(FeatureWrapper wrapper, Iterable<TabixLine> in) {
-		super(in,1024);
-		this.wrapper=wrapper;
+		super(in, 1024);
+		this.wrapper = wrapper;
 	}
 
 	/*
@@ -47,7 +47,7 @@ public class GFFCodec extends Codec<Feature> {
 				// arr = GFF3Parser.padGff(arr);
 				// }
 				Location l = new Location(line.getInt(3), line.getInt(4));
-				//String parent = GFF3Parser.extractParent(line.get(8));
+				// String parent = GFF3Parser.extractParent(line.get(8));
 
 				// /* Add to existing feature */
 				// if (parent != null && parentMap.containsKey(parent) &&
@@ -56,9 +56,9 @@ public class GFFCodec extends Codec<Feature> {
 				// parentMap.get(parent).addLocation(l);
 				//
 				// } else {/* Add as a new feature */
-				f = new Feature();
 				SortedSet<Location> tmp = new TreeSet<Location>();
 				tmp.add(l);
+				f = new Feature(tmp);
 				f.setLocation(tmp);
 				char strand = line.get(6).charAt(0);
 				switch (strand) {
@@ -77,7 +77,8 @@ public class GFFCodec extends Codec<Feature> {
 				f.addQualifier("source", line.get(1));
 				f.setType(Type.get(line.get(2)));
 				String five = line.get(5);
-				if (!(five.length() == 1 && five.charAt(0) == '.') && five.length() != 0)
+				if (!(five.length() == 1 && five.charAt(0) == '.')
+						&& five.length() != 0)
 					f.setScore(Double.parseDouble(five));
 				if (line.length() > 8) {
 					String[] attributes = line.get(8).split(";");

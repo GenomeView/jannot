@@ -5,6 +5,7 @@ package net.sf.jannot.parser;
 
 import java.io.InputStream;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
@@ -12,7 +13,6 @@ import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
-import be.abeel.io.LineIterator;
 
 /**
  * 
@@ -57,24 +57,27 @@ public class TBLParser extends Parser {
 				String[] arr = line.split("[ \t]+", 3);
 				if (arr.length == 3) {
 					if (arr[0].equals("")) {
+						// \t <name> <value>
 						currentF.addQualifier(arr[1], arr[2]);
 					} else {
-						currentF = new Feature();
+						// <start> <end> <gene>
 
 						int s = Integer.parseInt(arr[0]);
 						int t = Integer.parseInt(arr[1]);
+						currentF = new Feature(new Location(s, t));
 						if (s > t)
 							currentF.setStrand(Strand.REVERSE);
 						else
 							currentF.setStrand(Strand.FORWARD);
 						currentF.setType(Type.get(arr[2]));
-						currentF.addLocation(new Location(s, t));
 						// current.annotation.add(currentF);
-						MemoryFeatureAnnotation fa =current.getMemoryAnnotation(currentF.type());
+						MemoryFeatureAnnotation fa = current
+								.getMemoryAnnotation(currentF.type());
 						fa.add(currentF);
 					}
 
 				} else {
+					// <start> <end> : another feature
 					int s = Integer.parseInt(arr[0]);
 					int t = Integer.parseInt(arr[1]);
 					currentF.addLocation(new Location(s, t));

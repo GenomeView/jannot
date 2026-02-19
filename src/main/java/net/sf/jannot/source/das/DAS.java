@@ -14,6 +14,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import be.abeel.net.URIFactory;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
@@ -25,19 +30,15 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.source.DataSource;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import be.abeel.net.URIFactory;
-
 public class DAS extends DataSource {
 
 	private String serverPrefix;
 
 	private DSN dsn = null;
 
-	public DAS(String serverPrefix) throws MalformedURLException, ParserConfigurationException, SAXException, IOException, URISyntaxException {
+	public DAS(String serverPrefix)
+			throws MalformedURLException, ParserConfigurationException,
+			SAXException, IOException, URISyntaxException {
 		super(null);
 		this.serverPrefix = serverPrefix;
 		dsn = new DSN(serverPrefix);
@@ -54,17 +55,20 @@ public class DAS extends DataSource {
 		private ArrayList<EntryPoint> epList = new ArrayList<EntryPoint>();
 
 		@Override
-		public void endElement(String uri, String localName, String name) throws SAXException {
+		public void endElement(String uri, String localName, String name)
+				throws SAXException {
 			// TODO Auto-generated method stub
 			super.endElement(uri, localName, name);
 			String stackName = parserStack.pop();
 			if (!name.equals(stackName)) {
-				throw new SAXException("Tags do not match: expected=" + stackName + "; actual=" + name);
+				throw new SAXException("Tags do not match: expected="
+						+ stackName + "; actual=" + name);
 			}
 		}
 
 		@Override
-		public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
+		public void startElement(String uri, String localName, String name,
+				Attributes attributes) throws SAXException {
 			// TODO Auto-generated method stub
 			super.startElement(uri, localName, name, attributes);
 			parserStack.push(name);
@@ -96,7 +100,8 @@ public class DAS extends DataSource {
 		StringBuffer seq = null;
 
 		@Override
-		public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
+		public void startElement(String uri, String localName, String name,
+				Attributes attributes) throws SAXException {
 			// TODO Auto-generated method stub
 			super.startElement(uri, localName, name, attributes);
 			if (name.equalsIgnoreCase("DNA")) {
@@ -105,7 +110,8 @@ public class DAS extends DataSource {
 		}
 
 		@Override
-		public void characters(char[] ch, int start, int length) throws SAXException {
+		public void characters(char[] ch, int start, int length)
+				throws SAXException {
 			// TODO Auto-generated method stub
 			super.characters(ch, start, length);
 			seq.append(ch, start, length);
@@ -113,7 +119,9 @@ public class DAS extends DataSource {
 
 	}
 
-	private void getEntry(EntrySet set,String ref, EntryPoint ep) throws MalformedURLException, ParserConfigurationException, SAXException, IOException, URISyntaxException {
+	private void getEntry(EntrySet set, String ref, EntryPoint ep)
+			throws MalformedURLException, ParserConfigurationException,
+			SAXException, IOException, URISyntaxException {
 		StringBuffer seq = this.getSequence(ref, ep);
 		Entry out = set.getOrCreateEntry(ref + ":" + ep);
 //		out.setID();
@@ -124,7 +132,7 @@ public class DAS extends DataSource {
 
 		for (String source : this.getDSN().getSources(ref)) {
 			List<Feature> list = this.getFeatures(source, ep);
-			for(Feature f:list){
+			for (Feature f : list) {
 //				out.annotation.addAll(list);
 				MemoryFeatureAnnotation fa = out.getMemoryAnnotation(f.type());
 				fa.add(f);
@@ -133,7 +141,6 @@ public class DAS extends DataSource {
 		// System.out.println("** " + list);
 
 		// }
-		
 
 	}
 
@@ -148,7 +155,8 @@ public class DAS extends DataSource {
 		private double score;
 
 		@Override
-		public void characters(char[] ch, int st, int length) throws SAXException {
+		public void characters(char[] ch, int st, int length)
+				throws SAXException {
 			// TODO Auto-generated method stub
 			super.characters(ch, st, length);
 			if (parserStack.peek().equalsIgnoreCase("START")) {
@@ -172,16 +180,17 @@ public class DAS extends DataSource {
 		}
 
 		@Override
-		public void endElement(String uri, String localName, String name) throws SAXException {
+		public void endElement(String uri, String localName, String name)
+				throws SAXException {
 			// TODO Auto-generated method stub
 			super.endElement(uri, localName, name);
 			String stackName = parserStack.pop();
 			if (!name.equals(stackName)) {
-				throw new SAXException("Tags do not match: expected=" + stackName + "; actual=" + name);
+				throw new SAXException("Tags do not match: expected="
+						+ stackName + "; actual=" + name);
 			}
 			if (name.equalsIgnoreCase("feature")) {
-				Feature f = new Feature();
-				f.addLocation(new Location(start, end));
+				Feature f = new Feature(new Location(start, end));
 				f.setType(Type.get(typeID));
 				f.addQualifier("source", methodID);
 				f.addQualifier("name", featureID);
@@ -193,7 +202,8 @@ public class DAS extends DataSource {
 		}
 
 		@Override
-		public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
+		public void startElement(String uri, String localName, String name,
+				Attributes attributes) throws SAXException {
 			// TODO Auto-generated method stub
 			super.startElement(uri, localName, name, attributes);
 			parserStack.push(name);
@@ -215,13 +225,17 @@ public class DAS extends DataSource {
 
 	}
 
-	private List<Feature> getFeatures(String source, EntryPoint e) throws MalformedURLException, SAXException, IOException, ParserConfigurationException, URISyntaxException {
+	private List<Feature> getFeatures(String source, EntryPoint e)
+			throws MalformedURLException, SAXException, IOException,
+			ParserConfigurationException, URISyntaxException {
 		SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 		FeatureParser featp = new FeatureParser();
 		// System.out.println("Getting features: " + featureDSN);
 		// System.out.println(serverPrefix + "/das/" + featureDSN +
 		// "/features?segment=" + e.id + ":" + e.start + "," + e.stop);
-		parser.parse(URIFactory.url(serverPrefix + "/das/" + source + "/features?segment=" + e.id + ":" + e.start + "," + e.stop).openStream(), featp);
+		parser.parse(URIFactory.url(serverPrefix + "/das/" + source
+				+ "/features?segment=" + e.id + ":" + e.start + "," + e.stop)
+				.openStream(), featp);
 		return featp.list;
 	}
 
@@ -236,11 +250,16 @@ public class DAS extends DataSource {
 		this.reference = reference;
 	}
 
-	private StringBuffer getSequence(String ref, EntryPoint e) throws MalformedURLException, SAXException, IOException, ParserConfigurationException, URISyntaxException {
+	private StringBuffer getSequence(String ref, EntryPoint e)
+			throws MalformedURLException, SAXException, IOException,
+			ParserConfigurationException, URISyntaxException {
 		SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 		SequenceParser seqp = new SequenceParser();
-		System.out.println(ref + "/dna?segment=" + e.id + ":" + e.start + "," + e.stop);
-		parser.parse(URIFactory.url(ref + "/dna?segment=" + e.id + ":" + e.start + "," + e.stop).openStream(), seqp);
+		System.out.println(
+				ref + "/dna?segment=" + e.id + ":" + e.start + "," + e.stop);
+		parser.parse(URIFactory.url(
+				ref + "/dna?segment=" + e.id + ":" + e.start + "," + e.stop)
+				.openStream(), seqp);
 		return clean(seqp.seq);
 	}
 
@@ -248,11 +267,14 @@ public class DAS extends DataSource {
 		return new StringBuffer(new String(seq).replaceAll("[ \t\n\r]", ""));
 	}
 
-	public List<EntryPoint> getEntryPoints(String ref) throws MalformedURLException, SAXException, IOException, ParserConfigurationException, URISyntaxException {
+	public List<EntryPoint> getEntryPoints(String ref)
+			throws MalformedURLException, SAXException, IOException,
+			ParserConfigurationException, URISyntaxException {
 		if (entryPoints == null) {
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 			entryPoints = new EntryPointParser();
-			parser.parse(URIFactory.url(ref + "/entry_points").openStream(), entryPoints);
+			parser.parse(URIFactory.url(ref + "/entry_points").openStream(),
+					entryPoints);
 		}
 		return entryPoints.getAll();
 
@@ -268,10 +290,11 @@ public class DAS extends DataSource {
 	public EntrySet read(EntrySet set) throws ReadFailedException {
 		if (set == null)
 			set = new EntrySet();
-		if(ep==null||reference==null)
-			throw new ReadFailedException("Both the EntryPoint and the Reference need to be set!");
+		if (ep == null || reference == null)
+			throw new ReadFailedException(
+					"Both the EntryPoint and the Reference need to be set!");
 		try {
-			this.getEntry(set,reference, ep);
+			this.getEntry(set, reference, ep);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			throw new ReadFailedException(e);
@@ -291,7 +314,6 @@ public class DAS extends DataSource {
 		return set;
 	}
 
-
 	public List<String> getReferences() {
 		return dsn.getReferences();
 	}
@@ -299,10 +321,12 @@ public class DAS extends DataSource {
 	@Override
 	public void finalize() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.jannot.source.DataSource#isIndexed()
 	 */
 	@Override
@@ -310,7 +334,9 @@ public class DAS extends DataSource {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.jannot.source.DataSource#size()
 	 */
 	@Override

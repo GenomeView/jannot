@@ -20,6 +20,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
@@ -31,11 +35,6 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import support.DataManager;
 
 /**
@@ -45,7 +44,6 @@ import support.DataManager;
  */
 public class TestVCFParser {
 
-	@Ignore
 	@Test
 	public void testTinySize() {
 
@@ -62,15 +60,15 @@ public class TestVCFParser {
 			Data d = es.firstEntry().get(Type.get("tiny.vcf"));
 			for (DataKey dk : es.firstEntry()) {
 				System.out.println("Datakey=" + dk);
-				
+
 			}
 			Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
-			MemoryFeatureAnnotation mfa=(MemoryFeatureAnnotation)d;
-			
-			for(Feature feat: mfa.get()){
+			MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
+
+			for (Feature feat : mfa.get()) {
 				System.out.println(feat);
 			}
-			
+
 			Assert.assertNotNull(d);
 
 		} catch (URISyntaxException e) {
@@ -85,7 +83,7 @@ public class TestVCFParser {
 			Assert.fail();
 		}
 	}
-	
+
 	@Ignore
 	@Test
 	public void testRegularSize() {
@@ -95,7 +93,8 @@ public class TestVCFParser {
 			DataSource ds = DataSourceFactory.create(new Locator(f));
 			EntrySet es = ds.read();
 			// System.out.println(es.firstEntry());
-			Assert.assertEquals("gi|395136682|gb|CP003248.1|", es.firstEntry().getID());
+			Assert.assertEquals("gi|395136682|gb|CP003248.1|",
+					es.firstEntry().getID());
 			int count = 0;
 			for (Entry e : es)
 				count++;
@@ -103,15 +102,15 @@ public class TestVCFParser {
 			Data d = es.firstEntry().get(Type.get("regular.vcf"));
 			for (DataKey dk : es.firstEntry()) {
 				System.out.println("Datakey=" + dk);
-				
+
 			}
 			Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
-			MemoryFeatureAnnotation mfa=(MemoryFeatureAnnotation)d;
-			
-			for(Feature feat: mfa.get()){
-				System.out.println(feat+"\t"+feat.type());
+			MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
+
+			for (Feature feat : mfa.get()) {
+				System.out.println(feat + "\t" + feat.type());
 			}
-			
+
 			Assert.assertNotNull(d);
 
 		} catch (URISyntaxException e) {
