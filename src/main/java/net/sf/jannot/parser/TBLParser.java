@@ -20,6 +20,9 @@ import net.sf.jannot.Type;
  * 
  * http/www.ncbi.nlm.nih.gov/Sequin/table.html
  * 
+ * New specs seem on
+ * http://wiki.christophchamp.com/index.php?title=TAB_file_format
+ * 
  * @author Thomas Abeel
  * 
  */
@@ -33,12 +36,10 @@ public class TBLParser extends Parser {
 		// TODO Auto-generated constructor stub
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see net.sf.jannot.parser.Parser#parse(java.io.InputStream,
-	 * net.sf.jannot.source.DataSource, net.sf.jannot.EntrySet)
-	 */
+	 *      net.sf.jannot.source.DataSource, net.sf.jannot.EntrySet)
+	 **/
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
 		if (set == null)
@@ -47,6 +48,8 @@ public class TBLParser extends Parser {
 		Entry current = null;
 		Feature currentF = null;
 		for (String line : it) {
+			if (line.strip().isEmpty())
+				continue;// skip empty lines
 			if (line.startsWith(">")) {
 				current = set.getOrCreateEntry(line.split(">Feature ")[1]);
 			} else {
