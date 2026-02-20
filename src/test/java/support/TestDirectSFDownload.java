@@ -22,7 +22,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-
 /**
  * 
  * @author Thomas Abeel
@@ -30,25 +29,28 @@ import org.junit.Test;
  */
 public class TestDirectSFDownload {
 
+	// this test makes no sense, all files are now always in src/test/resources
 	@Ignore
 	@Test
-	public void testDownload(){
-		String id="minibed.bed";
+	public void testDownload() {
+		String id = "minibed.bed";
 		DataManager.file(id);
 		Assert.assertTrue(new File(".sf-testing-cache").exists());
 		Assert.assertTrue(new File(".sf-testing-cache/minibed.bed").exists());
-		Assert.assertTrue(new File(".sf-testing-cache/minibed.bed").length()>0);
-		
+		Assert.assertTrue(
+				new File(".sf-testing-cache/minibed.bed").length() > 0);
+
 	}
-	
+
+	// this test makes no sense, all files are now always in src/test/resources
 	@Ignore
 	@Test
-	public void testLargeDownload(){
-		String id="CEU.trio.2010_03.genotypes.vcf.gz";
+	public void testLargeDownload() {
+		String id = "CEU.trio.2010_03.genotypes.vcf.gz";
 		DataManager.file(id);
 		Assert.assertTrue(new File(".sf-testing-cache").exists());
-		Assert.assertTrue(new File(".sf-testing-cache/"+id).exists());
-		Assert.assertTrue(new File(".sf-testing-cache/"+id).length()>0);
-		
+		Assert.assertTrue(new File(".sf-testing-cache/" + id).exists());
+		Assert.assertTrue(new File(".sf-testing-cache/" + id).length() > 0);
+
 	}
 }

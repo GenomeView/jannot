@@ -10,14 +10,14 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.jannot.tabix.TabixWriter;
-import net.sf.jannot.tabix.TabixWriter.Conf;
-
+import be.abeel.net.URIFactory;
 import htsjdk.samtools.seekablestream.SeekableStream;
 import htsjdk.samtools.seekablestream.SeekableStreamFactory;
-import be.abeel.net.URIFactory;
+import net.sf.jannot.tabix.TabixWriter;
+import net.sf.jannot.tabix.TabixWriter.Conf;
 
 /**
  * 
@@ -29,14 +29,34 @@ import be.abeel.net.URIFactory;
  * 
  */
 public class Locator {
-	private static Logger log = Logger.getLogger(Locator.class.getCanonicalName());
+	private static Logger log = Logger
+			.getLogger(Locator.class.getCanonicalName());
 	private String locator;
 	private long length = -1;
 	private boolean exists = false;
 	private boolean streamCompressed = false;
 	private boolean blockCompressed = false;
 	private String ext;
-	private long lastModified=-1;
+	private long lastModified = -1;
+
+	public Locator(File f) {
+		this(f.toString());
+	}
+
+	/**
+	 * 
+	 * @param l the link to the file or URL. Files may start with file://
+	 *          http:// or https: If neither, it is assumed to be a file.
+	 *          Leading and trailing whitespaces are removed, so it is not
+	 *          possible to use filenames starting or ending with whitespace.
+	 */
+	public Locator(String l) {
+		if (l.startsWith("file://")) {
+			l = l.substring(7);
+		}
+		this.locator = l.trim();
+		init();
+	}
 
 	@Override
 	public String toString() {
@@ -47,29 +67,18 @@ public class Locator {
 	 * Removes the index extension from the file name
 	 */
 	public void stripIndex() {
-		if (locator.endsWith(".mfi") || locator.endsWith(".tbi") 
+		if (locator.endsWith(".mfi") || locator.endsWith(".tbi")
 				|| locator.endsWith(".fai")) {
 			locator = locator.substring(0, locator.length() - 4);
 			init();
 		}
-		if(locator.endsWith(".bai")){
+		if (locator.endsWith(".bai")) {
 			locator = locator.substring(0, locator.length() - 4);
-			if(!locator.endsWith(".bam"))
-				locator+=".bam";
+			if (!locator.endsWith(".bam"))
+				locator += ".bam";
 			init();
 		}
-		
-	}
 
-	public Locator(File f){
-		this(f.toString());
-	}
-	public Locator(String l) {
-		if (l.startsWith("file://")){
-			l = l.substring(7);
-		}
-		this.locator = l.trim();
-		init();
 	}
 
 	/**
@@ -148,9 +157,10 @@ public class Locator {
 
 			exists = true;
 			length = conn.getContentLength();
-			lastModified=conn.getLastModified();
+			lastModified = conn.getLastModified();
 		} catch (Exception ioe) {
-			System.err.println(ioe);
+			log.log(Level.WARNING, "Failed to open " + locator, ioe);
+			// System.err.println(ioe);
 			// ioe.printStackTrace();
 		}
 
@@ -160,11 +170,11 @@ public class Locator {
 	 * 
 	 */
 	private void initFile() {
-		File tmp=new File(locator);
+		File tmp = new File(locator);
 		exists = tmp.exists();
-		if (exists){
-			length =tmp.length();
-			lastModified=tmp.lastModified();
+		if (exists) {
+			length = tmp.length();
+			lastModified = tmp.lastModified();
 		}
 
 	}
@@ -238,14 +248,17 @@ public class Locator {
 	}
 
 	public boolean isTabix() {
-		return ext.equals("vcf")||ext.equals("gff") || ext.equals("gff3") || ext.equals("bed") || ext.equals("tsv")
-				|| ext.equals("pileup") || ext.equals("swig") || ext.equals("tab");
+		return ext.equals("vcf") || ext.equals("gff") || ext.equals("gff3")
+				|| ext.equals("bed") || ext.equals("tsv")
+				|| ext.equals("pileup") || ext.equals("swig")
+				|| ext.equals("tab");
 
 	}
 
 	public boolean requiresIndex() {
-		return (isMaf() && isBlockCompressed()) || isBAM()|| ext.equals("tsv") || ext.equals("pileup")
-				|| ext.equals("swig") || ext.equals("tab");
+		return (isMaf() && isBlockCompressed()) || isBAM() || ext.equals("tsv")
+				|| ext.equals("pileup") || ext.equals("swig")
+				|| ext.equals("tab");
 	}
 
 	public boolean recommendedIndex() {
@@ -253,7 +266,8 @@ public class Locator {
 	}
 
 	public boolean supportsIndex() {
-		return recommendedIndex() || requiresIndex()  ||isVCF()|| ext.equals("gff") || ext.equals("gff3") || ext.equals("bed");
+		return recommendedIndex() || requiresIndex() || isVCF()
+				|| ext.equals("gff") || ext.equals("gff3") || ext.equals("bed");
 	}
 
 	public boolean isBAM() {
@@ -262,14 +276,15 @@ public class Locator {
 	}
 
 	public boolean isFasta() {
-		return ext.equals("fasta") || ext.equals("fa") || ext.equals("fas") || ext.equals("con") || ext.equals("fna")|| ext.equals("tfa");
+		return ext.equals("fasta") || ext.equals("fa") || ext.equals("fas")
+				|| ext.equals("con") || ext.equals("fna") || ext.equals("tfa");
 	}
 
 	public boolean isMaf() {
 		return ext.equals("maf");
 
 	}
-	
+
 	public boolean isVCF() {
 		return ext.equals("vcf");
 
@@ -278,11 +293,11 @@ public class Locator {
 	public boolean isPileup() {
 		return ext.equals("pileup");
 	}
-	
-	
-	public long lastModified(){
+
+	public long lastModified() {
 		return lastModified;
 	}
+
 	/**
 	 * @return
 	 */
@@ -296,12 +311,13 @@ public class Locator {
 			return TabixWriter.BED_CONF;
 		}
 
-		if(ext.equals("vcf")){
+		if (ext.equals("vcf")) {
 			return TabixWriter.VCF_CONF;
 		}
 		Conf out = new Conf(0, 0, 0, 0, '#', 0);
 
-		if (ext.equals("pileup") || ext.equals("swig") || ext.equals("tab") || ext.equals("tsv")) {
+		if (ext.equals("pileup") || ext.equals("swig") || ext.equals("tab")
+				|| ext.equals("tsv")) {
 			out.chrColumn = 1;
 			out.startColumn = 2;
 			out.endColumn = 2;
@@ -312,15 +328,16 @@ public class Locator {
 	}
 
 	/**
-	 * @return
-	 * @throws IOException 
+	 * @return {@link SeekableStream}
+	 * @throws IOException
 	 * @throws FileNotFoundException
 	 * @throws URISyntaxException
 	 * @throws MalformedURLException
 	 */
 	public SeekableStream stream() throws IOException, URISyntaxException {
 		if (!isURL())
-			return SeekableStreamFactory.getInstance().getStreamFor(this.file().toString());
+			return SeekableStreamFactory.getInstance()
+					.getStreamFor(this.file().toString());
 		else
 			return SeekableStreamFactory.getInstance().getStreamFor(this.url());
 	}
@@ -339,5 +356,4 @@ public class Locator {
 
 	}
 
-	
 }
