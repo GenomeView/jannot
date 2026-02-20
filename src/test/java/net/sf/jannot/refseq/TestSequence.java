@@ -6,6 +6,7 @@ package net.sf.jannot.refseq;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
 import org.junit.Ignore;
@@ -20,28 +21,21 @@ public class TestSequence {
 
 	@Ignore // urls give access denied
 	@Test
-	public void testFaidx() throws URISyntaxException {
-		try {
-			Locator l = new Locator(
-					"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta");
-			Locator i = new Locator(
-					"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta.fai");
+	public void testFaidx() throws URISyntaxException, MalformedURLException,
+			ReadFailedException, IOException {
+		Locator l = new Locator(
+				"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta");
+		Locator i = new Locator(
+				"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta.fai");
 
-			EntrySet es = new IndexedFastaDataSource(l, i).read();
-			Sequence seq = es.firstEntry().sequence();
-			String tmp = "";
-			for (Character c : seq.get(1, 4)) {
-				tmp += c;
-			}
-			assertEquals(3, tmp.length());
-
-		} catch (ReadFailedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		EntrySet es = new IndexedFastaDataSource(l, i).read();
+		Sequence seq = es.firstEntry().sequence();
+		String tmp = "";
+		for (Character c : seq.get(1, 4)) {
+			tmp += c;
 		}
+		assertEquals(3, tmp.length());
+
 	}
 
 	@Test
