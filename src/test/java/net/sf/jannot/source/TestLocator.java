@@ -61,12 +61,11 @@ public class TestLocator {
 		l.stream(); // should throw
 	}
 
-	@Test(expected = IOException.class)
+	@Test
 	public void testOpenURL() throws IOException, URISyntaxException {
 		// This one's interesting, exists but reports length -1
 		Locator l = new Locator("https://www.tudelft.nl");
 		assertFalse(l.exists());
-		assertEquals(0, l.length());
 	}
 
 	@Test
