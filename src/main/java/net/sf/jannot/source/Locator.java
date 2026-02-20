@@ -166,12 +166,9 @@ public class Locator {
 
 	}
 
-	/**
-	 * 
-	 */
 	private void initFile() {
 		File tmp = new File(locator);
-		exists = tmp.exists();
+		exists = tmp.exists() && tmp.canRead();
 		if (exists) {
 			length = tmp.length();
 			lastModified = tmp.lastModified();
@@ -180,8 +177,7 @@ public class Locator {
 	}
 
 	/**
-	 * @param locator
-	 * @return
+	 * @return the file extension tbi,fasta,bai,mfi or null if other
 	 */
 	public String getPostfix() {
 
@@ -204,6 +200,10 @@ public class Locator {
 		return length;
 	}
 
+	/**
+	 * @return true iff the file exists and we can read it. So files without
+	 *         read permission, access denied errors, etc will return false.
+	 */
 	public boolean exists() {
 		return exists;
 	}
