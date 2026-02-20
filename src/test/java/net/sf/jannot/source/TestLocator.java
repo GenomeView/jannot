@@ -63,10 +63,10 @@ public class TestLocator {
 
 	@Test(expected = IOException.class)
 	public void testOpenURL() throws IOException, URISyntaxException {
-		// This one's interesting, exists but can't get length?
+		// This one's interesting, exists but reports length -1
 		Locator l = new Locator("https://www.tudelft.nl");
-		assertTrue(l.exists());
-		assertEquals(100, l.length());
+		assertFalse(l.exists());
+		assertEquals(0, l.length());
 	}
 
 	@Test

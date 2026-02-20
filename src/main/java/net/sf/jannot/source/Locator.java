@@ -150,17 +150,13 @@ public class Locator {
 
 			int len = conn.getContentLength();
 
-			switch (len) {
-			case -1:
+			if (len < 0) {
 				// happens eg with https://tudelft.nl
-				log.warning("Server eror: size is -1 for " + locator);
-				return;
-			case 0:
-				exists = true;
+				log.warning("Server eror: file has negative size: " + locator);
 				return;
 			}
 
-			// len>0
+			// len >= 0
 			byte[] buffer = new byte[50];
 			conn.getInputStream().read(buffer);
 			if (new String(buffer).trim().startsWith("<!DOCTYPE")) {
