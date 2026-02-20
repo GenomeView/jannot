@@ -3,24 +3,21 @@
  */
 package net.sf.jannot.source;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
+import htsjdk.samtools.seekablestream.SeekableFileStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.refseq.FaidxData;
 import net.sf.jannot.refseq.FaidxIndex;
-import htsjdk.samtools.seekablestream.SeekableFileStream;
-import htsjdk.samtools.seekablestream.SeekableStream;
-import be.abeel.net.URIFactory;
 
 /**
  * 
@@ -33,17 +30,13 @@ public class IndexedFastaDataSource extends DataSource {
 	private Locator index;
 	private Locator data;
 
-	
 	/**
-	 * @param data
-	 * @param index
-	 * @throws URISyntaxException
-	 * @throws ReadFailedException
-	 * @throws IOException
-	 * @throws MalformedURLException
+	 * @param data  the data file
+	 * @param index the index file that indexes the data
 	 */
-	public IndexedFastaDataSource(Locator data, Locator index) throws MalformedURLException, IOException,
-			ReadFailedException, URISyntaxException {
+	public IndexedFastaDataSource(Locator data, Locator index)
+			throws MalformedURLException, IOException, ReadFailedException,
+			URISyntaxException {
 		super(data);
 		if (data.isURL())
 			content = new SeekableFileCachedHTTPStream(data.url());
