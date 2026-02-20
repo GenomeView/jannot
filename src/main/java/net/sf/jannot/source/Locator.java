@@ -33,7 +33,7 @@ public class Locator {
 			.getLogger(Locator.class.getCanonicalName());
 	private String locator;
 	private long length = -1;
-	private boolean exists = false;
+	private boolean exists = false; // exists and can be read
 	private boolean streamCompressed = false;
 	private boolean blockCompressed = false;
 	private String ext;
@@ -130,35 +130,53 @@ public class Locator {
 			URLConnection conn = URIFactory.url(locator).openConnection();
 			conn.setUseCaches(false);
 			log.info(conn.getHeaderFields().toString());
+
+			// #3 URLConnection doesn't parse the response code
+			// so we have to do it here...
 			String header = conn.getHeaderField(null);
-			if (header.contains("404")) {
-				log.info("404 file not found: " + locator);
+			// we expect "HTTP/1.1 432 stringmessage"
+			if (!header.matches("HTTP/.*\\s\\d\\d\\d\\s.*")) {
+				log.warning("Unexpected server response from " + locator + ":"
+						+ header);
 				return;
 			}
-			if (header.contains("500")) {
-				log.info("500 server error: " + locator);
+			// received expected response
+			Integer responseCode = Integer.valueOf(header.split(" ")[1]);
+			if (responseCode >= 400) {
+				log.warning(
+						"Server eror: " + header + ". Can't read " + locator);
 				return;
 			}
 
-			if (conn.getContentLength() > 0) {
-				byte[] buffer = new byte[50];
+			int len = conn.getContentLength();
 
-				conn.getInputStream().read(buffer);
-				/*
-				 * This is not supposed to happen, except with badly configured
-				 * CMS that take over
-				 */
-				if (new String(buffer).trim().startsWith("<!DOCTYPE"))
-					return;
-			} else if (conn.getContentLength() == 0) {
+			switch (len) {
+			case -1:
+				// happens eg with https://tudelft.nl
+				log.warning("Server eror: size is -1 for " + locator);
+				return;
+			case 0:
 				exists = true;
 				return;
 			}
 
+			// len>0
+			byte[] buffer = new byte[50];
+			conn.getInputStream().read(buffer);
+			if (new String(buffer).trim().startsWith("<!DOCTYPE")) {
+				/*
+				 * This is not supposed to happen, except with badly configured
+				 * CMS that take over
+				 */
+				return;
+			}
+
 			exists = true;
-			length = conn.getContentLength();
+			length = len;
 			lastModified = conn.getLastModified();
-		} catch (Exception ioe) {
+		} catch (
+
+		Exception ioe) {
 			log.log(Level.WARNING, "Failed to open " + locator, ioe);
 			// System.err.println(ioe);
 			// ioe.printStackTrace();
@@ -196,6 +214,10 @@ public class Locator {
 		return locator.startsWith("http://") || locator.startsWith("https://");
 	}
 
+	/**
+	 * 
+	 * @return available number of chars in file, -1 if file can not be opened
+	 */
 	public long length() {
 		return length;
 	}
@@ -335,11 +357,12 @@ public class Locator {
 	 * @throws MalformedURLException
 	 */
 	public SeekableStream stream() throws IOException, URISyntaxException {
+		if (!exists)
+			throw new IOException("File can't be read: " + locator);
 		if (!isURL())
 			return SeekableStreamFactory.getInstance()
 					.getStreamFor(this.file().toString());
-		else
-			return SeekableStreamFactory.getInstance().getStreamFor(this.url());
+		return SeekableStreamFactory.getInstance().getStreamFor(this.url());
 	}
 
 	public boolean isAnyCompressed() {

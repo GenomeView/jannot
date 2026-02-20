@@ -45,10 +45,37 @@ public class TestLocator {
 		assertFalse(l.exists());
 	}
 
-	@Test
-	public void testDoesntExist() {
+	@Test(expected = IOException.class)
+	public void testDoesntExist() throws IOException, URISyntaxException {
 		Locator l = new Locator("http:nothing");
 		assertFalse(l.exists());
+		assertEquals(-1, l.length());
+		l.stream(); // should throw
+	}
+
+	@Test(expected = IOException.class)
+	public void testAccessDenied() throws IOException, URISyntaxException {
+		// access denined
+		Locator l = new Locator(
+				"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta");
+		l.stream(); // should throw
+	}
+
+	@Test(expected = IOException.class)
+	public void testOpenURL() throws IOException, URISyntaxException {
+		// This one's interesting, exists but can't get length?
+		Locator l = new Locator("https://www.tudelft.nl");
+		assertTrue(l.exists());
+		assertEquals(100, l.length());
+	}
+
+	@Test
+	public void testOpenEmptyURL() throws IOException, URISyntaxException {
+		// open URL that has empty content.
+		Locator l = new Locator(
+				"https://raw.githubusercontent.com/GenomeView/jannot/refs/heads/main/src/test/resources/empty");
+		assertTrue(l.exists());
 		assertEquals(0, l.length());
 	}
+
 }
