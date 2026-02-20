@@ -3,13 +3,14 @@
  */
 package net.sf.jannot.refseq;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-import junit.framework.Assert;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.IndexedFastaDataSource;
@@ -32,7 +33,7 @@ public class TestSequence {
 			for (Character c : seq.get(1, 4)) {
 				tmp += c;
 			}
-			Assert.assertEquals(3, tmp.length());
+			assertEquals(3, tmp.length());
 
 		} catch (ReadFailedException e) {
 			// TODO Auto-generated catch block
@@ -47,19 +48,18 @@ public class TestSequence {
 	public void testSubSequence() {
 		MemorySequence a = new MemorySequence("AGTCG");
 
-		Assert.assertEquals("GT", a.subsequence(2, 4).stringRepresentation());
-		Assert.assertEquals("AGTCG",
-				a.subsequence(1, 6).stringRepresentation());
+		assertEquals("GT", a.subsequence(2, 4).stringRepresentation());
+		assertEquals("AGTCG", a.subsequence(1, 6).stringRepresentation());
 		String tmp = "";
 		for (Character c : a.get(2, 4)) {
 			tmp += c;
 		}
-		Assert.assertEquals("GT", tmp);
+		assertEquals("GT", tmp);
 		tmp = "";
 		for (Character c : a.get(1, 6)) {
 			tmp += c;
 		}
-		Assert.assertEquals("AGTCG", tmp);
+		assertEquals("AGTCG", tmp);
 
 	}
 
