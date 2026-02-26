@@ -5,32 +5,32 @@ package net.sf.jannot.parser;
 
 import java.io.InputStream;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.SyntenicBlock;
-import be.abeel.io.LineIterator;
 
 /**
- * This parser read syntenic blocks from an 8 column file that has the following
- * formatting.
+ * This parser. Each line in input reads as a {@link SyntenicBlock}. Each line 8
+ * columns , tab separated , with
+ * <ol>
+ * <li>name of reference</li>
+ * <li>start of ref</li>
+ * <li>end of ref</li>
+ * <li>strand of ref. Only first char is relevant. See
+ * {@link Strand#fromSymbol(char)}</li>
+ * <li>name of informant</li>
+ * <li>start of informant</li>
+ * <li>end of informant</li>
+ * <li>strand of informant. Only first char is relevant. See
+ * {@link Strand#fromSymbol(char)}</li>
+ * </ol>
  * 
+ * blank lines are ignored.
  * 
- * Synthenic block:
- * 
- * Starts with the line
- * 
- * <pre>
- * gvheader:syntenic
- * </pre>
- * 
- * 8 columns
- * 
- * 0,1,2,3 name,start,end,strand of reference
- * 
- * 4,5,6,7 name,start,end,strand of informant
- * 
+ * Lines starting with 'gvheader' are ignored.
  * 
  * @author Thomas Abeel
  * 
@@ -58,12 +58,15 @@ public class SyntenicParser extends Parser {
 		it.addCommentIdentifier("gvheader");
 		for (String line : it) {
 			String[] arr = line.split("\t");
-			Location refLoc = new Location(Integer.parseInt(arr[1]), Integer.parseInt(arr[2]));
+			Location refLoc = new Location(Integer.parseInt(arr[1]),
+					Integer.parseInt(arr[2]));
 			Strand refStrand = Strand.fromSymbol(arr[3].charAt(0));
-			Location informantLoc = new Location(Integer.parseInt(arr[5]), Integer.parseInt(arr[6]));
+			Location informantLoc = new Location(Integer.parseInt(arr[5]),
+					Integer.parseInt(arr[6]));
 			Strand informantStrand = Strand.fromSymbol(arr[7].charAt(0));
 
-			SyntenicBlock sb = new SyntenicBlock(arr[0], arr[4], refLoc, informantLoc, refStrand, informantStrand);
+			SyntenicBlock sb = new SyntenicBlock(arr[0], arr[4], refLoc,
+					informantLoc, refStrand, informantStrand);
 			set.syntenic.add(sb);
 			// FIXME set.getOrCreateEntry(arr[0], source);
 			SyntenicBlock sbf = sb.flip();

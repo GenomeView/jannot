@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
@@ -24,8 +25,10 @@ import net.sf.jannot.parser.software.MauveParser;
 import net.sf.jannot.parser.software.SIPHTParser;
 import net.sf.jannot.parser.software.TRNAscanParser;
 import net.sf.jannot.parser.software.TransTermHPParser;
-import be.abeel.io.LineIterator;
 
+/**
+ * Base class for all parsers
+ */
 public abstract class Parser {
 
 	public static final Parser GFF3 = new GFF3Parser();
@@ -36,9 +39,13 @@ public abstract class Parser {
 
 	// FIXME this should be dynamically determined
 	public static Parser[] parsers(Object source) {
-		return new Parser[] { GFF3, new BEDParser(source.toString()), EMBL, new GTFParser(), new BlastM8Parser(), new FindPeaksParser(), new GeneMarkParser(),
-				new MaqSNPParser(), new TransTermHPParser(), new TRNAscanParser(), new EMBLParser(), new FastaParser(), new GenbankParser(), new PTTParser(),
-				new TBLParser(),new VCFParser(source.toString()),new WiggleParser() };
+		return new Parser[] { GFF3, new BEDParser(source.toString()), EMBL,
+				new GTFParser(), new BlastM8Parser(), new FindPeaksParser(),
+				new GeneMarkParser(), new MaqSNPParser(),
+				new TransTermHPParser(), new TRNAscanParser(), new EMBLParser(),
+				new FastaParser(), new GenbankParser(), new PTTParser(),
+				new TBLParser(), new VCFParser(source.toString()),
+				new WiggleParser() };
 	}
 
 	public Parser(DataKey dataKey) {
@@ -47,7 +54,8 @@ public abstract class Parser {
 
 	@Override
 	public String toString() {
-		return this.getClass().getName().replaceAll("net.sf.jannot.parser.", "");
+		return this.getClass().getName().replaceAll("net.sf.jannot.parser.",
+				"");
 	}
 
 	/**
@@ -56,14 +64,10 @@ public abstract class Parser {
 	 * to this set, otherwise a new set will be created. Either the supplied or
 	 * the new EntrySet is returned.
 	 * 
-	 * @param is
-	 *            inputStream
-	 * @param source
-	 *            source to set to features
-	 * @param set
-	 *            TODO
-	 * @param entrySet
-	 *            the EntrySet to which all stuff will be added
+	 * @param is       inputStream
+	 * @param source   source to set to features
+	 * @param set      TODO
+	 * @param entrySet the EntrySet to which all stuff will be added
 	 * @return either the supplied EntrySet or a new one containing the loaded
 	 *         stuff
 	 */
@@ -73,13 +77,10 @@ public abstract class Parser {
 	 * Output everything from the provided entry to the output stream.
 	 * 
 	 * 
-	 * @param os
-	 *            output stream to write data to
-	 * @param e
-	 *            the entry to save
-	 * @param source
-	 *            the source to filter on, or null when no filtering is
-	 *            required.
+	 * @param os     output stream to write data to
+	 * @param e      the entry to save
+	 * @param source the source to filter on, or null when no filtering is
+	 *               required.
 	 */
 	public void write(OutputStream os, Entry entry) {
 		write(os, entry, Type.values());
@@ -91,7 +92,8 @@ public abstract class Parser {
 
 	}
 
-	public static Parser detectParser(InputStream is, Object source) throws IOException {
+	public static Parser detectParser(InputStream is, Object source)
+			throws IOException {
 
 		Parser p = findParser(is, source);
 		log.info("parser: " + p);
@@ -107,7 +109,8 @@ public abstract class Parser {
 	 * @return
 	 * @throws IOException
 	 */
-	private static Parser findParser(InputStream is, Object source) throws IOException {
+	private static Parser findParser(InputStream is, Object source)
+			throws IOException {
 		LineIterator it = new LineIterator(is);
 		// it.setSkipComments(true);
 		it.setSkipBlanks(true);
@@ -115,13 +118,14 @@ public abstract class Parser {
 		String nonCommentLine = firstLine;
 
 		// Skip comments and UCSC browser information lines
-		while (nonCommentLine.startsWith("#") || nonCommentLine.startsWith("browser")) {
+		while (nonCommentLine.startsWith("#")
+				|| nonCommentLine.startsWith("browser")) {
 			nonCommentLine = it.next();
 
 		}
-		if(firstLine.contains("fileformat=VCF"))
+		if (firstLine.contains("fileformat=VCF"))
 			return new VCFParser(source.toString());
-		
+
 		if (firstLine.contains("Mauve1"))
 			return new MauveParser(new StringKey(source.toString()));
 
@@ -156,7 +160,8 @@ public abstract class Parser {
 
 		if (nonCommentLine.startsWith("LOCUS"))
 			return new GenbankParser();
-		log.info("tab split nonCommentLine: " + nonCommentLine.split("\t").length);
+		log.info("tab split nonCommentLine: "
+				+ nonCommentLine.split("\t").length);
 		String[] nonCommentArr = nonCommentLine.split("\t");
 		if (nonCommentArr.length == 9) {
 			if (nonCommentArr[0].contains(".."))
@@ -177,7 +182,8 @@ public abstract class Parser {
 		}
 
 		if (nonCommentLine.split("[ \t]+").length == 8) {
-			String[] head = new String[] { "Sequence", "tRNA", "Bounds", "tRNA", "Anti", "Intron", "Bounds", "Cove" };
+			String[] head = new String[] { "Sequence", "tRNA", "Bounds", "tRNA",
+					"Anti", "Intron", "Bounds", "Cove" };
 			if (Arrays.equals(nonCommentLine.split("[ \t]+"), head)) {
 				return new TRNAscanParser();
 			}
@@ -208,7 +214,8 @@ public abstract class Parser {
 		if (nonCommentLine.split("\t").length == 16) {
 			return new MapViewParser(new StringKey(source.toString()));
 		}
-		if (nonCommentLine.startsWith("ID") || nonCommentLine.startsWith("FT") || nonCommentLine.startsWith("FH"))
+		if (nonCommentLine.startsWith("ID") || nonCommentLine.startsWith("FT")
+				|| nonCommentLine.startsWith("FH"))
 			return new EMBLParser();
 
 		if (nonCommentLine.startsWith(">")) {
@@ -236,10 +243,10 @@ public abstract class Parser {
 	 */
 	protected DataKey dataKey = null;
 
-	public void setDataKey(DataKey dk){
-		this.dataKey=dk;
+	public void setDataKey(DataKey dk) {
+		this.dataKey = dk;
 	}
-	
+
 	@Deprecated
 	public void setDataKey(String s) {
 		setDataKey(new StringKey(s));
@@ -249,7 +256,9 @@ public abstract class Parser {
 		boolean broadShortRead = true;
 		try {
 			String[] arr = line.split(" ");
-			/* The final thing on the header line should be the word 'mismatches */
+			/*
+			 * The final thing on the header line should be the word 'mismatches
+			 */
 			if (!arr[arr.length - 1].equals("mismatches)")) {
 				broadShortRead = false;
 			}
