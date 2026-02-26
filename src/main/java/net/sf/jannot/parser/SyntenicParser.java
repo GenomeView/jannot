@@ -30,7 +30,7 @@ import net.sf.jannot.SyntenicBlock;
  * 
  * blank lines are ignored.
  * 
- * Lines starting with 'gvheader' are ignored.
+ * Lines starting with 'gvheader' '#' and '//" are ignored.
  * 
  * @author Thomas Abeel
  * 
