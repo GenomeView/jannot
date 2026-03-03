@@ -44,83 +44,61 @@ import support.DataManager;
 public class TestVCFParser {
 
 	@Test
-	public void testTinySize() {
+	public void testTinySize()
+			throws URISyntaxException, IOException, ReadFailedException {
 
 		File f = DataManager.file("tiny.vcf");
-		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f));
-			EntrySet es = ds.read();
-			// System.out.println(es.firstEntry());
-			Assert.assertEquals("20", es.firstEntry().getID());
-			int count = 0;
-			for (Entry e : es)
-				count++;
-			Assert.assertEquals(1, count);
-			Data d = es.firstEntry().get(Type.get("tiny.vcf"));
-			for (DataKey dk : es.firstEntry()) {
-				System.out.println("Datakey=" + dk);
+		DataSource ds = DataSourceFactory.create(new Locator(f));
+		EntrySet es = ds.read();
+		// System.out.println(es.firstEntry());
+		Assert.assertEquals("20", es.firstEntry().getID());
+		int count = 0;
+		for (Entry e : es)
+			count++;
+		Assert.assertEquals(1, count);
+		Data d = es.firstEntry().get(Type.get("tiny.vcf"));
+		for (DataKey dk : es.firstEntry()) {
+			System.out.println("Datakey=" + dk);
 
-			}
-			Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
-			MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
-
-			for (Feature feat : mfa.get()) {
-				System.out.println(feat);
-			}
-
-			Assert.assertNotNull(d);
-
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (ReadFailedException e) {
-
-			e.printStackTrace();
-			Assert.fail();
 		}
+		Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
+		MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
+
+		for (Feature feat : mfa.get()) {
+			System.out.println(feat);
+		}
+
+		Assert.assertNotNull(d);
+
 	}
 
 	@Test
-	public void testRegularSize() {
+	public void testRegularSize()
+			throws URISyntaxException, IOException, ReadFailedException {
 
 		File f = DataManager.file("regular.vcf");
-		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f));
-			EntrySet es = ds.read();
-			// System.out.println(es.firstEntry());
-			Assert.assertEquals("gi|395136682|gb|CP003248.1|",
-					es.firstEntry().getID());
-			int count = 0;
-			for (Entry e : es)
-				count++;
-			Assert.assertEquals(1, count);
-			Data d = es.firstEntry().get(Type.get("regular.vcf"));
-			for (DataKey dk : es.firstEntry()) {
-				System.out.println("Datakey=" + dk);
+		DataSource ds = DataSourceFactory.create(new Locator(f));
+		EntrySet es = ds.read();
+		// System.out.println(es.firstEntry());
+		Assert.assertEquals("gi|395136682|gb|CP003248.1|",
+				es.firstEntry().getID());
+		int count = 0;
+		for (Entry e : es)
+			count++;
+		Assert.assertEquals(1, count);
+		Data d = es.firstEntry().get(Type.get("regular.vcf"));
+		for (DataKey dk : es.firstEntry()) {
+			System.out.println("Datakey=" + dk);
 
-			}
-			Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
-			MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
-
-			for (Feature feat : mfa.get()) {
-				System.out.println(feat + "\t" + feat.type());
-			}
-
-			Assert.assertNotNull(d);
-
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (ReadFailedException e) {
-
-			e.printStackTrace();
-			Assert.fail();
 		}
+		Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
+		MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
+
+		for (Feature feat : mfa.get()) {
+			System.out.println(feat + "\t" + feat.type());
+		}
+
+		Assert.assertNotNull(d);
+
 	}
 }

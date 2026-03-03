@@ -16,35 +16,20 @@
  */
 package net.sf.jannot.parser;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
 
-import net.sf.jannot.Data;
-import net.sf.jannot.DataKey;
-import net.sf.jannot.Entry;
+import org.junit.Assert;
+import org.junit.Test;
+
 import net.sf.jannot.EntrySet;
-import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import be.abeel.io.LineIterator;
-
 import support.DataManager;
 
 /**
@@ -53,31 +38,18 @@ import support.DataManager;
  * 
  */
 public class TestGFFParser {
-	private static Logger log = Logger.getLogger(TestGFFParser.class.toString());
+	private static Logger log = Logger
+			.getLogger(TestGFFParser.class.toString());
 
 	@Test
-	public void testParserMini() {
+	public void testParserMini()
+			throws URISyntaxException, IOException, ReadFailedException {
 		File f = DataManager.file("doubleScore.gff3");
-		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f));
-			EntrySet es = ds.read();
-			double score=es.firstEntry().getMemoryAnnotation(Type.get("gene")).get(0).getScore();
-			Assert.assertEquals(0, score,0.0001);
-			
-
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (Exception e) {
-
-			e.printStackTrace();
-			Assert.fail();
-		}
+		DataSource ds = DataSourceFactory.create(new Locator(f));
+		EntrySet es = ds.read();
+		double score = es.firstEntry().getMemoryAnnotation(Type.get("gene"))
+				.get(0).getScore();
+		Assert.assertEquals(0, score, 0.0001);
 	}
-
-	
 
 }

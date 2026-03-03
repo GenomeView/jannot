@@ -16,41 +16,33 @@
  */
 package net.sf.jannot.parser;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import net.sf.jannot.EntrySet;
-import net.sf.jannot.Type;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import support.DataManager;
 
-/**
- * 
- * @author Thomas Abeel
- * 
- */
-public class TestGTFParser {
+public class TestSyntenicParser {
 	private static Logger log = Logger
-			.getLogger(TestGTFParser.class.toString());
+			.getLogger(TestSyntenicParser.class.toString());
 
 	@Test
 	public void testParserMini()
 			throws URISyntaxException, IOException, ReadFailedException {
-		File f = DataManager.file("doubleScore.gtf");
+		File f = DataManager.file("test.syn");
 		DataSource ds = DataSourceFactory.create(new Locator(f));
 		EntrySet es = ds.read();
-		double score = es.firstEntry().getMemoryAnnotation(Type.get("gene"))
-				.get(0).getScore();
-		Assert.assertEquals(0, score, 0.0001);
-
+		assertEquals(2, es.syntenic.getAll(null).size());
 	}
 
 }
