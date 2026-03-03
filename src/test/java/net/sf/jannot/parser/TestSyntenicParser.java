@@ -42,7 +42,8 @@ public class TestSyntenicParser {
 		File f = DataManager.file("test.syn");
 		DataSource ds = DataSourceFactory.create(new Locator(f));
 		EntrySet es = ds.read();
-		assertEquals(2, es.syntenic.getAll(null).size());
+		// 2 lines in the file, and we get 2 entries per line
+		assertEquals(2 * 2, es.syntenic.getAll(null).size());
 	}
 
 }
