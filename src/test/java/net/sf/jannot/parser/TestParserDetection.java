@@ -16,6 +16,8 @@
  */
 package net.sf.jannot.parser;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,39 +36,32 @@ import support.DataManager;
 public class TestParserDetection {
 
 	@Test
-	public void testBED() {
+	public void testBED() throws FileNotFoundException, IOException {
 		File f = DataManager.file("minibed.bed");
-		try {
-			Parser p = Parser.detectParser(new FileInputStream(f), "file");
-			Assert.assertTrue("Wrong parser: "+p.getClass(),p instanceof BEDParser);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			Assert.fail();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			Assert.fail();
-		}
+		Parser p = Parser.detectParser(new FileInputStream(f), "file");
+		assertNotNull(p);
+		Assert.assertTrue("Wrong parser: " + p.getClass(),
+				p instanceof BEDParser);
 
 	}
 
 	@Test
-	public void testVCF() {
+	public void testVCF() throws FileNotFoundException, IOException {
 		File f = DataManager.file("tiny.vcf");
-		try {
-			Parser p = Parser.detectParser(new FileInputStream(f), "file");
-			Assert.assertTrue("Wrong parser: "+p.getClass(),p instanceof VCFParser);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			Assert.fail();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			Assert.fail();
-		}
+		Parser p = Parser.detectParser(new FileInputStream(f), "file");
+		assertNotNull(p);
+		Assert.assertTrue("Wrong parser: " + p.getClass(),
+				p instanceof VCFParser);
 
 	}
-	
+
+	@Test
+	public void testSyntenic() throws FileNotFoundException, IOException {
+		File f = DataManager.file("test.syn");
+		Parser p = Parser.detectParser(new FileInputStream(f), "file");
+		assertNotNull(p);
+		Assert.assertTrue("Wrong parser: " + p.getClass(),
+				p instanceof SyntenicParser);
+	}
+
 }

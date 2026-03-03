@@ -13,7 +13,10 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.SyntenicBlock;
 
 /**
- * This parser. Each line in input reads as a {@link SyntenicBlock}. Each line 8
+ * Parses syntenic files.
+ * 
+ * THe file must have a first non-comment line with "gvheader:syntenic".
+ * Thereafter, each line in input reads as a {@link SyntenicBlock}. Each line 8
  * columns , tab separated , with
  * <ol>
  * <li>name of reference</li>

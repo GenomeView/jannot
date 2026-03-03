@@ -120,7 +120,8 @@ public abstract class Parser {
 	 *               valid File path. Others assume the source to be a "datakey"
 	 * 
 	 * @return an concrete Parser for the input stream, as determined by the
-	 *         headers actually in the input stream.
+	 *         headers actually in the input stream. Or null if no suitable
+	 *         parser is found.
 	 * @throws IOException
 	 */
 	private static Parser findParser(InputStream is, Object source)
