@@ -5,12 +5,16 @@ package net.sf.jannot;
 
 import net.sf.jannot.event.ChangeEvent;
 
+/**
+ * A Location is a range with start, end position. It probably means "locations
+ * of a label/tag on a genome".
+ */
 public class Location implements Comparable<Location> {
 
 	/**
-	 * These fields are public for efficient getter access. 
-	 * If you want to set these fields, please use the proper setters.
-	 * FIXME apparently these should not be public.
+	 * These fields are public for efficient getter access. If you want to set
+	 * these fields, please use the proper setters. FIXME apparently these
+	 * should not be public.
 	 */
 	public int start, end;
 
@@ -21,16 +25,16 @@ public class Location implements Comparable<Location> {
 	/**
 	 * Parses a location from a String. Inverse of the toString method
 	 * 
-	 * @param s string of the form "a..b".
-	 * If a starts with "<" the start is fuzzy
-	 * If b ends with ">" the end is fuzzy
+	 * @param s string of the form "a..b". If a starts with "<" the start is
+	 *          fuzzy If b ends with ">" the end is fuzzy
 	 * @return Location made from the string
 	 */
-	public static Location fromString(String s){
-		String[]arr=s.replace('<', ' ').replace('>', ' ').trim().split("..");
-		return new Location(Integer.parseInt(arr[0]),Integer.parseInt(arr[1]),s.startsWith("<"),s.endsWith(">"));
+	public static Location fromString(String s) {
+		String[] arr = s.replace('<', ' ').replace('>', ' ').trim().split("..");
+		return new Location(Integer.parseInt(arr[0]), Integer.parseInt(arr[1]),
+				s.startsWith("<"), s.endsWith(">"));
 	}
-	
+
 	@Override
 	public String toString() {
 		return (fuzzyStart ? "<" : "") + start + ".." + (fuzzyEnd ? ">" : "")
@@ -39,10 +43,13 @@ public class Location implements Comparable<Location> {
 
 	/**
 	 * The main constructor
-	 * @param start One endpoint of the interval. Can be negative
-	 * @param end the other endpoint of the interval. Can be negative.
-	 * @param fuzzyStart true iff start is fuzzy. NOTE this has no meaning anywhere.
-	 * @param fuzzyEnd true iff end is fuzzy. NOTE this has no meaning anywhere.
+	 * 
+	 * @param start      One endpoint of the interval. Can be negative
+	 * @param end        the other endpoint of the interval. Can be negative.
+	 * @param fuzzyStart true iff start is fuzzy. NOTE this has no meaning
+	 *                   anywhere.
+	 * @param fuzzyEnd   true iff end is fuzzy. NOTE this has no meaning
+	 *                   anywhere.
 	 */
 	public Location(int start, int end, boolean fuzzyStart, boolean fuzzyEnd) {
 		if (end > start) {
@@ -58,6 +65,7 @@ public class Location implements Comparable<Location> {
 
 	/**
 	 * Shortcut to create non-fuzzy interval.
+	 * 
 	 * @param x one endpoint of the interval
 	 * @param y the other endpoint of the interval.
 	 */
@@ -86,17 +94,16 @@ public class Location implements Comparable<Location> {
 	}
 
 	/**
-	 * {@inheritDoc}.
-	 * the start position is compared first. If equal, 
-	 * the ordering is determined by the end position.
-	 * {@link #fuzzyEnd} and {@link #fuzzyStart} have no effect here. 
+	 * {@inheritDoc}. the start position is compared first. If equal, the
+	 * ordering is determined by the end position. {@link #fuzzyEnd} and
+	 * {@link #fuzzyStart} have no effect here.
 	 */
 	@Override
 	public int compareTo(Location arg0) {
 		int comp = new Integer(start).compareTo(arg0.start());
 		if (comp == 0)
 			comp = new Integer(this.end).compareTo(arg0.end());
-		
+
 		return comp;
 	}
 
@@ -135,7 +142,7 @@ public class Location implements Comparable<Location> {
 		return end - start + 1;
 	}
 
-	public boolean overlaps(int lStart,int lEnd) {
+	public boolean overlaps(int lStart, int lEnd) {
 		if (start >= lStart && start <= lEnd)
 			return true;
 		if (end >= lStart && end <= lEnd)
@@ -160,7 +167,7 @@ public class Location implements Comparable<Location> {
 
 	/**
 	 * @return the {@link Feature} that is the unique parent of this location,
-	 * or null.	
+	 *         or null.
 	 */
 	public Feature getParent() {
 		return parent;
@@ -212,7 +219,8 @@ public class Location implements Comparable<Location> {
 
 		private Location l;
 
-		public SetStartEvent(Location l, int originalPosition, int newPosition) {
+		public SetStartEvent(Location l, int originalPosition,
+				int newPosition) {
 			this.l = l;
 			this.from = originalPosition;
 			this.to = newPosition;

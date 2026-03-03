@@ -27,7 +27,8 @@ import net.sf.jannot.parser.software.TRNAscanParser;
 import net.sf.jannot.parser.software.TransTermHPParser;
 
 /**
- * Base class for all parsers
+ * Base class for all genome data file parsers. The main method is
+ * {@link #findParser(InputStream, Object)}
  */
 public abstract class Parser {
 
@@ -36,6 +37,12 @@ public abstract class Parser {
 	public static final Parser EMBL = new EMBLParser();
 
 	private static Logger log = Logger.getLogger(Parser.class.toString());
+
+	/*
+	 * Data key for data types that require some external information to
+	 * determine the name of the data
+	 */
+	protected DataKey dataKey = null;
 
 	// FIXME this should be dynamically determined
 	public static Parser[] parsers(Object source) {
@@ -102,11 +109,18 @@ public abstract class Parser {
 	}
 
 	/**
-	 * Method to automagically detect parsers.
+	 * Method to automagically detect parsers. This relies on detailed knowledge
+	 * of header contents and rules for comments and empty lines for the parsers
+	 * at our disposal. In some cases trial reads are done to see if errors
+	 * occur.
 	 * 
-	 * @param is
-	 * @param source
-	 * @return
+	 * @param is     the inputstream of the data to parse
+	 * @param source the filename or so representing the original source. Some
+	 *               parsers require the object toString function to give a
+	 *               valid File path. Others assume the source to be a "datakey"
+	 * 
+	 * @return an concrete Parser for the input stream, as determined by the
+	 *         headers actually in the input stream.
 	 * @throws IOException
 	 */
 	private static Parser findParser(InputStream is, Object source)
@@ -237,12 +251,6 @@ public abstract class Parser {
 
 	}
 
-	/*
-	 * Data key for data types that require some external information to
-	 * determine the name of the data
-	 */
-	protected DataKey dataKey = null;
-
 	public void setDataKey(DataKey dk) {
 		this.dataKey = dk;
 	}
@@ -252,6 +260,12 @@ public abstract class Parser {
 		setDataKey(new StringKey(s));
 	}
 
+	/**
+	 * 
+	 * @param line   the final string on the header line
+	 * @param source the filename or id of the source
+	 * @return a {@link BroadSolexa} or {@link FastaParser}
+	 */
 	private static Parser specifyFastaType(String line, Object source) {
 		boolean broadShortRead = true;
 		try {
