@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+import be.abeel.util.LRUCache;
+import htsjdk.samtools.util.BlockCompressedInputStream;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.StringKey;
@@ -19,8 +21,6 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.LineBlockCompressedInputStream;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
-import htsjdk.samtools.util.BlockCompressedInputStream;
-import be.abeel.util.LRUCache;
 
 /**
  * 
@@ -31,19 +31,10 @@ public class IndexedFeatureFile extends DataSource {
 	// FIXME a lot of duplicated stuff from CachingQueryReader with respect to
 	// the tiling caching...
 
-	public String source() {
-		return data.toString();
-	}
-
-	@Override
-	public String toString() {
-		return data.toString();
-	}
-
 	/**
 	 * Index constructed from a binary index file
 	 */
-	private TabIndex idx;
+	TabIndex idx;
 
 	/**
 	 * Compressed data file.
@@ -53,10 +44,47 @@ public class IndexedFeatureFile extends DataSource {
 
 	private long size;
 
+	private final static int MAX_BIN = 37450;
+	private final static int TAD_LIDX_SHIFT = 14;
+
+	// preset masks
+//	private final static int TI_PRESET_GENERIC = 0;
+//	private final static int TI_PRESET_SAM = 1;
+//	private final static int TI_PRESET_VCF = 2;
+//	private final static int TI_FLAG_UCSC = 0x10000;
+
+	/**
+	 * @param data
+	 * @param index
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	public IndexedFeatureFile(Locator data, Locator index)
+			throws IOException, URISyntaxException {
+		super(data);
+		this.data = data;
+		// this.index = index;
+		this.size = data.length();
+		BlockCompressedInputStream in = null;
+		if (index.isURL()) {
+			in = new BlockCompressedInputStream(index.url());
+		} else
+			in = new BlockCompressedInputStream(index.file());
+		setup(in, 8000, 50);
+	}
+
 	public TabIndex getIndex() {
 		return idx;
 	}
 
+	public String source() {
+		return data.toString();
+	}
+
+	@Override
+	public String toString() {
+		return data.toString();
+	}
 	// /**
 	// * Reads an index file and constructs an index object.
 	// *
@@ -112,26 +140,8 @@ public class IndexedFeatureFile extends DataSource {
 	// setup(in, tileSize, tiles);
 	// }
 
-	/**
-	 * @param data
-	 * @param index
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	public IndexedFeatureFile(Locator data, Locator index) throws IOException, URISyntaxException {
-		super(data);
-		this.data = data;
-		// this.index = index;
-		this.size = data.length();
-		BlockCompressedInputStream in = null;
-		if (index.isURL()) {
-			in = new BlockCompressedInputStream(index.url());
-		} else
-			in = new BlockCompressedInputStream(index.file());
-		setup(in, 8000, 50);
-	}
-
-	private void setup(BlockCompressedInputStream in, int tileSize, int tiles) throws IOException {
+	private void setup(BlockCompressedInputStream in, int tileSize, int tiles)
+			throws IOException {
 		BinaryCodec bc = new BinaryCodec(in);
 		this.tileSize = tileSize;
 		this.maxTileCount = tiles;
@@ -194,7 +204,8 @@ public class IndexedFeatureFile extends DataSource {
 			for (int j = 0; j < numberOfOffsets; j++) {
 				idx.linIndex[i].add(bc.readLong());
 			}
-			// System.out.println("Linidex: "+idx.names.get(i)+"\t"+idx.linIndex[i]);
+			// System.out.println("Linidex:
+			// "+idx.names.get(i)+"\t"+idx.linIndex[i]);
 		}
 
 		in.close();
@@ -248,15 +259,6 @@ public class IndexedFeatureFile extends DataSource {
 		return (rend >= beg && rbeg <= end);
 	}
 
-	final int MAX_BIN = 37450;
-	final int TAD_LIDX_SHIFT = 14;
-
-	// preset masks
-	final int TI_PRESET_GENERIC = 0;
-	final int TI_PRESET_SAM = 1;
-	final int TI_PRESET_VCF = 2;
-	final int TI_FLAG_UCSC = 0x10000;
-
 	// private String sequence;
 	//
 	// private int start;
@@ -271,8 +273,8 @@ public class IndexedFeatureFile extends DataSource {
 
 		HashMap<Integer, ArrayList<Pair64>> index = idx.index[tid];
 
-		long min_off = (beg >> TAD_LIDX_SHIFT >= idx.linIndex[tid].size()) ? 0 : idx.linIndex[tid]
-				.get(beg >> TAD_LIDX_SHIFT);
+		long min_off = (beg >> TAD_LIDX_SHIFT >= idx.linIndex[tid].size()) ? 0
+				: idx.linIndex[tid].get(beg >> TAD_LIDX_SHIFT);
 
 		ArrayList<Pair64> off = new ArrayList<Pair64>();
 
@@ -360,8 +362,7 @@ public class IndexedFeatureFile extends DataSource {
 		}
 
 		/**
-		 * @param tileNumber
-		 *            the tileNumber to set
+		 * @param tileNumber the tileNumber to set
 		 */
 		public void setTileNumber(int tileNumber) {
 			this.tileNumber = tileNumber;
@@ -375,8 +376,7 @@ public class IndexedFeatureFile extends DataSource {
 		}
 
 		/**
-		 * @param start
-		 *            the start to set
+		 * @param start the start to set
 		 */
 		public void setStart(int start) {
 			this.start = start;
@@ -405,8 +405,7 @@ public class IndexedFeatureFile extends DataSource {
 		}
 
 		/**
-		 * @param overlappingRecords
-		 *            the overlappingRecords to set
+		 * @param overlappingRecords the overlappingRecords to set
 		 */
 		public void setOverlappingRecords(List<TabixLine> overlappingRecords) {
 			this.overlappingRecords = overlappingRecords;
@@ -420,8 +419,7 @@ public class IndexedFeatureFile extends DataSource {
 		}
 
 		/**
-		 * @param loaded
-		 *            the loaded to set
+		 * @param loaded the loaded to set
 		 */
 		public void setLoaded(boolean loaded) {
 			this.loaded = loaded;
@@ -432,7 +430,8 @@ public class IndexedFeatureFile extends DataSource {
 	private int maxTileCount;
 	private LRUCache<Integer, Tile> cache;
 
-	private List<Tile> getTiles(int tid, int startTile, int endTile) throws IOException, URISyntaxException {
+	private List<Tile> getTiles(int tid, int startTile, int endTile)
+			throws IOException, URISyntaxException {
 
 		if (tid != cachedChr) {
 			cache = new LRUCache<Integer, Tile>(maxTileCount);
@@ -473,7 +472,8 @@ public class IndexedFeatureFile extends DataSource {
 		return tiles;
 	}
 
-	private void loadTiles(int tid, List<Tile> tiles) throws IOException, URISyntaxException {
+	private void loadTiles(int tid, List<Tile> tiles)
+			throws IOException, URISyntaxException {
 
 		int start = tiles.get(0).start;
 		int end = tiles.get(tiles.size() - 1).end;
@@ -494,7 +494,8 @@ public class IndexedFeatureFile extends DataSource {
 			int aStart = record.beg;// record.getAlignmentStart();
 			int aEnd = record.end;// getAlignmentEnd();// record.getEnd();
 			int idx0 = Math.max(0, (aStart - start) / tileSize);
-			int idx1 = Math.min(tiles.size() - 1, (record.end - start) / tileSize);
+			int idx1 = Math.min(tiles.size() - 1,
+					(record.end - start) / tileSize);
 
 			// Loop over tiles this read overlaps
 			for (int i = idx0; i <= idx1; i++) {
@@ -517,7 +518,8 @@ public class IndexedFeatureFile extends DataSource {
 		}
 	}
 
-	private ArrayList<TabixLine> readRange(int tid, int beg, int end) throws IOException, URISyntaxException {
+	private ArrayList<TabixLine> readRange(int tid, int beg, int end)
+			throws IOException, URISyntaxException {
 		int startTile = (beg + 1) / tileSize;
 		int endTile = end / tileSize; // <= inclusive
 		List<Tile> tiles = getTiles(tid, startTile, endTile);
@@ -550,16 +552,14 @@ public class IndexedFeatureFile extends DataSource {
 	/**
 	 * Read a range from the compressed GFF-file.
 	 * 
-	 * @param tid
-	 *            the sequence number (0 based)
-	 * @param beg
-	 *            begin of range
-	 * @param end
-	 *            end of range
+	 * @param tid the sequence number (0 based)
+	 * @param beg begin of range
+	 * @param end end of range
 	 * @return A list of Strings, one GFF entry a line.
 	 * @throws URISyntaxException
 	 */
-	private ArrayList<TabixLine> readRawRange(int tid, int beg, int end) throws IOException, URISyntaxException {
+	private ArrayList<TabixLine> readRawRange(int tid, int beg, int end)
+			throws IOException, URISyntaxException {
 
 		ArrayList<TabixLine> output = new ArrayList<TabixLine>();
 
@@ -568,7 +568,8 @@ public class IndexedFeatureFile extends DataSource {
 		if (off.size() == 0)
 			return output;
 
-		LineBlockCompressedInputStream in = new LineBlockCompressedInputStream(data.stream());
+		LineBlockCompressedInputStream in = new LineBlockCompressedInputStream(
+				data.stream());
 
 		// System.out.println("Reading raw: " + tid + " " + beg + " " + end +
 		// " " + off);
@@ -580,10 +581,13 @@ public class IndexedFeatureFile extends DataSource {
 			// keep reading until end of block
 
 			/*
-			 * Checking the file pointer is not a good thing to check here as it is wrapped
-			 * in a buffered reader that will put the pointer way forward.
+			 * Checking the file pointer is not a good thing to check here as it
+			 * is wrapped in a buffered reader that will put the pointer way
+			 * forward.
 			 */
-			while (in.getFilePointer() >= 0 /* && in.getFilePointer() < bin.end */) {
+			while (in.getFilePointer() >= 0 /*
+											 * && in.getFilePointer() < bin.end
+											 */) {
 				// System.out.println("FP1: " + in.getFilePointer() + "\t" +
 				// bin.end);
 				TabixLine intv = this.readParsedLine(in, tid, beg, end);// Line(in);
@@ -637,7 +641,8 @@ public class IndexedFeatureFile extends DataSource {
 	 * @return
 	 * @throws IOException
 	 */
-	private TabixLine readParsedLine(LineBlockCompressedInputStream in, int tid, int beg, int end) throws IOException {
+	private TabixLine readParsedLine(LineBlockCompressedInputStream in, int tid,
+			int beg, int end) throws IOException {
 
 		TabixLine p = new TabixLine();
 
@@ -703,8 +708,8 @@ public class IndexedFeatureFile extends DataSource {
 	private ArrayList<TabixLine> lastList = null;
 
 	// @Override
-	public synchronized Iterable<TabixLine> query(String sequence, int start, int end) throws IOException,
-			URISyntaxException {
+	public synchronized Iterable<TabixLine> query(String sequence, int start,
+			int end) throws IOException, URISyntaxException {
 		if (!idx.names.contains(sequence))
 			return null;
 		if (sequence.equals(lastSeq) && start >= lastStart && end <= lastEnd)
@@ -743,37 +748,35 @@ public class IndexedFeatureFile extends DataSource {
 			// System.out.println("Adding e: " + e);
 			/* This should be done better, but for now I have no idea how */
 			if (data.isPileup())
-				e.add(new StringKey(data.toString()), new PileupWrapper(name, this, idx));
-			else if (data.toString().toLowerCase().contains(".swig") || data.toString().toLowerCase().contains(".tab")
+				e.add(new StringKey(data.toString()),
+						new PileupWrapper(name, this, idx));
+			else if (data.toString().toLowerCase().contains(".swig")
+					|| data.toString().toLowerCase().contains(".tab")
 					|| data.toString().toLowerCase().contains(".tsv"))
-				e.add(new StringKey(data.toString()), new SWigWrapper(name, this, idx));
+				e.add(new StringKey(data.toString()),
+						new SWigWrapper(name, this, idx));
 			else if (data.toString().toLowerCase().contains(".bed"))
-				e.add(Type.get(data.toString()), new BEDWrapper(name, this, idx));
+				e.add(Type.get(data.toString()),
+						new BEDWrapper(name, this, idx));
 			else if (data.toString().toLowerCase().contains(".gff"))
-				e.add(Type.get(data.toString()), new GFFWrapper(name, this, idx));
+				e.add(Type.get(data.toString()),
+						new GFFWrapper(name, this, idx));
 			else if (data.isVCF()) {
-				e.add(Type.get(data.toString()), new VCFWrapper(name, this, idx));
+				e.add(Type.get(data.toString()),
+						new VCFWrapper(name, this, idx));
 			} else
-				log.severe("Don't now how to read this file, can't figure out the type: " + data);
+				log.severe(
+						"Don't now how to read this file, can't figure out the type: "
+								+ data);
 		}
 		return add;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.source.DataSource#isIndexed()
-	 */
 	@Override
 	public boolean isIndexed() {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.source.DataSource#size()
-	 */
 	@Override
 	public long size() {
 		return size;
@@ -783,7 +786,7 @@ public class IndexedFeatureFile extends DataSource {
 
 /**
  * 
- * Organized content of an index file
+ * Organized content of an index file.
  */
 class TabIndex {
 
@@ -834,8 +837,7 @@ class TabIndex {
 	/**
 	 * Create a new TabIndex
 	 * 
-	 * @param size
-	 *            the number of sequences in the index
+	 * @param size the number of sequences in the index
 	 */
 	public TabIndex(int size) {
 		index = new HashMap[size];

@@ -48,6 +48,13 @@ public class SyntenicParser extends Parser {
 		// TODO Auto-generated constructor stub
 	}
 
+	/**
+	 * weird, all other parsers now have this. Makes not much sense.
+	 */
+	public SyntenicParser() {
+		this(null);
+	}
+
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
 		// List<Entry>list=new ArrayList<Entry>();

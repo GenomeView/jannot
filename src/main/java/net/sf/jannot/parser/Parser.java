@@ -52,7 +52,7 @@ public abstract class Parser {
 				new TransTermHPParser(), new TRNAscanParser(), new EMBLParser(),
 				new FastaParser(), new GenbankParser(), new PTTParser(),
 				new TBLParser(), new VCFParser(source.toString()),
-				new WiggleParser() };
+				new WiggleParser(), new SyntenicParser() };
 	}
 
 	public Parser(DataKey dataKey) {
@@ -99,6 +99,18 @@ public abstract class Parser {
 
 	}
 
+	/**
+	 * public method for {@link #findParser(InputStream, Object)}
+	 * 
+	 * @param is     the inputstream of the data to parse
+	 * @param source the filename or so representing the original source. Some
+	 *               parsers require the object toString function to give a
+	 *               valid File path. Others assume the source to be a "datakey"
+	 * @return an concrete Parser for the input stream, as determined by the
+	 *         headers actually in the input stream. Or null if no suitable
+	 *         parser is found.
+	 * @throws IOException
+	 */
 	public static Parser detectParser(InputStream is, Object source)
 			throws IOException {
 
@@ -158,6 +170,8 @@ public abstract class Parser {
 		if (nonCommentLine.startsWith("TransTermHP"))
 			return new TransTermHPParser();
 		if (nonCommentLine.startsWith("gvheader:syntenic")) {
+			// old style syntenic files. We don't have these anymore
+			// and maybe we should remove this type.
 			return new SyntenicParser(new StringKey(source.toString()));
 		}
 
@@ -175,9 +189,14 @@ public abstract class Parser {
 
 		if (nonCommentLine.startsWith("LOCUS"))
 			return new GenbankParser();
-		log.info("tab split nonCommentLine: "
-				+ nonCommentLine.split("\t").length);
+
+		// ====== NO HEADER. TRY TAB SPLIT . =====
+		// and look in contents. This is getting fuzzy.
+
 		String[] nonCommentArr = nonCommentLine.split("\t");
+
+		log.info("tab split nonCommentLine: " + nonCommentArr.length);
+
 		if (nonCommentArr.length == 9) {
 			if (nonCommentArr[0].contains(".."))
 				return new PTTParser();
@@ -204,16 +223,33 @@ public abstract class Parser {
 			}
 		}
 
+		if (nonCommentArr.length >= 12) {
+			// could be PAF. Check first because next test is not checking this
+			boolean isMap = true;
+			// check if it's PAF. But then all extra cols are 'key:val'
+			for (int col = 12; col < nonCommentArr.length; col++) {
+				isMap = isMap | nonCommentArr[col].contains(":");
+			}
+			if (isMap && isStrand(nonCommentArr[4].charAt(0))) {
+				return new SyntenicParser();
+			}
+		}
+
 		/* Can either be BlastM8 or BED */
 		if (nonCommentLine.split("\t").length == 12) {
 			String[] arr = nonCommentLine.split("\t");
+
+			if (isStrand(arr[4].charAt(0)))
+				return new SyntenicParser();
+
 			try {
 				Double.parseDouble(arr[4]);
 			} catch (NumberFormatException ne) {
+				// #34 won't happen for blast, as arr[4] is a simple number
 				return new BlastM8Parser();
 			}
-			char c = arr[5].charAt(0);
-			if (c == '+' || c == '-' || c == '.')
+
+			if (isStrand(arr[5].charAt(0)))
 				return new BEDParser(source.toString());
 
 			try {
@@ -247,9 +283,17 @@ public abstract class Parser {
 		// return new ALNParser(new StringKey(source.toString()));
 		// }
 		//
-		// if (nonCommentLine.split("\t").length != 9)
-		// return new BEDParser();
 
+	}
+
+	/**
+	 * 
+	 * @param c the strand character
+	 * @return true iff c is '+' '-' or '.' which are the strand direction
+	 *         chars.
+	 */
+	private static boolean isStrand(char c) {
+		return (c == '+' || c == '-' || c == '.');
 	}
 
 	public void setDataKey(DataKey dk) {

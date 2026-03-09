@@ -3,16 +3,15 @@
  */
 package net.sf.jannot.alignment.mfa;
 
-import net.sf.jannot.Data;
-import net.sf.jannot.MemoryListData;
 import be.abeel.util.CountMap;
+import net.sf.jannot.MemoryListData;
 
-public class AlignmentAnnotation extends MemoryListData<Alignment> implements Data<Alignment>  {
+public class AlignmentAnnotation extends MemoryListData<Alignment> {
 
-	public String label(){
+	public String label() {
 		return "Multiple alignment";
 	}
-	
+
 	private static final long serialVersionUID = -5188981624665479856L;
 //	private MemoryListData<Alignment> dataList = new MemoryListData<Alignment>();
 	private byte[][] conservation;
@@ -118,7 +117,8 @@ public class AlignmentAnnotation extends MemoryListData<Alignment> implements Da
 
 	@Override
 	public Iterable<Alignment> get(int start, int end) {
-		//It doesn't make sense for this data implementation to be queried by range
+		// It doesn't make sense for this data implementation to be queried by
+		// range
 		return get();
 	}
 

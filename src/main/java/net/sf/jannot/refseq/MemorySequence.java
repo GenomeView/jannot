@@ -3,12 +3,40 @@
  */
 package net.sf.jannot.refseq;
 
+import cern.colt.list.ByteArrayList;
 import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.utils.ArrayIterable;
 import net.sf.jannot.utils.SequenceTools;
-import cern.colt.list.ByteArrayList;
 
+/**
+ * A mutable sequence in memory
+ */
 public class MemorySequence extends Sequence {
+
+	private DefaultByteArrayList sequence = new DefaultByteArrayList(
+			(byte) 0xff);
+
+	public MemorySequence() {
+
+	}
+
+	/**
+	 * Copy constructor
+	 * 
+	 * @param sequence sequence to make a copy of
+	 */
+	public MemorySequence(MemorySequence sequence) {
+		this.sequence = sequence.sequence.copy();
+		this.size = sequence.size;
+	}
+
+	public MemorySequence(String string) {
+		this(new StringBuffer(string));
+	}
+
+	public MemorySequence(StringBuffer string) {
+		setSequence(string);
+	}
 
 	@Deprecated
 	public char getNucleotide(int index) {
@@ -25,13 +53,15 @@ public class MemorySequence extends Sequence {
 
 	@Deprecated
 	public char getAminoAcid(int pos, AminoAcidMapping mapping) {
-		String codon = "" + getNucleotide(pos) + getNucleotide(pos + 1) + getNucleotide(pos + 2);
+		String codon = "" + getNucleotide(pos) + getNucleotide(pos + 1)
+				+ getNucleotide(pos + 2);
 		return mapping.get(codon);
 	}
 
 	@Deprecated
 	public char getReverseAminoAcid(int pos, AminoAcidMapping mapping) {
-		String codon = "" + getReverseNucleotide(pos + 2) + getReverseNucleotide(pos + 1) + getReverseNucleotide(pos);
+		String codon = "" + getReverseNucleotide(pos + 2)
+				+ getReverseNucleotide(pos + 1) + getReverseNucleotide(pos);
 		return mapping.get(codon);
 	}
 
@@ -57,8 +87,6 @@ public class MemorySequence extends Sequence {
 	// }
 	// return out.toString();
 	// }
-
-	private DefaultByteArrayList sequence = new DefaultByteArrayList((byte) 0xff);
 
 	static class DefaultByteArrayList extends ByteArrayList {
 
@@ -166,29 +194,6 @@ public class MemorySequence extends Sequence {
 			current &= mask;
 		}
 		return decode(current);
-	}
-
-	public MemorySequence() {
-
-	}
-
-	/**
-	 * Copy constructor
-	 * 
-	 * @param sequence
-	 *            sequence to make a copy of
-	 */
-	public MemorySequence(MemorySequence sequence) {
-		this.sequence = sequence.sequence.copy();
-		this.size = sequence.size;
-	}
-
-	public MemorySequence(String string) {
-		this(new StringBuffer(string));
-	}
-
-	public MemorySequence(StringBuffer string) {
-		setSequence(string);
 	}
 
 	// @Deprecated
@@ -299,7 +304,7 @@ public class MemorySequence extends Sequence {
 	}
 
 	// public void setSequence(StringBuffer seq, int start) {
-	//		
+	//
 	//
 	// }
 
@@ -332,7 +337,7 @@ public class MemorySequence extends Sequence {
 	 */
 	@Override
 	public Iterable<Character> get() {
-		return get(1, size()+1);
+		return get(1, size() + 1);
 		// return new ArrayIterable<Character>();
 		// char[] seq = getSequence().toCharArray();
 		// return new ArrayIterable<Character>(seq);

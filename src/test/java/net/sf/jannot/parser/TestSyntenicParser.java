@@ -33,6 +33,7 @@ import net.sf.jannot.source.Locator;
 import support.DataManager;
 
 public class TestSyntenicParser {
+	private static final String PAF = "YJM1447_vs_R64.paf";
 	private static Logger log = Logger
 			.getLogger(TestSyntenicParser.class.toString());
 
@@ -44,6 +45,16 @@ public class TestSyntenicParser {
 		EntrySet es = ds.read();
 		// 2 lines in the file, and we get 2 entries per line
 		assertEquals(2 * 2, es.syntenic.getAll(null).size());
+	}
+
+	@Test
+	public void testParserPaf()
+			throws URISyntaxException, IOException, ReadFailedException {
+		File f = DataManager.file(PAF);
+		DataSource ds = DataSourceFactory.create(new Locator(f));
+		EntrySet es = ds.read();
+		// 2 lines in the file, and we get 2 entries per line
+		assertEquals(782 * 2, es.syntenic.getAll(null).size());
 	}
 
 }

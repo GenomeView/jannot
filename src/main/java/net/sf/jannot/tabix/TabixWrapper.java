@@ -7,36 +7,38 @@ import net.sf.jannot.Data;
 import net.sf.jannot.DensityEstimate;
 import net.sf.jannot.Location;
 
+/**
+ * abstract wrapper for density-like data like {@link FeatureWrapper},
+ * {@link PileupWrapper}
+ * 
+ * @param <T> the type of the contained data.
+ */
 public abstract class TabixWrapper<T> implements Data<T>, DensityEstimate {
 
-	public boolean canSave(){
-		return false;
-	}
 	private static final int RECORDSIZE = 12;
 	protected String key;
 	protected IndexedFeatureFile data;
 	protected TabIndex idx;
 
-	public String label(){
-		String s=data.source();
-		int bIndx=s.lastIndexOf('\\');
-		int fIdx=s.lastIndexOf('/');
-		int idx=Math.max(bIndx, fIdx);
-		return s.substring(idx+1);
-		
-	}
-	
 	TabixWrapper(String key, IndexedFeatureFile data, TabIndex idx) {
 		this.data = data;
 		this.key = key;
 		this.idx = idx;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get()
-	 */
+	public String label() {
+		String s = data.source();
+		int bIndx = s.lastIndexOf('\\');
+		int fIdx = s.lastIndexOf('/');
+		int idx = Math.max(bIndx, fIdx);
+		return s.substring(idx + 1);
+
+	}
+
+	public boolean canSave() {
+		return false;
+	}
+
 	@Override
 	public Iterable<T> get() {
 		return get(1, getMaximumCoordinate());
@@ -68,11 +70,6 @@ public abstract class TabixWrapper<T> implements Data<T>, DensityEstimate {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.DensityEstimate#getMaximumCoordinate()
-	 */
 	@Override
 	public int getMaximumCoordinate() {
 		int tid = idx.names.indexOf(key);

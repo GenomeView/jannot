@@ -3,10 +3,10 @@
  */
 package net.sf.jannot;
 
-
 /* Represents the annotation of a single type */
 
-public class MemoryFeatureAnnotation extends MemoryListData<Feature> implements FeatureAnnotation {
+public class MemoryFeatureAnnotation extends MemoryListData<Feature>
+		implements FeatureAnnotation {
 
 	/* All data that is kept in memory, these get added manually */
 	// private MemoryListData<Feature> memoryData = new
@@ -94,29 +94,18 @@ public class MemoryFeatureAnnotation extends MemoryListData<Feature> implements 
 		return super.indexOf(first);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.jannot.DensityEstimate#getEstimateCount(net.sf.jannot.Location)
-	 */
 	@Override
 	public int getEstimateCount(Location l) {
-		if(cachedCount()<200)
+		if (cachedCount() < 200)
 			return 0;
 		double d = cachedCount() / (maxEnd - minStart);
-		
+
 		int estMemory = (int) (l.length() * d);
-	
+
 		return estMemory;
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.DensityEstimate#getMaximumCoordinate()
-	 */
 	@Override
 	public int getMaximumCoordinate() {
 		return (int) maxEnd;
@@ -163,11 +152,6 @@ public class MemoryFeatureAnnotation extends MemoryListData<Feature> implements 
 //		return qualifierKeys;
 //	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#canSave()
-	 */
 	@Override
 	public boolean canSave() {
 		if (super.size() > 0)

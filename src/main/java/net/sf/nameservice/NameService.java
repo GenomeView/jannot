@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
-import net.sf.jannot.exception.ReadFailedException;
 import be.abeel.io.LineIterator;
+import net.sf.jannot.exception.ReadFailedException;
 
+/**
+ * Stores key-value pairs.
+ */
 public class NameService {
+	// all keys are stored in UPPER CASE.
 	public static final HashMap<String, String> map = new HashMap<String, String>();
 
 	static {
@@ -16,8 +20,8 @@ public class NameService {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err
-					.println("Failed to load naming service, synonyms won't work...");
+			System.err.println(
+					"Failed to load naming service, synonyms won't work...");
 		}
 	}
 
@@ -25,6 +29,13 @@ public class NameService {
 		System.out.println(map);
 	}
 
+	/**
+	 * 
+	 * @param key an un-cleaned key
+	 * @return a cleaned key, with all leading and trailing spaces removed. But
+	 *         if the cleaned key in all-upper-case is a known key, the value
+	 *         stored for that key is returned.
+	 */
 	public static String getPrimaryName(String key) {
 		key = key.trim();
 		if (map.containsKey(key.toUpperCase()))
@@ -38,28 +49,43 @@ public class NameService {
 		addSynonyms(NameService.class.getResourceAsStream("synonyms.txt"));
 	}
 
+	/**
+	 * 
+	 * @param primary the key. The key is cleaned: trimmed and whitespaces are
+	 *                replaced with '_'.
+	 * @param alt     a comma-separated list of [value]s for key. Each of these
+	 *                values is put as [cleaned-primary]:[value] in the map.
+	 */
 	public static void addSynonym(String primary, String alt) {
 		map.put(primary.trim().replace(' ', '_').toUpperCase(), primary.trim());
 		String[] arr = alt.split(",");
 		for (String s : arr) {
-			map.put(s.trim().toUpperCase(),primary.trim());
+			map.put(s.trim().toUpperCase(), primary.trim());
 			map.put(s.trim().replace(' ', '_').toUpperCase(), primary.trim());
 		}
 
 	}
 
+	/**
+	 * Imports maps from an input stream. The stream must contain lines of the
+	 * form XXX=AA,BB,CC...,FF. AA..FF is a comma-separated list of values. Each
+	 * is added with {@link #addSynonym(XX, AA..FF)}
+	 * 
+	 * @param is the {@link InputStream}
+	 * @throws ReadFailedException
+	 */
 	public static void addSynonyms(InputStream is) throws ReadFailedException {
 		for (String line : new LineIterator(is, true, true)) {
 			String[] prim = line.split("=");
-			addSynonym(prim[0],prim[1]);
-			
+			addSynonym(prim[0], prim[1]);
+
 		}
 		try {
 			is.close();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
-			System.err
-					.println("Failed to close the file, probably synonyms will work anyway...");
+			System.err.println(
+					"Failed to close the file, probably synonyms will work anyway...");
 		}
 	}
 }

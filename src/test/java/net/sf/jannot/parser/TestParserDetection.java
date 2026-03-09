@@ -26,6 +26,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import net.sf.jannot.parser.software.BlastM8Parser;
 import support.DataManager;
 
 /**
@@ -34,6 +35,7 @@ import support.DataManager;
  * 
  */
 public class TestParserDetection {
+	private static final String PAF = "YJM1447_vs_R64.paf";
 
 	@Test
 	public void testBED() throws FileNotFoundException, IOException {
@@ -56,8 +58,28 @@ public class TestParserDetection {
 	}
 
 	@Test
+	public void testBlast() throws FileNotFoundException, IOException {
+		File f = DataManager.file("testblast.m8");
+		Parser p = Parser.detectParser(new FileInputStream(f), "file");
+		assertNotNull(p);
+		Assert.assertTrue("Wrong parser: " + p.getClass(),
+				p instanceof BlastM8Parser);
+
+	}
+
+	@Test
+	public void testPAF() throws FileNotFoundException, IOException {
+		File f = DataManager.file("minibed.bed");
+		Parser p = Parser.detectParser(new FileInputStream(f), "file");
+		assertNotNull(p);
+		Assert.assertTrue("Wrong parser: " + p.getClass(),
+				p instanceof BEDParser);
+
+	}
+
+	@Test
 	public void testSyntenic() throws FileNotFoundException, IOException {
-		File f = DataManager.file("test.syn");
+		File f = DataManager.file(PAF);
 		Parser p = Parser.detectParser(new FileInputStream(f), "file");
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),

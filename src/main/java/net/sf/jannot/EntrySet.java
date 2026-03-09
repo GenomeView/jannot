@@ -34,7 +34,9 @@ public class EntrySet implements Iterable<Entry> {
 	private final HashMap<String, Entry> map = new HashMap<String, Entry>();
 
 	/*
-	 * This should be the only way to access the map as it does some key mapping
+	 * @return map[key], or if that is null map[key.lowercase] , or if that is
+	 * also null map["chr"+key], or if that is null and key starts with "chr"
+	 * map[key without "chr"], or else null
 	 */
 	private Entry mapGet(String key) {
 		Entry out = map.get(key);
@@ -53,14 +55,20 @@ public class EntrySet implements Iterable<Entry> {
 		return entries.iterator();
 	}
 
-	public synchronized Entry getOrCreateEntry(String string) {
-		string = NameService.getPrimaryName(string);
-		if (mapGet(string) == null) {
-			Entry e = new Entry(string);
-			map.put(string, e);
+	/**
+	 * 
+	 * @param key a key. If the key is a registered synonym, the 'real' value is
+	 *            used
+	 * @return an Entry that has the key as id.
+	 */
+	public synchronized Entry getOrCreateEntry(String key) {
+		key = NameService.getPrimaryName(key);
+		if (mapGet(key) == null) {
+			Entry e = new Entry(key);
+			map.put(key, e);
 			entries.add(e);
 		}
-		return mapGet(string);
+		return mapGet(key);
 	}
 
 	public synchronized Entry firstEntry() {

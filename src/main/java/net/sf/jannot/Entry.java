@@ -31,7 +31,7 @@ import net.sf.nameservice.NameService;
  * 
  * will read notations from the .gff file to Entryset set.
  * 
- * 
+ * An entry is mutable
  * 
  * 
  * @author Thomas Abeel
@@ -39,15 +39,33 @@ import net.sf.nameservice.NameService;
  */
 public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
-//	static final NameService ns=new NameService();
-	
-	private static final StringKey seqKey = new StringKey("SEQ*(^#%(@#%)@#^@#^))^)@#)^(@#%^*()SEQ");
+	/**
+	 * A key that should be used only to store THE sequence in this entry.
+	 */
+	private static final StringKey seqKey = new StringKey(
+			"SEQ*(^#%(@#%)@#^@#^))^)@#)^(@#%^*()SEQ");
 
-	private static final Logger log=Logger.getLogger(Entry.class.getCanonicalName());
-	
-	final public Description description = new Description();
+	private static final Logger log = Logger
+			.getLogger(Entry.class.getCanonicalName());
 
-	private Map<DataKey, Data<?>> data = new HashMap<DataKey, Data<?>>();
+	public final Description description = new Description();
+
+	private final Map<DataKey, Data<?>> data = new HashMap<DataKey, Data<?>>();
+
+	private final String id;
+
+	/**
+	 * 
+	 * @param id the dirty id, may be an alias previously registered to the
+	 *           NameService. Must not be null
+	 */
+	public Entry(String id) {
+		id = NameService.getPrimaryName(id);
+		if (id == null)
+			throw new RuntimeException("id is null");
+		this.id = id;
+
+	}
 
 	/**
 	 * Returns the highest position for which there is data
@@ -76,32 +94,36 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	// public AlignmentAnnotation align = null;
 
+	/**
+	 * 
+	 * @param key     the key ID
+	 * @param newData the data to add to this entry.
+	 */
 	public void add(DataKey key, Data<?> newData) {
-		
+
 		if (!data.containsKey(key)) {
 			data.put(key, newData);
 			// if (newData instanceof AlignmentAnnotation)
 			// align = (AlignmentAnnotation) newData;
 		} else {
 			// FIXME implement for feature data */
-			log.severe("Already here, you lose!!!");
+			log.severe("Entry already contains data for " + key
+					+ ". new data is ignored");
 
 		}
-		
+
 	}
 
 	/**
 	 * @param dataKey
-	 * @return
+	 * @return the data stored under the datakey.
 	 */
 	public Data<?> get(DataKey dataKey) {
 		return data.get(dataKey);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Iterable#iterator()
+	/**
+	 * return iterator over the data keys
 	 */
 	@Override
 	public Iterator<DataKey> iterator() {
@@ -109,7 +131,8 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	}
 
 	/**
-	 * @return
+	 * @return iteratable over all {@link ReadGroup}s contained in the data.
+	 *         Note that these are in arbitrary order
 	 */
 	public Iterable<ReadGroup> shortReads() {
 		ArrayList<ReadGroup> out = new ArrayList<ReadGroup>();
@@ -122,8 +145,10 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	}
 
 	/**
-	 * @param type
-	 * @return
+	 * @param type the data key for which a {@link MemoryFeatureAnnotation} is
+	 *             expected in the data
+	 * @return the {@link MemoryFeatureAnnotation} registered for 'type', or
+	 *         null if such feature is not there and cannot be created either.
 	 */
 	public MemoryFeatureAnnotation getMemoryAnnotation(DataKey type) {
 		if (!data.containsKey(type))
@@ -136,8 +161,10 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	}
 
-	private final String id;
-
+	/**
+	 * 
+	 * @return the sequence stored for this entry, or an empty sequence
+	 */
 	public Sequence sequence() {
 		if (!data.containsKey(seqKey)) {
 			data.put(seqKey, new MemorySequence());
@@ -145,28 +172,19 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 		return (Sequence) data.get(seqKey);
 	}
 
-	public Entry(String id) {
-		id=NameService.getPrimaryName(id);
-		if (id == null)
-			throw new RuntimeException("Should never be null!");
-		this.id = id;
-
-		
-	}	
-
 	@Override
 	public String toString() {
 		return id;
 	}
 
 	/**
-	 * Shortcut to access the id
 	 * 
-	 * @return
+	 * @return the id of this entry
 	 */
 	public String getID() {
 		return id;
 	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -179,12 +197,16 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	/**
 	 * @param dataKey
-	 * @return
+	 * @return true iff data contains a value for this dataKey
 	 */
 	public boolean contains(DataKey dataKey) {
 		return data.containsKey(dataKey);
 	}
 
+	/**
+	 * 
+	 * @param seq a {@link Sequence}
+	 */
 	public void setSequence(Sequence seq) {
 		data.put(seqKey, seq);
 	}
