@@ -7,11 +7,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import be.abeel.io.LineIterator;
+import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.wiggle.TroveArrayWiggle;
-import be.abeel.io.LineIterator;
+
 /**
  * 
  * @author Thomas
@@ -43,16 +45,16 @@ public class WiggleParser extends Parser {
 			String name = "" + System.currentTimeMillis();
 			Entry e = null;
 			for (String line : it) {
-				//System.out.println("Parsing: "+line);
+				// System.out.println("Parsing: "+line);
 				if (line.startsWith("track")) {
-					Map<String,String>lineMap=BEDTools.parseTrack(line);
+					Map<String, String> lineMap = BEDTools.parseTrack(line);
 					name = lineMap.get("name");
-					String chr=lineMap.get("chrom");
-					e=set.getEntry(chr);
+					String chr = lineMap.get("chrom");
+					e = set.getEntry(chr);
 
 				} else if (line.startsWith("variableStep")) {
-					if(e==null)
-						e=set.iterator().next();
+					if (e == null)
+						e = set.iterator().next();
 					add(e, name, daw);
 
 					String[] arr = line.split("[ \t]+");
@@ -72,8 +74,8 @@ public class WiggleParser extends Parser {
 
 					}
 				} else if (line.startsWith("fixedStep")) {
-					if(e==null)
-						e=set.iterator().next();
+					if (e == null)
+						e = set.iterator().next();
 					add(e, name, daw);
 
 					String[] arr = line.split("[ \t]+");
@@ -97,14 +99,15 @@ public class WiggleParser extends Parser {
 					String[] arr = line.split("[ \t]+");
 					int s = Integer.parseInt(arr[0]);
 					double val = Double.parseDouble(arr[1]);
-					
+
 					for (int i = s; i < s + span; i++) {
 						daw.set(i, (float) val);
 					}
 				} else {
 					double val = Double.parseDouble(line);
-					
-					for (int i = start + stepOffset; i < start + stepOffset + span; i++) {
+
+					for (int i = start + stepOffset; i < start + stepOffset
+							+ span; i++) {
 						daw.set(i, (float) val);
 					}
 					stepOffset += step;
@@ -115,26 +118,23 @@ public class WiggleParser extends Parser {
 			throw new RuntimeException(ioex);
 		}
 
-		
 		return set;
 	}
 
 	/**
-	 * @param e
-	 * @param name
-	 * @param daw
+	 * @param e    the {@link Entry} to be extended
+	 * @param name the key for the new data
+	 * @param daw  the {@link Data} to get, in this case
 	 */
 	private void add(Entry e, String name, TroveArrayWiggle daw) {
 		/* Add the previous one */
 		if (daw != null) {
 			daw.init();
 			e.add(new StringKey(name), daw);
-			
+
 			daw = null;
 		}
 
 	}
-
-	
 
 }

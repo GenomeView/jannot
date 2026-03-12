@@ -10,9 +10,10 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import net.sf.nameservice.NameService;
 
 /**
- * Seems a kind of hashmap stored as a list of {@link Entry}. For use, it seems
- * you need to call {@link #mapGet(String)} to get an entry and then fill the
- * entry.
+ * Stores all available {@link Entry}s - the data loaded into the viewer.
+ * 
+ * Call {@link #getOrCreateEntry(String)} to get a (new or existing) entry to
+ * add a new Entry.
  * 
  * Top level class for JAnnot, this class represents a set of {@link Entry}.
  * 

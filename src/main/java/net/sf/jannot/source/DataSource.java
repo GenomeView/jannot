@@ -11,6 +11,7 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
 
 /**
+ * This is an object from which an {@link EntrySet} can be read.
  * 
  * @author Thomas Abeel
  * 
@@ -39,12 +40,11 @@ public abstract class DataSource implements Comparable<DataSource> {
 	public abstract long size();
 
 	/**
-	 * try to read from given sources
 	 * 
 	 * @param url  a {@link URL}
 	 * @param file a {@link File}
-	 * @return the file length, or if null, the url content length, or 0 if if the
-	 *         url can also not be read
+	 * @return the file length, or if null, the url content length, or 0 if if
+	 *         the url can also not be read. Will try to read the actual file.
 	 */
 	protected static long size(URL url, File file) {
 		long size = 0;

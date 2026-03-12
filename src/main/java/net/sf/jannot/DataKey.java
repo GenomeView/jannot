@@ -4,7 +4,7 @@
 package net.sf.jannot;
 
 /**
- * Keys for the entry data
+ * Key that gives unique name to {@link Data}
  * 
  * @author Thomas Abeel
  */

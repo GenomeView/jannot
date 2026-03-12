@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import be.abeel.io.LineIterator;
+import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
@@ -73,10 +74,11 @@ public abstract class Parser {
 	 * 
 	 * @param is       inputStream
 	 * @param source   source to set to features
-	 * @param set      TODO
+	 * @param set      an EntrySet to add the parse results to. If null, a new
+	 *                 {@link EntrySet} is created
 	 * @param entrySet the EntrySet to which all stuff will be added
 	 * @return either the supplied EntrySet or a new one containing the loaded
-	 *         stuff
+	 *         {@link Data}
 	 */
 	public abstract EntrySet parse(InputStream is, EntrySet set);
 

@@ -20,39 +20,36 @@ public class SyntenicBlock {
 	private String targetEntry;
 	private Strand refStrand;
 	private Strand targetStrand;
-	
 
 	public SyntenicBlock(String refEntry, String targetEntry, Location refLoc,
-			Location targetLoc,Strand refStrand,Strand targetStrand) {
+			Location targetLoc, Strand refStrand, Strand targetStrand) {
 		super();
 		this.refLoc = refLoc;
 		this.targetLoc = targetLoc;
 		this.refEntry = refEntry;
 		this.targetEntry = targetEntry;
-		this.refStrand=refStrand;
-		this.targetStrand=targetStrand;
-		
+		this.refStrand = refStrand;
+		this.targetStrand = targetStrand;
+
 	}
 
-
 	/**
-	 * Flip reference and target 
+	 * Flip reference and target
+	 * 
 	 * @return
 	 */
 	public SyntenicBlock flip() {
-		return new SyntenicBlock(targetEntry,refEntry,targetLoc,refLoc,targetStrand,refStrand);
+		return new SyntenicBlock(targetEntry, refEntry, targetLoc, refLoc,
+				targetStrand, refStrand);
 	}
-
 
 	public String target() {
 		return targetEntry;
 	}
 
-
 	public Location refLocation() {
 		return refLoc;
 	}
-
 
 	public Location targetLocation() {
 		return targetLoc;

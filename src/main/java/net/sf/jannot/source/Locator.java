@@ -16,14 +16,15 @@ import java.util.logging.Logger;
 import be.abeel.net.URIFactory;
 import htsjdk.samtools.seekablestream.SeekableStream;
 import htsjdk.samtools.seekablestream.SeekableStreamFactory;
+import net.sf.jannot.Data;
 import net.sf.jannot.tabix.TabixWriter;
 import net.sf.jannot.tabix.TabixWriter.Conf;
 
 /**
  * 
- * Intelligent descriptor of a file. Can either be local or remote on a server.
- * Can be indexed or plain. This locator can describe the type of data that is
- * in the file.
+ * {@link Data} pointer. Can either be local or remote on a server. Can be
+ * indexed or plain. This locator can describe the type of data that is in the
+ * file.
  * 
  * @author Thomas Abeel
  * 

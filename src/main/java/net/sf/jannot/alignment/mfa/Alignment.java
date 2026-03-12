@@ -10,11 +10,34 @@ import net.sf.jannot.alignment.ReferenceSequence;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.refseq.Sequence;
 
+/**
+ * A sequence with a name that aligns at a known location with some
+ * {@link ReferenceSequence}
+ */
 public class Alignment implements Located {
 
-	private String name;
-	private MemorySequence alignment;
-	private ReferenceSequence reference;
+	private final String name;
+	private final MemorySequence alignment;
+	private final ReferenceSequence reference;
+	// true where ref and target explicitly match (not '-')
+	private final BitSet aligned = new BitSet();
+
+	public Alignment(String name, MemorySequence sequence,
+			ReferenceSequence reference) {
+		this.name = name;
+		this.alignment = sequence;
+		this.reference = reference;
+
+		/* Only positions in reference sequence are cached */
+		for (int i = 1; i < this.refLength(); i++) {
+			char inf = getNucleotide(i);
+			char ref = getReferenceNucleotide(i);
+			if (inf != '-' && ref != '-'
+					&& Character.toLowerCase(inf) == Character.toLowerCase(ref))
+				aligned.set(i);
+		}
+
+	}
 
 	/**
 	 * Returns the expanded query sequence including gaps
@@ -34,22 +57,6 @@ public class Alignment implements Located {
 		return reference;
 	}
 
-	public Alignment(String name, MemorySequence sequence, ReferenceSequence reference) {
-		this.name = name;
-		this.alignment = sequence;
-		this.reference = reference;
-		aligned = new BitSet();
-
-		/* Only positions in reference sequence are cached */
-		for (int i = 1; i < this.refLength(); i++) {
-			char inf = getNucleotide(i);
-			char ref = getReferenceNucleotide(i);
-			if (inf != '-' && ref != '-' && Character.toLowerCase(inf) == Character.toLowerCase(ref))
-				aligned.set(i);
-		}
-
-	}
-
 	/**
 	 * Returns the name of this alignment
 	 * 
@@ -63,8 +70,7 @@ public class Alignment implements Located {
 	 * Gives the nucleotide that appears at the given position in the alignment.
 	 * The coordinates are in the expanded reference sequence.
 	 * 
-	 * @param pos
-	 *            position the get nucleotide
+	 * @param pos position the get nucleotide
 	 * @return nucleotide at provided position
 	 */
 	public char getNucleotide(int pos) {
@@ -75,39 +81,34 @@ public class Alignment implements Located {
 	 * Gives the nucleotide that appears at the given position in the reference
 	 * sequence. The coordinates are in the expanded reference sequence.
 	 * 
-	 * @param pos
-	 *            position the get nucleotide
+	 * @param pos position the get nucleotide
 	 * @return nucleotide at provided position
 	 */
 	public char getReferenceNucleotide(int pos) {
 		return reference.getNucleotide(reference.ref2aln(pos));
 	}
 
-	private BitSet aligned;
-
 	/**
-	 * Returns whether the supplied position is aligned. Two sequences are
-	 * aligned in a position if the share the same nucleotide.
-	 * 
-	 * @param pos
-	 * @return
+	 * @param pos the exact position
+	 * @return true iff target and ref nucleotice explicitly match (not '-') at
+	 *         pos.
 	 */
 	public boolean isAligned(int pos) {
 		return aligned.get(pos);
 	}
 
 	/**
-	 * Returns the length of the reference sequence. This is the length of the
-	 * reference alignment minus all gaps.
 	 * 
-	 * @return
+	 * @return the length of the reference sequence. This is the length of the
+	 *         reference alignment minus all gaps.
+	 * 
 	 */
 	public int refLength() {
 		return reference.size() - reference.getRefGapCount();
 	}
 
 	/*
-	 * Returns true if there is extra data between this position and the next
+	 * @return true iff there is extra data between this position and the next
 	 * one.
 	 */
 	public int sizeGapAfter(int i) {

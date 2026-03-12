@@ -4,8 +4,9 @@
 package net.sf.jannot;
 
 /**
- * Data of type K, for an {@link Entry}. Data has a start and end point, a
- * label, and can be iterated over
+ * Data related to genome. Thought of as a 'list with elements of type K.
+ * Typically part of an {@link Entry}. Data has a start and end point, a label,
+ * and can be iterated over
  * 
  * @author Thomas Abeel
  */

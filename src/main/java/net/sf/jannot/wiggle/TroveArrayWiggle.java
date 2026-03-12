@@ -3,16 +3,15 @@
  */
 package net.sf.jannot.wiggle;
 
-import gnu.trove.map.hash.TIntFloatHashMap;
-
 import java.io.IOException;
 import java.util.Iterator;
 
-import net.sf.jannot.picard.BinaryBlob;
+import gnu.trove.map.hash.TIntFloatHashMap;
+import net.sf.jannot.Data;
 
 /**
  * 
- * Make wiggle
+ * Make wiggle {@link Data}set
  * 
  * Fill it with setMethod
  * 
@@ -21,7 +20,8 @@ import net.sf.jannot.picard.BinaryBlob;
  * @author Thomas Abeel
  * 
  */
-public class TroveArrayWiggle extends AbstractWiggle implements Iterable<Float> {
+public class TroveArrayWiggle extends AbstractWiggle
+		implements Iterable<Float> {
 
 	// private float[] buffer;
 	// private String name;
@@ -30,13 +30,13 @@ public class TroveArrayWiggle extends AbstractWiggle implements Iterable<Float> 
 	// private FloatBuffer fb = null;
 	// private int size;
 
-	private TIntFloatHashMap blob = null;
-	private int size;
+	// the data in blob is mutable
+	private final TIntFloatHashMap blob = new TIntFloatHashMap();
+	private final int size;
 
 	public TroveArrayWiggle(int size) throws IOException {
 		this.size = size;
 		System.out.println("Mapping: " + size * 4);
-		blob = new TIntFloatHashMap();
 		System.out.println("Mapping successfull!");
 
 	}
@@ -44,8 +44,8 @@ public class TroveArrayWiggle extends AbstractWiggle implements Iterable<Float> 
 	/**
 	 * Zero based coordinate
 	 * 
-	 * @param position
-	 * @param value
+	 * @param position the position to change
+	 * @param value    the new value for position
 	 */
 	public void set(int position, float value) {
 
@@ -71,6 +71,9 @@ public class TroveArrayWiggle extends AbstractWiggle implements Iterable<Float> 
 	// return name;
 	// }
 
+	/**
+	 * @return copy of data from start (inclusive) to end (exclusive)
+	 */
 	@Override
 	public float[] getRawRange(int start, int end) {
 		if (start >= size)
@@ -116,7 +119,7 @@ public class TroveArrayWiggle extends AbstractWiggle implements Iterable<Float> 
 	@Override
 	public float value(int pos) {
 //		try {
-			return blob.get(pos-1);
+		return blob.get(pos - 1);
 //		} catch (IOException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
@@ -124,11 +127,6 @@ public class TroveArrayWiggle extends AbstractWiggle implements Iterable<Float> 
 //		return -1;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get()
-	 */
 	@Override
 	public Iterable<Float> get() {
 		return this;

@@ -9,7 +9,7 @@ import net.sf.jannot.utils.ArrayIterable;
 import net.sf.jannot.utils.SequenceTools;
 
 /**
- * A mutable sequence in memory
+ * A (mutable) sequence (list of chars) in memory
  */
 public class MemorySequence extends Sequence {
 

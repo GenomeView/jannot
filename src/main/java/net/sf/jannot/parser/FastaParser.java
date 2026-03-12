@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
@@ -19,7 +20,6 @@ import net.sf.jannot.alignment.mfa.Alignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.refseq.Sequence;
-import be.abeel.io.LineIterator;
 
 /**
  * In case of multiple alignments it is strongly advised to set the dataKey
@@ -49,22 +49,22 @@ public class FastaParser extends Parser {
 	public EntrySet parse(InputStream is, EntrySet set) {
 		if (set == null)
 			set = new EntrySet();
-		LineIterator it = new LineIterator(is);
-		StringBuffer current = null;
-		ArrayList<StringBuffer> seq = new ArrayList<StringBuffer>();
-		ArrayList<String> names = new ArrayList<String>();
-		ArrayList<String> description = new ArrayList<String>();
+		final LineIterator it = new LineIterator(is);
+		StringBuffer current = null; // accumulates all lines after last '>'
+		final ArrayList<StringBuffer> seq = new ArrayList<StringBuffer>();
+		final ArrayList<String> names = new ArrayList<String>();
+		final ArrayList<String> description = new ArrayList<String>();
 
 		for (String line : it) {
 
 			if (line.startsWith(">")) {
-
 				names.add(line.substring(1).trim().split("[ \t]+", 2)[0]);
-				current = new StringBuffer();
+				current = new StringBuffer(); // will be filled later in loop
 				seq.add(current);
 				description.add(line.substring(1).trim());
 
-				// current.description.setPrimaryAccessionNumber(line.substring(1).split(" ")[0].split("\t")[0]);
+				// current.description.setPrimaryAccessionNumber(line.substring(1).split("
+				// ")[0].split("\t")[0]);
 
 			} else {
 				current.append(line);

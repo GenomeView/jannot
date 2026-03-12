@@ -6,11 +6,12 @@ package net.sf.jannot.wiggle;
 import net.sf.jannot.Data;
 
 /**
+ * A list of float {@link Data}
  * 
  * @author Thomas Abeel
  * 
  */
-public interface Graph extends Data<Float>{
+public interface Graph extends Data<Float> {
 
 	/**
 	 * Returns float array with float[i] containing a value
@@ -19,12 +20,9 @@ public interface Graph extends Data<Float>{
 	 * 
 	 * Their corresponding indices are: 0,1,2,3,4,5,6,7,8,...
 	 * 
-	 * @param start
-	 *            zero based coordinate of the start
-	 * @param end
-	 *            zero based coordinate of the end, non-inclusive
-	 * @param resolutionIndex
-	 *            index of the desired resolution
+	 * @param start           zero based coordinate of the start
+	 * @param end             zero based coordinate of the end, non-inclusive
+	 * @param resolutionIndex index of the desired resolution
 	 */
 	public float[] get(int start, int end, int resolutionIndex);
 
@@ -32,7 +30,7 @@ public interface Graph extends Data<Float>{
 
 	public float max();
 
-	//public String getName();
+	// public String getName();
 
 	/**
 	 * @param pos one based coordinate

@@ -15,11 +15,9 @@ import net.sf.jannot.shortread.ReadGroup;
 import net.sf.nameservice.NameService;
 
 /**
- * Each Entry contains information about a specific genome/chromossomes or any
- * chunck of DNA.
- * 
- * With the chunk we associate a sequence, feature annotation, a description,
- * graph annotation and alignment annotation.
+ * Contains loaded a map of {@link Data}, such as genome sequences or
+ * annotations. Each data is associated with a {@link DataKey}. With the chunk
+ * we
  * 
  * In order to load data to an Entry set, you should use the class Filesource.
  * 
@@ -54,6 +52,8 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	private final String id;
 
+	// public AlignmentAnnotation align = null;
+
 	/**
 	 * 
 	 * @param id the dirty id, may be an alias previously registered to the
@@ -68,9 +68,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	}
 
 	/**
-	 * Returns the highest position for which there is data
-	 * 
-	 * @return
+	 * @return the highest position for which there is data
 	 */
 	public int getMaximumLength() {
 		// FIXME think of a more efficient way
@@ -91,8 +89,6 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 		}
 		return (int) maxSize;
 	}
-
-	// public AlignmentAnnotation align = null;
 
 	/**
 	 * 
@@ -185,10 +181,8 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 		return id;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	/**
+	 * @return {@link String#compareTo(String)} between our ID and o.getID()
 	 */
 	@Override
 	public int compareTo(Entry o) {

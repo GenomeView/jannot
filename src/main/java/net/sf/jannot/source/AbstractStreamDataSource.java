@@ -10,45 +10,41 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.parser.Parser;
 
 /**
- * Extends DataSource. 
+ * Extends DataSource.
  * 
- * Contains methods to read  
+ * Contains methods to read
  * 
  * @author Thomas Abeel
  *
  */
 public abstract class AbstractStreamDataSource extends DataSource {
-    private Parser parser;
+	private Parser parser;
 
-    private InputStream ios;
+	private InputStream ios;
 
-    public final void setParser(Parser parser) {
-        this.parser = parser;
-    }
+	protected AbstractStreamDataSource(Locator l) {
+		super(l);
+	}
 
-    public final void setIos(InputStream ios) {
-        this.ios = ios;
-    }
+	public final void setParser(Parser parser) {
+		this.parser = parser;
+	}
 
-    protected AbstractStreamDataSource(Locator l) {
-super(l);
-    }
+	public final void setIos(InputStream ios) {
+		this.ios = ios;
+	}
 
-    /**
-     * 
-     */
-    @Override
-    public EntrySet read(EntrySet set) throws ReadFailedException {
-       return parser.parse(ios,set);
-     
+	@Override
+	public EntrySet read(EntrySet set) throws ReadFailedException {
+		return parser.parse(ios, set);
 
-    }
+	}
 
-    public InputStream getIos(){
-    	return ios;
-    }
-    
-    public Parser getParser() {
-        return parser;
-    }
+	public InputStream getIos() {
+		return ios;
+	}
+
+	public Parser getParser() {
+		return parser;
+	}
 }
