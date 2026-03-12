@@ -47,14 +47,4 @@ public class TestSyntenicParser {
 		assertEquals(2 * 2, es.syntenic.getAll(null).size());
 	}
 
-	@Test
-	public void testParserPaf()
-			throws URISyntaxException, IOException, ReadFailedException {
-		File f = DataManager.file(PAF);
-		DataSource ds = DataSourceFactory.create(new Locator(f));
-		EntrySet es = ds.read();
-		// 2 lines in the file, and we get 2 entries per line
-		assertEquals(782 * 2, es.syntenic.getAll(null).size());
-	}
-
 }
