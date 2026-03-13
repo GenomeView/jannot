@@ -24,11 +24,12 @@ import net.sf.nameservice.NameService;
  */
 public class EntrySet implements Iterable<Entry> {
 
-	/**
-	 * EntrySet level annotation, typically annotation types spanning multiple
-	 * {@link Entry}s like comparative data
-	 */
-	final public SyntenicAnnotation syntenic = new SyntenicAnnotation();
+// we now have SyntenicData in the Entry
+//	/**
+//	 * EntrySet level annotation, typically annotation types spanning multiple
+//	 * {@link Entry}s like comparative data
+//	 */
+//	final public SyntenicAnnotation syntenic = new SyntenicAnnotation();
 
 	final public Description description = new Description();
 
@@ -89,7 +90,7 @@ public class EntrySet implements Iterable<Entry> {
 	public void clear() {
 		entries.clear();
 		map.clear();
-		syntenic.clear();
+		// syntenic.clear();
 
 	}
 

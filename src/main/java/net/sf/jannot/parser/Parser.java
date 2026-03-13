@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import be.abeel.io.LineIterator;
-import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
@@ -29,7 +28,8 @@ import net.sf.jannot.parser.software.TransTermHPParser;
 
 /**
  * Base class for all genome data file parsers. The main method is
- * {@link #findParser(InputStream, Object)}
+ * {@link #findParser(InputStream, Object)}.
+ * 
  */
 public abstract class Parser {
 
@@ -68,17 +68,19 @@ public abstract class Parser {
 
 	/**
 	 * Read all data from an input stream. Set the data source for each item to
-	 * the supplied source. If and EntrySet is supplied the data will be added
-	 * to this set, otherwise a new set will be created. Either the supplied or
-	 * the new EntrySet is returned.
+	 * the supplied source. If and {@link EntrySet} is supplied the data will be
+	 * added to this set, otherwise a new {@link EntrySet} will be created.
+	 * <p>
+	 * The parser needs to figure out which {@link Entry} / {@link DataKey} in
+	 * the {@link EntrySet} to use. This is usually done with data available in
+	 * the parsed file itself, If multiple files are read, all referring to the
+	 * same {@link Entry}, it is assumed that different parsers store their
+	 * results under different keys in the {@link Entry}'s data.
 	 * 
-	 * @param is       inputStream
-	 * @param source   source to set to features
-	 * @param set      an EntrySet to add the parse results to. If null, a new
-	 *                 {@link EntrySet} is created
-	 * @param entrySet the EntrySet to which all stuff will be added
-	 * @return either the supplied EntrySet or a new one containing the loaded
-	 *         {@link Data}
+	 * @param is  inputStream
+	 * @param set an EntrySet to add the parse results to. If null, a new
+	 *            {@link EntrySet} is created
+	 * @return either the set to which the parsed data was added.
 	 */
 	public abstract EntrySet parse(InputStream is, EntrySet set);
 

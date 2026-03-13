@@ -4,13 +4,17 @@
 package net.sf.jannot.parser;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
+import net.sf.jannot.StringKey;
 import net.sf.jannot.SyntenicBlock;
+import net.sf.jannot.SyntenicData;
 
 /**
  * Parses syntenic files.
@@ -40,6 +44,8 @@ import net.sf.jannot.SyntenicBlock;
  */
 public class SyntenicParser extends Parser {
 
+	public static final StringKey SYNTENIC_KEY = new StringKey("syntenic");
+
 	/**
 	 * @param dataKey
 	 */
@@ -66,24 +72,34 @@ public class SyntenicParser extends Parser {
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
 		it.addCommentIdentifier("gvheader");
-		for (String line : it) {
-			String[] arr = line.split("\t");
-			Location refLoc = new Location(Integer.parseInt(arr[1]),
-					Integer.parseInt(arr[2]));
-			Strand refStrand = Strand.fromSymbol(arr[3].charAt(0));
-			Location informantLoc = new Location(Integer.parseInt(arr[5]),
-					Integer.parseInt(arr[6]));
-			Strand informantStrand = Strand.fromSymbol(arr[7].charAt(0));
 
-			SyntenicBlock sb = new SyntenicBlock(arr[0], arr[4], refLoc,
-					informantLoc, refStrand, informantStrand);
-			set.syntenic.add(sb);
-			// FIXME set.getOrCreateEntry(arr[0], source);
-			SyntenicBlock sbf = sb.flip();
-			set.syntenic.add(sbf);
-			// FIXME set.getOrCreateEntry(arr[4], source);
+		final List<SyntenicBlock> blocks = new ArrayList<>();
+		for (final String line : it) {
+			final String[] arr = line.split("\t");
+			final Location refLoc = new Location(Integer.parseInt(arr[1]),
+					Integer.parseInt(arr[2]));
+			final Strand refStrand = Strand.fromSymbol(arr[3].charAt(0));
+			final Location informantLoc = new Location(Integer.parseInt(arr[5]),
+					Integer.parseInt(arr[6]));
+			final Strand informantStrand = Strand.fromSymbol(arr[7].charAt(0));
+
+			blocks.add(new SyntenicBlock(arr[0], arr[4], refLoc, informantLoc,
+					refStrand, informantStrand));
+//			set.getEntry(line).set.syntenic.add(sb);
+//			// FIXME set.getOrCreateEntry(arr[0], source);
+//			SyntenicBlock sbf = sb.flip();
+//			set.syntenic.add(sbf);
+//			// FIXME set.getOrCreateEntry(arr[4], source);
 
 		}
+		final SyntenicData data = new SyntenicData(blocks);
+
+		// add this data to ALL relevant Entry's
+		for (String ref : data.getReferences()) {
+			// FIXME loading multiple syntenics might overwrite existing
+			set.getOrCreateEntry(ref).add(SYNTENIC_KEY, data);
+		}
+
 		return set;
 	}
 

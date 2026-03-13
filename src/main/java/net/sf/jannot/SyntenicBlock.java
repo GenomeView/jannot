@@ -21,6 +21,15 @@ public class SyntenicBlock {
 	private Strand refStrand;
 	private Strand targetStrand;
 
+	/**
+	 * 
+	 * @param refEntry     ID of reference
+	 * @param targetEntry  ID of target
+	 * @param refLoc
+	 * @param targetLoc
+	 * @param refStrand
+	 * @param targetStrand
+	 */
 	public SyntenicBlock(String refEntry, String targetEntry, Location refLoc,
 			Location targetLoc, Strand refStrand, Strand targetStrand) {
 		super();
@@ -43,6 +52,18 @@ public class SyntenicBlock {
 				targetStrand, refStrand);
 	}
 
+	/**
+	 * 
+	 * @return ID of reference
+	 */
+	public String reference() {
+		return refEntry;
+	}
+
+	/**
+	 * 
+	 * @return ID of target
+	 */
 	public String target() {
 		return targetEntry;
 	}
@@ -53,6 +74,20 @@ public class SyntenicBlock {
 
 	public Location targetLocation() {
 		return targetLoc;
+	}
+
+	/**
+	 * @param ref    the ref ID
+	 * @param target the target ID
+	 * @return this , possibly {@link #flip()}ped, or null if this does not
+	 *         match ref+target
+	 */
+	public SyntenicBlock match(String ref, String target) {
+		if (refEntry.equals(ref) && targetEntry.equals(target))
+			return this;
+		if (targetEntry.equals(ref) && refEntry.equals(target))
+			return flip();
+		return null;
 	}
 
 }

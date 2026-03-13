@@ -17,6 +17,7 @@
 package net.sf.jannot.parser;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +26,9 @@ import java.util.logging.Logger;
 
 import org.junit.Test;
 
+import net.sf.jannot.Data;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.SyntenicData;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
@@ -33,18 +36,27 @@ import net.sf.jannot.source.Locator;
 import support.DataManager;
 
 public class TestSyntenicParser {
-	private static final String PAF = "YJM1447_vs_R64.paf";
+	private static final String SYN_FILE = "test.syn";
 	private static Logger log = Logger
 			.getLogger(TestSyntenicParser.class.toString());
 
 	@Test
 	public void testParserMini()
 			throws URISyntaxException, IOException, ReadFailedException {
-		File f = DataManager.file("test.syn");
+		File f = DataManager.file(SYN_FILE);
 		DataSource ds = DataSourceFactory.create(new Locator(f));
 		EntrySet es = ds.read();
-		// 2 lines in the file, and we get 2 entries per line
-		assertEquals(2 * 2, es.syntenic.getAll(null).size());
+
+		Data<?> data = es.getOrCreateEntry("anth")
+				.get(SyntenicParser.SYNTENIC_KEY);
+		assertTrue(data instanceof SyntenicData);
+		assertEquals(2, ((SyntenicData) data).getReferences().size());
+
+		data = es.getOrCreateEntry("info1").get(SyntenicParser.SYNTENIC_KEY);
+		assertTrue(data instanceof SyntenicData);
+		assertEquals(2, ((SyntenicData) data).getReferences().size());
+
+		;
 	}
 
 }

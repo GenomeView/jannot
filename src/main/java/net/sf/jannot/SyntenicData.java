@@ -1,8 +1,11 @@
 package net.sf.jannot;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Contains Syntenic Data which is just a set of {@link SyntenicBlock}s. Work in
@@ -10,15 +13,24 @@ import java.util.HashSet;
  */
 public class SyntenicData implements Data<SyntenicBlock> {
 
-	private final Collection<SyntenicBlock> data = new HashSet<>();
+	private final List<SyntenicBlock> data = new ArrayList<>();
+
+	// List to fix order.
+	private final List<String> refs = new ArrayList<>();
 
 	/**
 	 * 
-	 * @param d             the data
+	 * @param d             the data. List to fix the order for visualization
 	 * @param referencename the name of the reference. U
 	 */
-	public SyntenicData(Collection<SyntenicBlock> d) {
+	public SyntenicData(List<SyntenicBlock> d) {
 		this.data.addAll(d);
+		Set<String> uniquerefs = new HashSet<>();
+		for (SyntenicBlock b : data) {
+			uniquerefs.add(b.reference());
+			uniquerefs.add(b.target());
+		}
+		refs.addAll(uniquerefs);
 	}
 
 	@Override
@@ -40,5 +52,24 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	@Override
 	public String label() {
 		return "syntenic";
+	}
+
+	/**
+	 * 
+	 * @return all referenced names in the {@link #data}
+	 */
+	public List<String> getReferences() {
+		return Collections.unmodifiableList(refs);
+	}
+
+	/**
+	 * 
+	 * @param ref    the reference
+	 * @param target the target
+	 * @return all {@link SyntenicBlock}s from ref to target
+	 */
+	public List<SyntenicBlock> get(String ref, String target) {
+		return data.stream().map(d -> d.match(ref, target))
+				.filter(d -> d != null).collect(Collectors.toList());
 	}
 }
