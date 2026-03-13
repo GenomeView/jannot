@@ -10,7 +10,8 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import net.sf.nameservice.NameService;
 
 /**
- * Stores all available {@link Entry}s - the data loaded into the viewer.
+ * Stores all available {@link Entry}s. Each {@link Entry} is a named chromosome
+ * and can be selected with the combobox in top of the viewer.
  * 
  * Call {@link #getOrCreateEntry(String)} to get a (new or existing) entry to
  * add a new Entry.
@@ -23,9 +24,9 @@ import net.sf.nameservice.NameService;
  */
 public class EntrySet implements Iterable<Entry> {
 
-	/*
+	/**
 	 * EntrySet level annotation, typically annotation types spanning multiple
-	 * entries like comparative data
+	 * {@link Entry}s like comparative data
 	 */
 	final public SyntenicAnnotation syntenic = new SyntenicAnnotation();
 

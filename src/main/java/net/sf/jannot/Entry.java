@@ -15,9 +15,17 @@ import net.sf.jannot.shortread.ReadGroup;
 import net.sf.nameservice.NameService;
 
 /**
- * Contains loaded a map of {@link Data}, such as genome sequences or
- * annotations. Each data is associated with a {@link DataKey}. With the chunk
- * we
+ * "chromosome" container for a (often short) named nucleotide sequence. If
+ * multiple named sequences are loaded (eg through a m-fasta file), each named
+ * sequence is kept as separate 'chromosome' and can be selected with the
+ * combobox in the top of the viewer.
+ * 
+ * each chromosome has an {@link #id} and {@link #description}
+ * 
+ * It contains a map of key-{@link Data} pairs. The {@link #seqKey} contains the
+ * nucleotide sequence of the chromosome. Other keys contain other data such as
+ * annotations, related {@link Sequence}s, {@link ReadGroup}s with shortreads
+ * for this chromosome, etc.
  * 
  * In order to load data to an Entry set, you should use the class Filesource.
  * 
@@ -38,7 +46,8 @@ import net.sf.nameservice.NameService;
 public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	/**
-	 * A key that should be used only to store THE sequence in this entry.
+	 * A key that I assume is used to store the reference sequence in this
+	 * entry.
 	 */
 	private static final StringKey seqKey = new StringKey(
 			"SEQ*(^#%(@#%)@#^@#^))^)@#)^(@#%^*()SEQ");
@@ -199,7 +208,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	/**
 	 * 
-	 * @param seq a {@link Sequence}
+	 * @param seq the (reference?) {@link Sequence}
 	 */
 	public void setSequence(Sequence seq) {
 		data.put(seqKey, seq);

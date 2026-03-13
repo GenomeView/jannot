@@ -47,11 +47,6 @@ public class SyntenicAnnotation extends EntrySetAnnotation<SyntenicBlock> {
 		return syntenicBlocks.iterator();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.EntrySetAnnotation#contains(java.lang.Object)
-	 */
 	@Override
 	public boolean contains(SyntenicBlock t) {
 		return syntenicBlocks.contains(t);

@@ -30,6 +30,11 @@ public abstract class EntrySetAnnotation<T> implements Iterable<T> {
 		return getAll(e);
 	}
 
+	/**
+	 * 
+	 * @param t an element in the set
+	 * @return true iff this set contains t
+	 */
 	public abstract boolean contains(T t);
 
 	/**
