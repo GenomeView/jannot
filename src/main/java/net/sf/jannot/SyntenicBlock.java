@@ -4,8 +4,9 @@
 package net.sf.jannot;
 
 /**
- * Synthenic block provides a syntenic mapping between two entries. It maps one
- * location in one entry to another location in the other Entry.
+ * Synthenic block provides a syntenic mapping between two locations in 2
+ * chromosomes ( {@link Entry}s). It maps one location in one entry to another
+ * location in the other Entry.
  * 
  * @author Thomas Abeel
  * 

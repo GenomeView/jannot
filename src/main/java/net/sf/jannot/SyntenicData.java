@@ -1,9 +1,12 @@
 package net.sf.jannot;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,8 +18,8 @@ public class SyntenicData implements Data<SyntenicBlock> {
 
 	private final List<SyntenicBlock> data = new ArrayList<>();
 
-	// List to fix order.
-	private final List<String> refs = new ArrayList<>();
+	// LinkedHashMap to fix order
+	private final Map<String, Location> range = new LinkedHashMap<>();
 
 	/**
 	 * 
@@ -27,10 +30,24 @@ public class SyntenicData implements Data<SyntenicBlock> {
 		this.data.addAll(d);
 		Set<String> uniquerefs = new HashSet<>();
 		for (SyntenicBlock b : data) {
-			uniquerefs.add(b.reference());
-			uniquerefs.add(b.target());
+			extendRange(b.reference(), b.refLocation());
+			extendRange(b.target(), b.targetLocation());
 		}
-		refs.addAll(uniquerefs);
+	}
+
+	/**
+	 * extend {@link #range} of target to include targetLocation
+	 * 
+	 * @param target
+	 * @param targetLocation
+	 */
+	private void extendRange(String target, Location targetLocation) {
+		Location oldloc = range.get(target);
+		if (oldloc == null) {
+			range.put(target, targetLocation);
+		} else {
+			range.put(target, oldloc.extend(targetLocation));
+		}
 	}
 
 	@Override
@@ -58,8 +75,8 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	 * 
 	 * @return all referenced names in the {@link #data}
 	 */
-	public List<String> getReferences() {
-		return Collections.unmodifiableList(refs);
+	public Collection<String> getReferences() {
+		return Collections.unmodifiableCollection(range.keySet());
 	}
 
 	/**
@@ -71,5 +88,15 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	public List<SyntenicBlock> get(String ref, String target) {
 		return data.stream().map(d -> d.match(ref, target))
 				.filter(d -> d != null).collect(Collectors.toList());
+	}
+
+	/**
+	 * @param name the name of the syntenic target
+	 * @return the range of the given entry name. All syntenic data for given
+	 *         name is inside this
+	 * 
+	 */
+	public Location getRange(String name) {
+		return range.get(name);
 	}
 }

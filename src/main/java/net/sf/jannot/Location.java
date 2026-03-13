@@ -13,14 +13,22 @@ public class Location implements Comparable<Location> {
 
 	/**
 	 * These fields are public for efficient getter access. If you want to set
-	 * these fields, please use the proper setters. FIXME apparently these
-	 * should not be public.
+	 * these fields, please use the proper setters.
 	 */
+	// FIXME apparently these should not be public.
 	public int start, end;
 
 	private boolean fuzzyEnd;
 
 	private boolean fuzzyStart;
+
+	/*
+	 * A location can belong to a feature, but the feature is responsible for
+	 * notifying the location that it belongs to that feature
+	 * 
+	 * This change is not recorded using a ChangeEvent.
+	 */
+	private Feature parent = null;
 
 	/**
 	 * Parses a location from a String. Inverse of the toString method
@@ -142,6 +150,15 @@ public class Location implements Comparable<Location> {
 		return end - start + 1;
 	}
 
+	/**
+	 * 
+	 * @param pos a position
+	 * @return true iff pos is inside this
+	 */
+	public boolean contains(int pos) {
+		return pos >= start && pos <= end;
+	}
+
 	public boolean overlaps(int lStart, int lEnd) {
 		if (start >= lStart && start <= lEnd)
 			return true;
@@ -153,13 +170,9 @@ public class Location implements Comparable<Location> {
 		return false;
 	}
 
-	/*
-	 * A location can belong to a feature, but the feature is responsible for
-	 * notifying the location that it belongs to that feature
-	 * 
-	 * This change is not recorded using a ChangeEvent.
-	 */
-	private Feature parent = null;
+	public Location copy() {
+		return new Location(start, end, fuzzyStart, fuzzyEnd);
+	}
 
 	void setParent(Feature f) {
 		this.parent = f;
@@ -171,6 +184,27 @@ public class Location implements Comparable<Location> {
 	 */
 	public Feature getParent() {
 		return parent;
+	}
+
+	/**
+	 * 
+	 * @param range an additional range to include
+	 * @return copy of this but extended such that targetLocation is included
+	 */
+	public Location extend(Location range) {
+		return new Location(Math.min(start, range.start),
+				Math.max(end, range.end), fuzzyStart, fuzzyEnd);
+	}
+
+	/**
+	 * 
+	 * @param x a number that is to be scaled relative to this
+	 * @return the position as number relative to this. x=start returns 0, x=end
+	 *         returns 1, and extrapolates linearly.
+	 * 
+	 */
+	public double fraction(int x) {
+		return (double) (x - start) / (end - start);
 	}
 
 	class SetEndEvent implements ChangeEvent {
@@ -248,7 +282,4 @@ public class Location implements Comparable<Location> {
 		}
 	}
 
-	public Location copy() {
-		return new Location(start, end, fuzzyStart, fuzzyEnd);
-	}
 }
