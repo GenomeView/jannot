@@ -47,7 +47,7 @@ public class TestSyntenicParser {
 		DataSource ds = DataSourceFactory.create(new Locator(f));
 		EntrySet es = ds.read();
 
-		Data<?> data = es.getOrCreateEntry("anth")
+		Data<?> data = es.getOrCreateEntry("anthracis")
 				.get(SyntenicParser.SYNTENIC_KEY);
 		assertTrue(data instanceof SyntenicData);
 		assertEquals(2, ((SyntenicData) data).getReferences().size());
