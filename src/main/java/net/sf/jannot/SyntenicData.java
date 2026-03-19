@@ -3,11 +3,9 @@ package net.sf.jannot;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -18,7 +16,7 @@ public class SyntenicData implements Data<SyntenicBlock> {
 
 	private final List<SyntenicBlock> data = new ArrayList<>();
 
-	// LinkedHashMap to fix order
+	// the range (Location) of the IDs found in data. LinkedHashMap to fix order
 	private final Map<String, Location> range = new LinkedHashMap<>();
 
 	/**
@@ -28,7 +26,6 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	 */
 	public SyntenicData(List<SyntenicBlock> d) {
 		this.data.addAll(d);
-		Set<String> uniquerefs = new HashSet<>();
 		for (SyntenicBlock b : data) {
 			extendRange(b.reference(), b.refLocation());
 			extendRange(b.target(), b.targetLocation());
@@ -98,5 +95,9 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	 */
 	public Location getRange(String name) {
 		return range.get(name);
+	}
+
+	public String toString() {
+		return "SyntenicData[" + data + "]";
 	}
 }

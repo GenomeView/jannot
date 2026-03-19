@@ -94,4 +94,7 @@ public class EntrySet implements Iterable<Entry> {
 
 	}
 
+	public String toString() {
+		return "EntrySet[" + map + "]";
+	}
 }

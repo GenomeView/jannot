@@ -179,7 +179,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	@Override
 	public String toString() {
-		return id;
+		return "" + data;
 	}
 
 	/**

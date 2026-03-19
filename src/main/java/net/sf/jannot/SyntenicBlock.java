@@ -91,4 +91,10 @@ public class SyntenicBlock {
 		return null;
 	}
 
+	public String toString() {
+		return "Syntenic[" + refLoc + "," + refEntry + "," + refStrand + ","
+				+ targetLoc + "," + targetEntry + "," + targetStrand + "]";
+
+	}
+
 }

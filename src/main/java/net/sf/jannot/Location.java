@@ -52,8 +52,10 @@ public class Location implements Comparable<Location> {
 	/**
 	 * The main constructor
 	 * 
-	 * @param start      One endpoint of the interval. Can be negative
-	 * @param end        the other endpoint of the interval. Can be negative.
+	 * @param start      One endpoint of the interval. Can be negative. If
+	 *                   smaller than end, start is used as end
+	 * @param end        the other endpoint of the interval. Can be negative. If
+	 *                   smaller than start, end is used as start
 	 * @param fuzzyStart true iff start is fuzzy. NOTE this has no meaning
 	 *                   anywhere.
 	 * @param fuzzyEnd   true iff end is fuzzy. NOTE this has no meaning
