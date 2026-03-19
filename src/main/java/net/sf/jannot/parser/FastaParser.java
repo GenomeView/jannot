@@ -55,6 +55,7 @@ public class FastaParser extends Parser {
 		final ArrayList<String> names = new ArrayList<String>();
 		final ArrayList<String> description = new ArrayList<String>();
 
+		// load names and current lists with matching name-content.
 		for (String line : it) {
 
 			if (line.startsWith(">")) {

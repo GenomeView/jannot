@@ -33,6 +33,7 @@ public class EntrySet implements Iterable<Entry> {
 
 	final public Description description = new Description();
 
+	// sorts entries to 'natural' (alphabetical) order
 	private final ConcurrentSkipListSet<Entry> entries = new ConcurrentSkipListSet<Entry>();
 	private final HashMap<String, Entry> map = new HashMap<String, Entry>();
 
@@ -74,6 +75,7 @@ public class EntrySet implements Iterable<Entry> {
 		return mapGet(key);
 	}
 
+	// the first ID (IDs are sorted alphabetically)
 	public synchronized Entry firstEntry() {
 		return entries.first();
 	}
