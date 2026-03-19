@@ -5,6 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
@@ -12,10 +15,6 @@ import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import support.DataManager;
 
 /**
@@ -25,72 +24,49 @@ import support.DataManager;
  */
 public class TestFastaParser {
 
-	private void testFile(File file) {
-		try {
+	private void testFile(File file)
+			throws URISyntaxException, IOException, ReadFailedException {
 
-			DataSource ds = DataSourceFactory.create(new Locator(file));
-			EntrySet es = ds.read();
-			// System.out.println(es.firstEntry());
-			Assert.assertEquals("TestFasta", es.firstEntry().getID());
-			int count = 0;
-			for (Entry e : es)
-				count++;
-			Assert.assertEquals(1, count);
+		DataSource ds = DataSourceFactory.create(new Locator(file));
+		EntrySet es = ds.read();
+		// System.out.println(es.firstEntry());
+		Assert.assertEquals("TestFasta", es.firstEntry().getID());
+		int count = 0;
+		for (Entry e : es)
+			count++;
+		Assert.assertEquals(1, count);
 
-			Sequence d = es.firstEntry().sequence();
-			Assert.assertEquals(38, d.size());
+		Sequence d = es.firstEntry().sequence();
+		Assert.assertEquals(38, d.size());
 
-			Assert.assertEquals("ACGTACGTAACCGGTTTTGGCCAATGCATGCAAGTTGA", d.stringRepresentation());
-
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (ReadFailedException e) {
-
-			e.printStackTrace();
-			Assert.fail();
-		}
+		Assert.assertEquals("ACGTACGTAACCGGTTTTGGCCAATGCATGCAAGTTGA",
+				d.stringRepresentation());
 	}
 
 	@Test
-	public void testMiniFasta() {
+	public void testMiniFasta()
+			throws URISyntaxException, IOException, ReadFailedException {
 		File f = DataManager.file("mini.fasta");
 		testFile(f);
 	}
 
 	@Test
-	public void testWrite() {
+	public void testWrite()
+			throws URISyntaxException, IOException, ReadFailedException {
 		File f = DataManager.file("mini.fasta");
-		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f));
-			EntrySet es = ds.read();
+		DataSource ds = DataSourceFactory.create(new Locator(f));
+		EntrySet es = ds.read();
 
-			File out = File.createTempFile("unittesting.", ".fasta");
-			out.deleteOnExit();
+		File out = File.createTempFile("unittesting.", ".fasta");
+		out.deleteOnExit();
 
-			FileOutputStream fos = new FileOutputStream(out);
-			for (Entry e : es)
-				new FastaParser().write(fos, e);
-			fos.close();
+		FileOutputStream fos = new FileOutputStream(out);
+		for (Entry e : es)
+			new FastaParser().write(fos, e);
+		fos.close();
 
-			testFile(out);
-			
-		
+		testFile(out);
 
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (ReadFailedException e) {
-
-			e.printStackTrace();
-			Assert.fail();
-		}
 	}
 
 }
