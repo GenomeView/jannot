@@ -77,6 +77,14 @@ public class SyntenicBlock {
 		return targetLoc;
 	}
 
+	public Strand getRefStrand() {
+		return refStrand;
+	}
+
+	public Strand getTargetStrand() {
+		return targetStrand;
+	}
+
 	/**
 	 * @param ref    the ref ID
 	 * @param target the target ID
