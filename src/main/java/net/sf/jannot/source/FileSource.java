@@ -9,9 +9,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.sf.jannot.parser.Parser;
+import net.sf.jannot.parser.ParserFactory;
 
 /**
- * Extends AbstractStreamDataSource. It prepares the data to be read.  
+ * Extends AbstractStreamDataSource. It prepares the data to be read.
  * 
  * @author Thomas Abeel
  *
@@ -20,21 +21,20 @@ public class FileSource extends AbstractStreamDataSource {
 
 	private File file;
 
-
-	
-
 	public FileSource(String file) throws IOException {
 		this(new File(file));
 	}
-	public File getFile(){
+
+	public File getFile() {
 		return file;
 	}
+
 	public FileSource(File file) throws IOException {
 		super(new Locator(file.toString()));
 		InputStream ios1, ios2;
 		ios1 = new FileInputStream(file);
 		ios2 = new FileInputStream(file);
-		Parser p = Parser.detectParser(ios1,file);
+		Parser p = ParserFactory.detectParser(ios1, file);
 		ios1.close();
 		super.setParser(p);
 		super.setIos(ios2);
@@ -77,7 +77,9 @@ public class FileSource extends AbstractStreamDataSource {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.jannot.source.DataSource#isIndexed()
 	 */
 	@Override
@@ -85,13 +87,14 @@ public class FileSource extends AbstractStreamDataSource {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.jannot.source.DataSource#size()
 	 */
 	@Override
 	public long size() {
 		return file.length();
 	}
-
 
 }

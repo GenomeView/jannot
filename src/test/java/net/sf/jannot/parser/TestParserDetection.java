@@ -40,7 +40,7 @@ public class TestParserDetection {
 	@Test
 	public void testBED() throws FileNotFoundException, IOException {
 		File f = DataManager.file("minibed.bed");
-		Parser p = Parser.detectParser(new FileInputStream(f), "file");
+		Parser p = ParserFactory.detectParser(new FileInputStream(f), "file");
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
 				p instanceof BEDParser);
@@ -50,7 +50,7 @@ public class TestParserDetection {
 	@Test
 	public void testVCF() throws FileNotFoundException, IOException {
 		File f = DataManager.file("tiny.vcf");
-		Parser p = Parser.detectParser(new FileInputStream(f), "file");
+		Parser p = ParserFactory.detectParser(new FileInputStream(f), "file");
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
 				p instanceof VCFParser);
@@ -60,7 +60,7 @@ public class TestParserDetection {
 	@Test
 	public void testBlast() throws FileNotFoundException, IOException {
 		File f = DataManager.file("testblast.m8");
-		Parser p = Parser.detectParser(new FileInputStream(f), "file");
+		Parser p = ParserFactory.detectParser(new FileInputStream(f), "file");
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
 				p instanceof BlastM8Parser);
@@ -70,7 +70,7 @@ public class TestParserDetection {
 	@Test
 	public void testPAF() throws FileNotFoundException, IOException {
 		File f = DataManager.file("minibed.bed");
-		Parser p = Parser.detectParser(new FileInputStream(f), "file");
+		Parser p = ParserFactory.detectParser(new FileInputStream(f), "file");
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
 				p instanceof BEDParser);
@@ -80,7 +80,7 @@ public class TestParserDetection {
 	@Test
 	public void testSyntenic() throws FileNotFoundException, IOException {
 		File f = DataManager.file(PAF);
-		Parser p = Parser.detectParser(new FileInputStream(f), "file");
+		Parser p = ParserFactory.detectParser(new FileInputStream(f), "file");
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
 				p instanceof SyntenicParser);

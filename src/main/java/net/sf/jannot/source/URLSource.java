@@ -9,7 +9,8 @@ import java.io.PushbackInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import net.sf.jannot.parser.Parser;
+import net.sf.jannot.parser.ParserFactory;
+
 /**
  * 
  * @author Thomas Abeel
@@ -29,11 +30,13 @@ public class URLSource extends AbstractStreamDataSource {
 	}
 
 	private void init() throws MalformedURLException, IOException {
-		PushbackInputStream pis=new PushbackInputStream(url.openStream(), 16*1024);
-		byte[]buffer=new byte[16*1024];
-		int i=pis.read(buffer);
-		super.setParser(Parser.detectParser(new ByteArrayInputStream(buffer,0,i),url));
-		pis.unread(buffer,0,i);
+		PushbackInputStream pis = new PushbackInputStream(url.openStream(),
+				16 * 1024);
+		byte[] buffer = new byte[16 * 1024];
+		int i = pis.read(buffer);
+		super.setParser(ParserFactory
+				.detectParser(new ByteArrayInputStream(buffer, 0, i), url));
+		pis.unread(buffer, 0, i);
 		super.setIos(pis);
 
 	}
@@ -97,25 +100,28 @@ public class URLSource extends AbstractStreamDataSource {
 		return url.toString();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.jannot.source.DataSource#isIndexed()
 	 */
 	@Override
 	public boolean isIndexed() {
 		return false;
 	}
-	
-	
-	private long cachedSize=-2;
 
-	/* (non-Javadoc)
+	private long cachedSize = -2;
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.jannot.source.DataSource#size()
 	 */
 	@Override
 	public long size() {
-		if(cachedSize==-2)
+		if (cachedSize == -2)
 			try {
-				cachedSize=url.openConnection().getContentLength();
+				cachedSize = url.openConnection().getContentLength();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

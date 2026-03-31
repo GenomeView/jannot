@@ -12,8 +12,7 @@ import java.net.URL;
 
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.exception.SaveFailedException;
-import net.sf.jannot.parser.Parser;
+import net.sf.jannot.parser.ParserFactory;
 import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
 
@@ -24,14 +23,13 @@ public class CachedURLSource extends URLSource {
 
 	}
 
-	
-
 	@Override
 	public EntrySet read(EntrySet set) throws ReadFailedException {
 		if (!SourceCache.contains(url)) {
 			SSL.certify(url);
 			try {
-				super.setParser(Parser.detectParser(url.openStream(),url));
+				super.setParser(
+						ParserFactory.detectParser(url.openStream(), url));
 				final PipedInputStream in = new PipedInputStream();
 				final PipedOutputStream forParser = new PipedOutputStream(in);
 
@@ -39,10 +37,10 @@ public class CachedURLSource extends URLSource {
 					public void run() {
 						try {
 							OutputStream out = SourceCache.startCaching(url);
-							InputStream is=url.openStream();
+							InputStream is = url.openStream();
 							byte[] buffer = new byte[100000];
 							while (true) {
-								
+
 								int amountRead = is.read(buffer);
 								if (amountRead == -1) {
 									break;
