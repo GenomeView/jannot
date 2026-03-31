@@ -88,6 +88,19 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	}
 
 	/**
+	 * 
+	 * @param name the name
+	 * @return The {@link SyntenicData} that have either start or end equal to
+	 *         name. FIXME this duplicates the data, which might be avoidable eg
+	 *         with ImmutableList
+	 */
+	public SyntenicData get(String name) {
+		return new SyntenicData(data.stream().filter(
+				d -> d.reference().equals(name) | d.target().equals(name))
+				.collect(Collectors.toList()));
+	}
+
+	/**
 	 * @param name the name of the syntenic target
 	 * @return the range of the given entry name. All syntenic data for given
 	 *         name is inside this
@@ -100,4 +113,5 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	public String toString() {
 		return "SyntenicData[" + data + "]";
 	}
+
 }

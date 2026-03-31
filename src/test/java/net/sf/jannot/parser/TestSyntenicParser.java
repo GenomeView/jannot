@@ -50,13 +50,16 @@ public class TestSyntenicParser {
 		Data<?> data = es.getOrCreateEntry("anthracis")
 				.get(SyntenicParser.SYNTENIC_KEY);
 		assertTrue(data instanceof SyntenicData);
-		assertEquals(2, ((SyntenicData) data).getReferences().size());
+		assertEquals(6, data.get().spliterator().getExactSizeIfKnown());
+		assertEquals(3, ((SyntenicData) data).getReferences().size());
 
 		data = es.getOrCreateEntry("info1").get(SyntenicParser.SYNTENIC_KEY);
 		assertTrue(data instanceof SyntenicData);
-		assertEquals(2, ((SyntenicData) data).getReferences().size());
+		assertEquals(4, data.get().spliterator().getExactSizeIfKnown());
 
-		;
+		data = es.getOrCreateEntry("info2").get(SyntenicParser.SYNTENIC_KEY);
+		assertTrue(data instanceof SyntenicData);
+		assertEquals(2, data.get().spliterator().getExactSizeIfKnown());
 	}
 
 }

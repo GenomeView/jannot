@@ -7,3 +7,6 @@ anthracis	1100	2500	+	info1	800	2800	+
 anthracis	3000	4000	+	info1	5000	4500	-
 #and reversal indicated by reversing the source
 anthracis	5000	4000	-	info1	3000	4000	+
+#and compare with a second chromosome
+anthracis	3300	3800	+	info2	3000	3500	+
+anthracis	1100	1200	+	info2	900	1000	+

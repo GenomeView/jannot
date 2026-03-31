@@ -97,7 +97,7 @@ public class SyntenicParser extends Parser {
 		// add this data to ALL relevant Entry's
 		for (String ref : data.getReferences()) {
 			// FIXME loading multiple syntenics might overwrite existing
-			set.getOrCreateEntry(ref).add(SYNTENIC_KEY, data);
+			set.getOrCreateEntry(ref).add(SYNTENIC_KEY, data.get(ref));
 		}
 
 		return set;
