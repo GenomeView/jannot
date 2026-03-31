@@ -12,8 +12,7 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.Type;
 
 /**
- * Base class for all genome data file parsers. The main method is
- * {@link #findParser(InputStream, Object)}.
+ * Base class for all genome data file parsers.
  * 
  */
 public abstract class Parser {
