@@ -31,9 +31,13 @@ public class VCFParser extends Parser {
 	 * @param dataKey
 	 */
 	VCFParser(String fileName) {
-		super(null);
+		super(getType(fileName));
+	}
+
+	private static Type getType(String fileName) {
 		String[] arr = fileName.replace('\\', '/').split("/");
-		setDataKey(Type.get(arr[arr.length - 1]));
+		return Type.get(arr[arr.length - 1]);
+
 	}
 
 	/**

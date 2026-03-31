@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
-import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
 
 /**
@@ -19,17 +18,11 @@ import net.sf.jannot.Type;
  */
 public abstract class Parser {
 
-	// public static final Parser GFF3 = new GFF3Parser();
-
-	// public static final Parser EMBL = new EMBLParser();
-
-	// private static Logger log = Logger.getLogger(Parser.class.toString());
-
 	/*
 	 * Data key for data types that require some external information to
 	 * determine the name of the data
 	 */
-	protected DataKey dataKey = null;
+	protected final DataKey dataKey;
 
 	public Parser(DataKey dataKey) {
 		this.dataKey = dataKey;
@@ -76,25 +69,6 @@ public abstract class Parser {
 		// Do nothing by default, parser can choose to implement the write
 		// method.
 
-	}
-
-	/**
-	 * 
-	 * @param c the strand character
-	 * @return true iff c is '+' '-' or '.' which are the strand direction
-	 *         chars.
-	 */
-	private static boolean isStrand(char c) {
-		return (c == '+' || c == '-' || c == '.');
-	}
-
-	public void setDataKey(DataKey dk) {
-		this.dataKey = dk;
-	}
-
-	@Deprecated
-	public void setDataKey(String s) {
-		setDataKey(new StringKey(s));
 	}
 
 }
