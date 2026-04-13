@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.apache.commons.collections.map.Flat3Map;
 
@@ -22,6 +23,7 @@ import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -33,9 +35,8 @@ public class GTFParser extends Parser {
 	/**
 	 * @param dataKey
 	 */
-	public GTFParser() {
-		super(null);
-		// TODO Auto-generated constructor stub
+	public GTFParser(Reporter log) {
+		super(null, log);
 	}
 
 	/**
@@ -119,9 +120,8 @@ public class GTFParser extends Parser {
 				}
 
 			} catch (Exception e) {
-				e.printStackTrace();
-				System.err.println(
-						"Could not parse line: " + Arrays.toString(arr));
+				getLog().log(Level.WARNING,
+						"Could not parse line: " + Arrays.toString(arr), e);
 			}
 
 		}

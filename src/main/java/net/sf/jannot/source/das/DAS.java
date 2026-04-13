@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -26,9 +27,9 @@ import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.source.DataSource;
+import tudelft.utilities.logging.Reporter;
 
 public class DAS extends DataSource {
 
@@ -36,10 +37,10 @@ public class DAS extends DataSource {
 
 	private DSN dsn = null;
 
-	public DAS(String serverPrefix)
+	public DAS(String serverPrefix, Reporter log)
 			throws MalformedURLException, ParserConfigurationException,
 			SAXException, IOException, URISyntaxException {
-		super(null);
+		super(null, log);
 		this.serverPrefix = serverPrefix;
 		dsn = new DSN(serverPrefix);
 	}
@@ -287,29 +288,21 @@ public class DAS extends DataSource {
 //	}
 
 	@Override
-	public EntrySet read(EntrySet set) throws ReadFailedException {
+	public EntrySet read(EntrySet set) {
 		if (set == null)
 			set = new EntrySet();
-		if (ep == null || reference == null)
-			throw new ReadFailedException(
+		if (ep == null || reference == null) {
+			getLog().log(Level.SEVERE,
 					"Both the EntryPoint and the Reference need to be set!");
+			return set;
+		}
 		try {
 			this.getEntry(set, reference, ep);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			throw new ReadFailedException(e);
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			throw new ReadFailedException(e);
-		} catch (SAXException e) {
-			e.printStackTrace();
-			throw new ReadFailedException(e);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new ReadFailedException(e);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (ParserConfigurationException | SAXException | IOException
+				| URISyntaxException e) {
+			getLog().log(Level.SEVERE,
+					"Both the EntryPoint and the Reference need to be set!");
+			return set;
 		}
 		return set;
 	}

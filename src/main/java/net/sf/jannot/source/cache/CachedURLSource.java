@@ -9,9 +9,9 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.URL;
+import java.util.logging.Level;
 
 import net.sf.jannot.EntrySet;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.parser.ParserFactory;
 import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
@@ -24,12 +24,12 @@ public class CachedURLSource extends URLSource {
 	}
 
 	@Override
-	public EntrySet read(EntrySet set) throws ReadFailedException {
+	public EntrySet read(EntrySet set) {
 		if (!SourceCache.contains(url)) {
 			SSL.certify(url);
 			try {
-				super.setParser(
-						ParserFactory.detectParser(url.openStream(), url));
+				super.setParser(ParserFactory.detectParser(url.openStream(),
+						url, getLog()));
 				final PipedInputStream in = new PipedInputStream();
 				final PipedOutputStream forParser = new PipedOutputStream(in);
 
@@ -61,16 +61,20 @@ public class CachedURLSource extends URLSource {
 				}).start();
 
 				super.setIos(in);
-			} catch (Exception e) {
-				throw new ReadFailedException(e);
+			} catch (IOException e) {
+				getLog().log(Level.SEVERE, "Failed to read data from " + url,
+						e);
+				return set;
 
 			}
 			return super.read(set);
 		} else {
 			try {
-				return SourceCache.get(url).read(set);
+				return SourceCache.get(url, getLog()).read(set);
 			} catch (IOException e) {
-				throw new ReadFailedException(e);
+				// FIXME this shouldn't happen
+				getLog().log(Level.SEVERE, "failed to read " + url, e);
+				return set;
 			}
 		}
 	}

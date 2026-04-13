@@ -11,30 +11,35 @@ import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import atk.util.MD5Tools;
-import net.sf.jannot.indexing.Faidx;
-import net.sf.jannot.mafix.MafixFactory;
-import net.sf.jannot.tabix.TabixWriter;
-import net.sf.jannot.tabix.TabixWriter.Conf;
 import htsjdk.samtools.BAMIndexer;
 import htsjdk.samtools.SAMFileHeader;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
 import htsjdk.samtools.SamInputResource;
 import htsjdk.samtools.SamReader;
-import htsjdk.samtools.SamReaderFactory; 
+import htsjdk.samtools.SamReaderFactory;
+import net.sf.jannot.indexing.Faidx;
+import net.sf.jannot.mafix.MafixFactory;
+import net.sf.jannot.tabix.TabixWriter;
+import net.sf.jannot.tabix.TabixWriter.Conf;
 
 /**
  * @author Thomas Abeel
  * 
  */
 public class IndexManager {
-	private static Logger log = Logger.getLogger(IndexManager.class.getCanonicalName());
-	public static File cacheDir = new File(System.getProperty("user.home")+"/.genomeview/index");
+	// FIXME another singleton class with only static members
+
+	private static Logger log = Logger
+			.getLogger(IndexManager.class.getCanonicalName());
+	public static File cacheDir = new File(
+			System.getProperty("user.home") + "/.genomeview/index");
 
 	public static Locator getIndex(Locator locator) {
 		String postfix = locator.getPostfix();
 		if (postfix == null) {
-			log.info("JAnnot does not know the index format for this locator: " + locator);
+			log.info("JAnnot does not know the index format for this locator: "
+					+ locator);
 		}
 		log.info("Trying to find local index");
 		Locator out = findLocalIndex(locator);
@@ -55,13 +60,15 @@ public class IndexManager {
 	private static Locator findRemoteIndex(Locator locator) {
 		Locator index = new Locator(locator + "." + locator.getPostfix());
 
-		if (!index.exists()||index.length()==0)
+		if (!index.exists() || index.length() == 0)
 			index = null;
 
 		/* Special case handling of bam files */
 		if (index == null) {
-			index = new Locator(locator.toString().substring(0, locator.toString().length() - 4) + "." + locator.getPostfix());
-			if (!index.exists()||index.length()==0)
+			index = new Locator(locator.toString().substring(0,
+					locator.toString().length() - 4) + "."
+					+ locator.getPostfix());
+			if (!index.exists() || index.length() == 0)
 				index = null;
 		}
 		return index;
@@ -76,13 +83,14 @@ public class IndexManager {
 		if (!cacheDir.exists())
 			cacheDir.mkdir();
 		Locator idx = cacheIndex(locator);
-		if (!idx.exists()||idx.length()==0)
+		if (!idx.exists() || idx.length() == 0)
 			idx = null;
 		return idx;
 	}
 
 	private static Locator cacheIndex(Locator locator) {
-		return new Locator(cacheDir + "/" + MD5Tools.md5(locator.toString()) + "." + locator.getPostfix());
+		return new Locator(cacheDir + "/" + MD5Tools.md5(locator.toString())
+				+ "." + locator.getPostfix());
 	}
 
 	/**
@@ -94,43 +102,46 @@ public class IndexManager {
 	 * @throws IOException
 	 * @throws MalformedURLException
 	 */
-	public static boolean createIndex(Locator locator) throws MalformedURLException, IOException, URISyntaxException {
-		log.info("Creating index for "+locator);
+	public static boolean createIndex(Locator locator)
+			throws MalformedURLException, IOException, URISyntaxException {
+		log.info("Creating index for " + locator);
 		if (!cacheDir.exists())
 			cacheDir.mkdir();
 
 		Locator idx = cacheIndex(locator);
 
-		if(!idx.isURL()){
-			Locator tmp=new Locator(locator.toString() + "." + locator.getPostfix());
-			File f=tmp.file();
-			try{
-			f.createNewFile();
-			}catch(IOException e){
-				log.warning("Tried to make index file, failed: "+e);
+		if (!idx.isURL()) {
+			Locator tmp = new Locator(
+					locator.toString() + "." + locator.getPostfix());
+			File f = tmp.file();
+			try {
+				f.createNewFile();
+			} catch (IOException e) {
+				log.warning("Tried to make index file, failed: " + e);
 			}
-			if(f.exists()&&f.canWrite())
-				idx=tmp;
-					
+			if (f.exists() && f.canWrite())
+				idx = tmp;
+
 		}
-		
+
 		if (idx.exists())
 			log.info("Index already exists and will be overwritten!!!");
 
-		if(locator.isMaf()){
+		if (locator.isMaf()) {
 			MafixFactory.generateIndex(locator.stream(), idx.file());
-			
+
 		}
-		
+
 		if (locator.isBAM()) {
 
 			InputStream ios = locator.stream();
-			SamReader sfr = SamReaderFactory.makeDefault().open(SamInputResource.of(ios));
-			//sfr.enableFileSource(true); // CHECK do we still need this?
+			SamReader sfr = SamReaderFactory.makeDefault()
+					.open(SamInputResource.of(ios));
+			// sfr.enableFileSource(true); // CHECK do we still need this?
 
 			SAMFileHeader head = sfr.getFileHeader();
 
-			File tmpOutput= new File(idx+".tmp");
+			File tmpOutput = new File(idx + ".tmp");
 			BAMIndexer bix = new BAMIndexer(tmpOutput, head);
 
 			SAMRecordIterator sir = sfr.iterator();
@@ -141,8 +152,8 @@ public class IndexManager {
 			}
 			bix.finish();
 			idx.file().delete();
-			boolean rename=tmpOutput.renameTo(idx.file());
-			log.info("Did rename succeed? "+rename);
+			boolean rename = tmpOutput.renameTo(idx.file());
+			log.info("Did rename succeed? " + rename);
 			System.out.println(rename);
 			return rename;
 //			return true;
@@ -154,7 +165,7 @@ public class IndexManager {
 			// }
 
 		}
-		
+
 		if (locator.isTabix()) {
 			Conf c = locator.getTabixConfiguration();
 			try {
@@ -185,7 +196,9 @@ public class IndexManager {
 	 */
 	public static boolean canBuildIndex(Locator data) {
 		boolean tbx = data.isTabix() && data.isBlockCompressed();
-		return data.isBAM() || tbx || (data.isFasta() && !data.isAnyCompressed()) || (data.isMaf() && data.isBlockCompressed());
+		return data.isBAM() || tbx
+				|| (data.isFasta() && !data.isAnyCompressed())
+				|| (data.isMaf() && data.isBlockCompressed());
 	}
 
 }

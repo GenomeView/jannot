@@ -5,6 +5,7 @@ package net.sf.jannot.parser;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.EntrySet;
@@ -13,15 +14,15 @@ import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
+import tudelft.utilities.logging.Reporter;
 
 public class PTTParser extends Parser {
 
 	/**
 	 * @param dataKey
 	 */
-	public PTTParser() {
-		super(null);
-		// TODO Auto-generated constructor stub
+	public PTTParser(Reporter log) {
+		super(null, log);
 	}
 
 	/**
@@ -72,9 +73,9 @@ public class PTTParser extends Parser {
 				fa.add(f);
 
 			} catch (Exception e) {
-				e.printStackTrace();
-				System.err.println(
-						"Could not parse line: " + Arrays.toString(arr));
+				getLog().log(Level.WARNING,
+						"Could not parse line: " + Arrays.toString(arr), e);
+				// original parser ignored the error as well
 			}
 
 		}

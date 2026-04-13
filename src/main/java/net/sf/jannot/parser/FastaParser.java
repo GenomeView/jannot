@@ -20,6 +20,7 @@ import net.sf.jannot.alignment.mfa.Alignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.refseq.Sequence;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * In case of multiple alignments it is strongly advised to set the dataKey
@@ -34,15 +35,15 @@ public class FastaParser extends Parser {
 	 */
 	public static boolean forceEntries = false;
 
-	public FastaParser() {
-		super(null);
+	public FastaParser(Reporter log) {
+		super(null, log);
 	}
 
 	/**
 	 * @param dataKey
 	 */
-	public FastaParser(DataKey dataKey) {
-		super(dataKey);
+	public FastaParser(DataKey dataKey, Reporter log) {
+		super(dataKey, log);
 	}
 
 	@Override

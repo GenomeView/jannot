@@ -13,14 +13,16 @@ import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
+import tudelft.utilities.logging.Reporter;
 
 public class BlastM8Parser extends Parser {
 
 	/**
 	 * @param dataKey
+	 * @param log     the {@link Reporter} to log issues to
 	 */
-	public BlastM8Parser() {
-		super(null);
+	public BlastM8Parser(Reporter log) {
+		super(null, log);
 		// TODO Auto-generated constructor stub
 	}
 

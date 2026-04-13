@@ -19,7 +19,6 @@ package net.sf.jannot.parser;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,10 +30,12 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import support.DataManager;
+import tudelft.utilities.logging.ReportToLogger;
+import tudelft.utilities.logging.Reporter;
 
 public class TestTBLParser {
-	private static Logger log = Logger
-			.getLogger(TestTBLParser.class.toString());
+	private static Reporter log = new ReportToLogger(
+			TestTBLParser.class.toString());
 
 	@Test
 	public void testParserMini()
@@ -42,7 +43,7 @@ public class TestTBLParser {
 		File f = DataManager.file("sequin.tbl");
 		// following is copy of another test.
 		// It was expected to fail but apparently works. No idea what it does...
-		DataSource ds = DataSourceFactory.create(new Locator(f));
+		DataSource ds = DataSourceFactory.create(new Locator(f), log);
 		EntrySet es = ds.read();
 		double score = es.firstEntry().getMemoryAnnotation(Type.get("gene"))
 				.get(0).getScore();

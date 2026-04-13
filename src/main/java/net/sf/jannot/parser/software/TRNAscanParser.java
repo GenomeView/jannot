@@ -14,6 +14,7 @@ import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -23,9 +24,10 @@ public class TRNAscanParser extends Parser {
 
 	/**
 	 * @param dataKey
+	 * @param log     the {@link Reporter} to log issues to
 	 */
-	public TRNAscanParser() {
-		super(null);
+	public TRNAscanParser(Reporter log) {
+		super(null, log);
 		// TODO Auto-generated constructor stub
 	}
 

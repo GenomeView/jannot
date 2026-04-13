@@ -22,6 +22,7 @@ import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.refseq.MemorySequence;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Parser for EMBL files.
@@ -33,8 +34,8 @@ import net.sf.jannot.refseq.MemorySequence;
  */
 public class EMBLParser extends Parser {
 
-	EMBLParser() {
-		super(null);
+	EMBLParser(Reporter log) {
+		super(null, log);
 	}
 
 	@Override

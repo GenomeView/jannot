@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import org.junit.After;
 import org.junit.Before;
@@ -20,6 +20,8 @@ import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import net.sf.jannot.variation.Variation;
 import support.DataManager;
+import tudelft.utilities.logging.ReportToLogger;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * IMPORTANT!!!: This test requires the data in test/resource to be prepared.
@@ -35,7 +37,7 @@ public class TestVCF {
 
 	// private String[] files =DataManager.vcfFiles();
 
-	private static Logger log = Logger.getLogger(TestVCF.class.toString());
+	private static Reporter log = new ReportToLogger(TestVCF.class.toString());
 
 	@Before
 	public void init() {
@@ -48,14 +50,14 @@ public class TestVCF {
 
 	@Test
 	public void test_dummyTest() {
-		log.info("BEGIN test_dummyTest");
+		log.log(Level.INFO, "BEGIN test_dummyTest");
 		assertTrue(true);
-		log.info("END test_dummyTest");
+		log.log(Level.INFO, "END test_dummyTest");
 	}
 
 	@Test
 	public void test_loadEntries() {
-		log.info("BEGIN test_loadEntries");
+		log.log(Level.INFO, "BEGIN test_loadEntries");
 		try {
 			int i = 0;
 
@@ -65,25 +67,26 @@ public class TestVCF {
 			EntrySet entries = new EntrySet();
 			Locator fIndex = new Locator(DataManager.file(indexIdentifier));
 			Locator fData = new Locator(DataManager.file(dataIdentifier));
-			DataSource ds = DataSourceFactory.create(fData, fIndex);
+			DataSource ds = DataSourceFactory.create(fData, fIndex, log);
 
 			// File fileData = new File(dataFile);
 			// File indexData = new File(indexFile);
 
-			log.info("------ Sample # " + i + " ---------");
-			log.info("	> fileData: " + fData.file() + "( "
+			log.log(Level.INFO, "------ Sample # " + i + " ---------");
+			log.log(Level.INFO, "	> fileData: " + fData.file() + "( "
 					+ fData.file().length() + " KB)");
-			log.info("	> indexData: " + fIndex.file() + "( "
+			log.log(Level.INFO, "	> indexData: " + fIndex.file() + "( "
 					+ fIndex.file().length() + " KB)");
 			i++;
-			log.info("	> Reading source:" + ds);
+			log.log(Level.INFO, "	> Reading source:" + ds);
 			try {
 				long t1 = System.currentTimeMillis();
 				ds.read(entries);
 				long t2 = System.currentTimeMillis();
-				log.info("		> Time consumed loading files: "
+				log.log(Level.INFO, "		> Time consumed loading files: "
 						+ Math.abs(t2 - t1));
-				log.info("		> Number of entries: " + entries.size());
+				log.log(Level.INFO,
+						"		> Number of entries: " + entries.size());
 				// assertTrue(entries.size() > 0);
 				// We build an ArrayList to access randonmly to a entry
 				List<Entry> list = new ArrayList<Entry>();
@@ -109,7 +112,7 @@ public class TestVCF {
 				// System.out.println("DD: " + data);
 				Iterable<?> resultSet = data.get(500000, 2000000);
 				long t4 = System.currentTimeMillis();
-				log.info("		> Time consumed fetching data: "
+				log.log(Level.INFO, "		> Time consumed fetching data: "
 						+ Math.abs(t4 - t3));
 				for (Object o : resultSet) {
 					// System.out.println(o);

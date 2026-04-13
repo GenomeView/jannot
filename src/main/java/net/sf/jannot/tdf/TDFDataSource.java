@@ -3,15 +3,16 @@
  */
 package net.sf.jannot.tdf;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.broad.igv.tdf.TDFReader;
+
+import htsjdk.samtools.seekablestream.SeekableFileStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.StringKey;
@@ -19,13 +20,7 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
-import net.sf.jannot.tabix.PileupWrapper;
-import htsjdk.samtools.seekablestream.SeekableFileStream;
-import htsjdk.samtools.seekablestream.SeekableStream;
-
-import org.broad.igv.tdf.TDFReader;
-
-import cern.colt.Arrays;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -40,13 +35,15 @@ public class TDFDataSource extends DataSource {
 
 	/**
 	 * @param file
+	 * @param log  the {@link Reporter} to log issues to.
 	 * @throws URISyntaxException
 	 * @throws ReadFailedException
-	 * @throws IOException 
-	 * @throws MalformedURLException 
+	 * @throws IOException
+	 * @throws MalformedURLException
 	 */
-	public TDFDataSource(Locator l) throws ReadFailedException, URISyntaxException, MalformedURLException, IOException {
-		super(l);
+	public TDFDataSource(Locator l, Reporter log) throws ReadFailedException,
+			URISyntaxException, MalformedURLException, IOException {
+		super(l, log);
 		if (!l.isURL())
 			s = new SeekableFileStream(l.file());
 		else
@@ -87,7 +84,7 @@ public class TDFDataSource extends DataSource {
 	 * @see net.sf.jannot.source.DataSource#read(net.sf.jannot.EntrySet)
 	 */
 	@Override
-	public EntrySet read(EntrySet set) throws ReadFailedException {
+	public EntrySet read(EntrySet set) {
 
 		if (set == null)
 			set = new EntrySet();

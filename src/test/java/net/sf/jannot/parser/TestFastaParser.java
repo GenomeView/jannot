@@ -18,6 +18,8 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import support.DataManager;
+import tudelft.utilities.logging.ReportToLogger;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -26,10 +28,12 @@ import support.DataManager;
  */
 public class TestFastaParser {
 
+	private Reporter log = new ReportToLogger("test");
+
 	private void testFile(File file)
 			throws URISyntaxException, IOException, ReadFailedException {
 
-		DataSource ds = DataSourceFactory.create(new Locator(file));
+		DataSource ds = DataSourceFactory.create(new Locator(file), log);
 		EntrySet es = ds.read();
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("TestFasta", es.firstEntry().getID());
@@ -56,7 +60,7 @@ public class TestFastaParser {
 	public void testWrite()
 			throws URISyntaxException, IOException, ReadFailedException {
 		File f = DataManager.file("mini.fasta");
-		DataSource ds = DataSourceFactory.create(new Locator(f));
+		DataSource ds = DataSourceFactory.create(new Locator(f), log);
 		EntrySet es = ds.read();
 
 		File out = File.createTempFile("unittesting.", ".fasta");
@@ -64,7 +68,7 @@ public class TestFastaParser {
 
 		FileOutputStream fos = new FileOutputStream(out);
 		for (Entry e : es)
-			new FastaParser().write(fos, e);
+			new FastaParser(log).write(fos, e);
 		fos.close();
 
 		testFile(out);
@@ -76,7 +80,7 @@ public class TestFastaParser {
 			throws URISyntaxException, IOException, ReadFailedException {
 
 		DataSource ds = DataSourceFactory
-				.create(new Locator(DataManager.file("10313-CDS.fasta")));
+				.create(new Locator(DataManager.file("10313-CDS.fasta")), log);
 		EntrySet es = ds.read();
 
 		assertEquals(11386 / 2, es.size());

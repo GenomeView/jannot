@@ -6,7 +6,7 @@ package net.sf.jannot.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.StringKey;
@@ -20,6 +20,7 @@ import net.sf.jannot.parser.software.MauveParser;
 import net.sf.jannot.parser.software.SIPHTParser;
 import net.sf.jannot.parser.software.TRNAscanParser;
 import net.sf.jannot.parser.software.TransTermHPParser;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Factory that produces parser(s) that can handle an inputstream.
@@ -27,23 +28,24 @@ import net.sf.jannot.parser.software.TransTermHPParser;
  */
 public abstract class ParserFactory {
 
-	public static final Parser GFF3 = new GFF3Parser();
+//	public static final Parser GFF3 = new GFF3Parser();
+//
+//	public static final Parser EMBL = new EMBLParser();
+//
+//	private static Logger log = Logger.getLogger(Parser.class.toString());
+//
+//	// FIXME this should be dynamically determined
+//	public static Parser[] parsers(Object source) {
+//		return new Parser[] { GFF3, new BEDParser(source.toString()), EMBL,
+//				new GTFParser(), new BlastM8Parser(), new FindPeaksParser(),
+//				new GeneMarkParser(), new MaqSNPParser(),
+//				new TransTermHPParser(), new TRNAscanParser(), new EMBLParser(),
+//				new FastaParser(), new GenbankParser(), new PTTParser(),
+//				new TBLParser(), new VCFParser(source.toString()),
+//				new WiggleParser(), new SyntenicParser() };
+//	}
 
-	public static final Parser EMBL = new EMBLParser();
-
-	private static Logger log = Logger.getLogger(Parser.class.toString());
-
-	// FIXME this should be dynamically determined
-	public static Parser[] parsers(Object source) {
-		return new Parser[] { GFF3, new BEDParser(source.toString()), EMBL,
-				new GTFParser(), new BlastM8Parser(), new FindPeaksParser(),
-				new GeneMarkParser(), new MaqSNPParser(),
-				new TransTermHPParser(), new TRNAscanParser(), new EMBLParser(),
-				new FastaParser(), new GenbankParser(), new PTTParser(),
-				new TBLParser(), new VCFParser(source.toString()),
-				new WiggleParser(), new SyntenicParser() };
-	}
-
+	// this is singleton class
 	private ParserFactory() {
 
 	}
@@ -55,16 +57,17 @@ public abstract class ParserFactory {
 	 * @param source the filename or so representing the original source. Some
 	 *               parsers require the object toString function to give a
 	 *               valid File path. Others assume the source to be a "datakey"
+	 * @param log    the {@link Reporter} where the parser will log issues to
 	 * @return an concrete Parser for the input stream, as determined by the
 	 *         headers actually in the input stream. Or null if no suitable
 	 *         parser is found.
 	 * @throws IOException
 	 */
-	public static Parser detectParser(InputStream is, Object source)
-			throws IOException {
+	public static Parser detectParser(InputStream is, Object source,
+			Reporter log) throws IOException {
 
-		Parser p = findParser(is, source);
-		log.info("parser: " + p);
+		Parser p = findParser(is, source, log);
+		log.log(Level.INFO, "parser: " + p);
 		return p;
 
 	}
@@ -85,8 +88,8 @@ public abstract class ParserFactory {
 	 *         parser is found.
 	 * @throws IOException
 	 */
-	private static Parser findParser(InputStream is, Object source)
-			throws IOException {
+	private static Parser findParser(InputStream is, Object source,
+			Reporter log) throws IOException {
 		LineIterator it = new LineIterator(is);
 		// it.setSkipComments(true);
 		it.setSkipBlanks(true);
@@ -103,33 +106,34 @@ public abstract class ParserFactory {
 			return new VCFParser(source.toString());
 
 		if (firstLine.contains("Mauve1"))
-			return new MauveParser(new StringKey(source.toString()));
+			return new MauveParser(new StringKey(source.toString()), log);
 
 		if (nonCommentLine.equals("id	chrom	start	end	max_coord"))
-			return new FindPeaksParser();
+			return new FindPeaksParser(log);
 
-		log.info("firstLine: " + firstLine);
-		log.info("nonCommentLine: " + nonCommentLine);
+		log.log(Level.FINEST, "firstLine: " + firstLine);
+		log.log(Level.FINEST, "nonCommentLine: " + nonCommentLine);
 		if (firstLine.startsWith("Guide for interpreting SIPHT output"))
-			return new SIPHTParser(new StringKey(source.toString()));
+			return new SIPHTParser(new StringKey(source.toString()), log);
 		if (firstLine.startsWith("##maf"))
-			return new MAFParser(new StringKey(source.toString()));
+			return new MAFParser(new StringKey(source.toString()), log);
 		if (nonCommentLine.startsWith("GeneMark"))
-			return new GeneMarkParser();
+			return new GeneMarkParser(log);
 		if (nonCommentLine.startsWith("TransTermHP"))
 			return new TransTermHPParser();
 		if (nonCommentLine.startsWith("gvheader:syntenic")) {
 			// old style syntenic files. We don't have these anymore
 			// and maybe we should remove this type.
-			return new SyntenicParser(new StringKey(source.toString()));
+			return new SyntenicParser(new StringKey(source.toString()), log);
 		}
 
 		// System.out.println("Detect: " + line);
 		if (nonCommentLine.startsWith("track")) {
 			if (nonCommentLine.startsWith("track type=wiggle_0")) {
-				return new WiggleParser();
+				return new WiggleParser(log);
 			} else if (nonCommentLine.startsWith("track type=bedGraph")) {
-				return new BedGraphParser(new StringKey(source.toString()));
+				return new BedGraphParser(new StringKey(source.toString()),
+						log);
 			} else {
 				nonCommentLine = it.next();
 			}
@@ -137,28 +141,29 @@ public abstract class ParserFactory {
 		}
 
 		if (nonCommentLine.startsWith("LOCUS"))
-			return new GenbankParser();
+			return new GenbankParser(null, log);
 
 		// ====== NO HEADER. TRY TAB SPLIT . =====
 		// and look in contents. This is getting fuzzy.
 
 		String[] nonCommentArr = nonCommentLine.split("\t");
 
-		log.info("tab split nonCommentLine: " + nonCommentArr.length);
+		log.log(Level.FINEST,
+				"tab split nonCommentLine: " + nonCommentArr.length);
 
 		if (nonCommentArr.length == 9) {
 			if (nonCommentArr[0].contains(".."))
-				return new PTTParser();
+				return new PTTParser(log);
 			else {
 				boolean no1 = nonCommentArr[1].matches("[0-9]+");
 				boolean no2 = nonCommentArr[2].matches("[0-9]+");
 
 				if (no1 && no2) {
-					return new BEDParser(source.toString());
+					return new BEDParser(source.toString(), log);
 				} else if (nonCommentArr[8].contains("="))
-					return new GFF3Parser();
+					return new GFF3Parser(log);
 				else
-					return new GTFParser();
+					return new GTFParser(log);
 
 			}
 
@@ -168,7 +173,7 @@ public abstract class ParserFactory {
 			String[] head = new String[] { "Sequence", "tRNA", "Bounds", "tRNA",
 					"Anti", "Intron", "Bounds", "Cove" };
 			if (Arrays.equals(nonCommentLine.split("[ \t]+"), head)) {
-				return new TRNAscanParser();
+				return new TRNAscanParser(log);
 			}
 		}
 
@@ -180,7 +185,8 @@ public abstract class ParserFactory {
 				isMap = isMap | nonCommentArr[col].contains(":");
 			}
 			if (isMap && isStrand(nonCommentArr[4].charAt(0))) {
-				return new SyntenicParser();
+				return new SyntenicParser(new StringKey(source.toString()),
+						log);
 			}
 		}
 
@@ -189,41 +195,42 @@ public abstract class ParserFactory {
 			String[] arr = nonCommentLine.split("\t");
 
 			if (isStrand(arr[4].charAt(0)))
-				return new SyntenicParser();
+				return new SyntenicParser(new StringKey(source.toString()),
+						log);
 
 			try {
 				Double.parseDouble(arr[4]);
 			} catch (NumberFormatException ne) {
 				// #34 won't happen for blast, as arr[4] is a simple number
-				return new BlastM8Parser();
+				return new BlastM8Parser(log);
 			}
 
 			if (isStrand(arr[5].charAt(0)))
-				return new BEDParser(source.toString());
+				return new BEDParser(source.toString(), log);
 
 			try {
 				Double.parseDouble(arr[9]);
 				Double.parseDouble(arr[11]);
 			} catch (NumberFormatException ne) {
-				return new MaqSNPParser();
+				return new MaqSNPParser(log);
 			}
 
-			return new BlastM8Parser();
+			return new BlastM8Parser(log);
 		}
 
 		if (nonCommentLine.split("\t").length == 16) {
-			return new MapViewParser(new StringKey(source.toString()));
+			return new MapViewParser(new StringKey(source.toString()), log);
 		}
 		if (nonCommentLine.startsWith("ID") || nonCommentLine.startsWith("FT")
 				|| nonCommentLine.startsWith("FH"))
-			return new EMBLParser();
+			return new EMBLParser(log);
 
 		if (nonCommentLine.startsWith(">")) {
 
 			if (nonCommentLine.startsWith(">Feature "))
-				return new TBLParser();
+				return new TBLParser(log);
 			else
-				return specifyFastaType(nonCommentLine, source);
+				return specifyFastaType(nonCommentLine, source, log);
 
 		}
 
@@ -251,7 +258,8 @@ public abstract class ParserFactory {
 	 * @param source the filename or id of the source
 	 * @return a {@link BroadSolexa} or {@link FastaParser}
 	 */
-	private static Parser specifyFastaType(String line, Object source) {
+	private static Parser specifyFastaType(String line, Object source,
+			Reporter log) {
 		boolean broadShortRead = true;
 		try {
 			String[] arr = line.split(" ");
@@ -273,9 +281,9 @@ public abstract class ParserFactory {
 			broadShortRead = false;
 		}
 		if (broadShortRead)
-			return new BroadSolexa(new StringKey(source.toString()));
+			return new BroadSolexa(new StringKey(source.toString()), log);
 		else
-			return new FastaParser(new StringKey(source.toString()));
+			return new FastaParser(new StringKey(source.toString()), log);
 	}
 
 }

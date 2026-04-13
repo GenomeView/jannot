@@ -6,7 +6,9 @@ package net.sf.jannot.parser;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.logging.Level;
 
+import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
@@ -14,7 +16,7 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
-import be.abeel.io.LineIterator;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -27,9 +29,10 @@ public class BEDParser extends Parser {
 
 	/**
 	 * @param dataKey
+	 * @param log     the {@link Reporter} to log issues to
 	 */
-	public BEDParser(String fileName) {
-		super(null);
+	public BEDParser(String fileName, Reporter log) {
+		super(null, log);
 		String[] arr = fileName.replace('\\', '/').split("/");
 		defaultType = arr[arr.length - 1];
 
@@ -47,15 +50,17 @@ public class BEDParser extends Parser {
 			/* Handle header lines */
 			if (line.startsWith("track")) {
 				String name = BEDTools.parseTrack(line).get("name");
-				System.out.println(BEDTools.parseTrack(line));
-				System.out.println("NAME: " + name);
+				getLog().log(Level.INFO, BEDTools.parseTrack(line).toString());
+				getLog().log(Level.INFO, "NAME: " + name);
 				if (name != null)
 					type = Type.get(name);
 				continue;
 			} else if (line.startsWith("browser"))
 				continue;
 			Feature f = BEDTools.parseLine(line, type, defaultType);
-			MemoryFeatureAnnotation fa = set.getOrCreateEntry(f.qualifier("chrom")).getMemoryAnnotation(f.type());// (FeatureAnnotation)
+			MemoryFeatureAnnotation fa = set
+					.getOrCreateEntry(f.qualifier("chrom"))
+					.getMemoryAnnotation(f.type());// (FeatureAnnotation)
 			fa.add(f);
 
 		}
@@ -68,15 +73,17 @@ public class BEDParser extends Parser {
 		PrintWriter out = new PrintWriter(os);
 
 		for (DataKey data : entry) {
-			
+
 			if (entry.get(data) instanceof FeatureAnnotation) {
-				String headerLine = "track name=\""+entry.get(data).label()+"\"";
-				if(entry.description.keys().size()>0)
-						headerLine+=" description=\""+entry.description.toString()+"\"";
+				String headerLine = "track name=\"" + entry.get(data).label()
+						+ "\"";
+				if (entry.description.keys().size() > 0)
+					headerLine += " description=\""
+							+ entry.description.toString() + "\"";
 				out.println(headerLine);
 				FeatureAnnotation fa = (FeatureAnnotation) entry.get(data);
 				for (Feature f : fa.get()) {
-					out.println(line(f, entry.getID(),entry));
+					out.println(line(f, entry.getID(), entry));
 				}
 			}
 
@@ -88,21 +95,21 @@ public class BEDParser extends Parser {
 
 	private String line(Feature f, String acc, Entry e) {
 
-        StringBuffer out = new StringBuffer();
+		StringBuffer out = new StringBuffer();
 
-        out.append(e.getID() + "\t");
-        out.append((f.start()-1) + "\t");
-        out.append(f.end() + "\t");
-        out.append(f.qualifier("Name") + "\t");
-        out.append(f.qualifier("score") + "\t");
-        out.append(f.strand().symbol() + "\t");
-        out.append((f.start()-1) + "\t");
-        out.append(f.end() + "\t");   
-        if (f.getColor()!=null)
-            out.append(f.getColor().toString());
-        else
-            out.append("");
-        return out.toString();
-    }
+		out.append(e.getID() + "\t");
+		out.append((f.start() - 1) + "\t");
+		out.append(f.end() + "\t");
+		out.append(f.qualifier("Name") + "\t");
+		out.append(f.qualifier("score") + "\t");
+		out.append(f.strand().symbol() + "\t");
+		out.append((f.start() - 1) + "\t");
+		out.append(f.end() + "\t");
+		if (f.getColor() != null)
+			out.append(f.getColor().toString());
+		else
+			out.append("");
+		return out.toString();
+	}
 
 }

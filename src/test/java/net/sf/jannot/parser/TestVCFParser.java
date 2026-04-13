@@ -35,6 +35,8 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import support.DataManager;
+import tudelft.utilities.logging.ReportToLogger;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -43,12 +45,15 @@ import support.DataManager;
  */
 public class TestVCFParser {
 
+	private static final Reporter log = new ReportToLogger(
+			TestVCFParser.class.toString());
+
 	@Test
 	public void testTinySize()
 			throws URISyntaxException, IOException, ReadFailedException {
 
 		File f = DataManager.file("tiny.vcf");
-		DataSource ds = DataSourceFactory.create(new Locator(f));
+		DataSource ds = DataSourceFactory.create(new Locator(f), log);
 		EntrySet es = ds.read();
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("20", es.firstEntry().getID());
@@ -77,7 +82,7 @@ public class TestVCFParser {
 			throws URISyntaxException, IOException, ReadFailedException {
 
 		File f = DataManager.file("regular.vcf");
-		DataSource ds = DataSourceFactory.create(new Locator(f));
+		DataSource ds = DataSourceFactory.create(new Locator(f), log);
 		EntrySet es = ds.read();
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("gi|395136682|gb|CP003248.1|",

@@ -28,6 +28,7 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.shortread.BAMreads;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -205,9 +206,10 @@ public class SAMDataSource extends DataSource {
 	/**
 	 * @param data
 	 * @param index2
+	 * @param log    the {@link Reporter} to log issues to
 	 */
-	public SAMDataSource(Locator data, Locator index) {
-		super(data);
+	public SAMDataSource(Locator data, Locator index, Reporter log) {
+		super(data, log);
 		if (data == null || index == null)
 			throw new RuntimeException("Either data or index are not provided: "
 					+ data + "; " + index);
@@ -242,7 +244,7 @@ public class SAMDataSource extends DataSource {
 	}
 
 	@Override
-	public EntrySet read(EntrySet set) throws ReadFailedException {
+	public EntrySet read(EntrySet set) {
 		if (set == null)
 			set = new EntrySet();
 		SamReader inputSam = getReader();

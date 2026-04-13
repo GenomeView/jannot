@@ -1,12 +1,10 @@
 package net.sf.jannot.parser.software;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-
-import cern.colt.Arrays;
+import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
-
+import cern.colt.Arrays;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
@@ -18,14 +16,16 @@ import net.sf.jannot.alignment.maf.MemoryAlignmentBlock;
 import net.sf.jannot.alignment.maf.MemoryAlignmentSequence;
 import net.sf.jannot.parser.Parser;
 import net.sf.jannot.refseq.MemorySequence;
+import tudelft.utilities.logging.Reporter;
 
 public class MauveParser extends Parser {
 
 	/**
 	 * @param dataKey
+	 * @param log     the {@link Reporter} to log issues to
 	 */
-	public MauveParser(DataKey dataKey) {
-		super(dataKey);
+	public MauveParser(DataKey dataKey, Reporter log) {
+		super(dataKey, log);
 
 	}
 
@@ -64,7 +64,8 @@ public class MauveParser extends Parser {
 				String[] locArr = arr[1].split(":")[1].split("-");
 
 				if (ma == null) {
-					String name = arr[3].substring(arr[3].lastIndexOf('/') + 1).split("\\.")[0];
+					String name = arr[3].substring(arr[3].lastIndexOf('/') + 1)
+							.split("\\.")[0];
 					entry = set.getOrCreateEntry(name);
 					ma = new MAFMemoryMultipleAlignment();
 					entry.add(dataKey, ma);
@@ -72,14 +73,17 @@ public class MauveParser extends Parser {
 
 				if (buffer != null) {
 
-					addSequence(buffer, headerLine, a, entry,ma);
+					addSequence(buffer, headerLine, a, entry, ma);
 
 				}
 				if (marker) {
 					marker = false;
-					System.out.println("->Make block " + Arrays.toString(arr) + "\t" + java.util.Arrays.toString(locArr));
+					getLog().log(Level.INFO,
+							"->Make block " + Arrays.toString(arr) + "\t"
+									+ java.util.Arrays.toString(locArr));
 
-					a = new MemoryAlignmentBlock(Integer.parseInt(locArr[0]), Integer.parseInt(locArr[1]));
+					a = new MemoryAlignmentBlock(Integer.parseInt(locArr[0]),
+							Integer.parseInt(locArr[1]));
 					ma.add(a);
 				}
 				buffer = new StringBuffer();
@@ -90,26 +94,32 @@ public class MauveParser extends Parser {
 
 			}
 		}
-		addSequence(buffer, headerLine, a, entry,ma);
-		
+		addSequence(buffer, headerLine, a, entry, ma);
+
 		for (AbstractAlignmentBlock ab : ma.get()) {
-			System.out.println("AB: " + ab.start() + "\t" + ab.end());
+			getLog().log(Level.INFO, "AB: " + ab.start() + "\t" + ab.end());
 			for (AbstractAlignmentSequence as : ab) {
-				System.out.println("\tAS: " + as.getName() + "\t" + as.start() + "\t" + as.end());
+				getLog().log(Level.INFO, "\tAS: " + as.getName() + "\t"
+						+ as.start() + "\t" + as.end());
 			}
 		}
 		return set;
 	}
 
-	private void addSequence(StringBuffer buffer, String headerLine, MemoryAlignmentBlock a, Entry entry, MAFMemoryMultipleAlignment ma) {
+	private void addSequence(StringBuffer buffer, String headerLine,
+			MemoryAlignmentBlock a, Entry entry,
+			MAFMemoryMultipleAlignment ma) {
 		String[] prevArr = headerLine.split("[ ]+");
-		System.out.println("-->Add sequence " + prevArr[3]);
+		getLog().log(Level.INFO, "-->Add sequence " + prevArr[3]);
 
 		String[] prevLocArr = prevArr[1].split(":")[1].split("-");
 
 		MemorySequence seq = new MemorySequence(buffer.toString());
-		AbstractAlignmentSequence s = new MemoryAlignmentSequence(prevArr[3], Integer.parseInt(prevLocArr[0]),
-				Integer.parseInt(prevLocArr[1]) - Integer.parseInt(prevLocArr[0]) + 1, entry.getMaximumLength(),
+		AbstractAlignmentSequence s = new MemoryAlignmentSequence(prevArr[3],
+				Integer.parseInt(prevLocArr[0]),
+				Integer.parseInt(prevLocArr[1])
+						- Integer.parseInt(prevLocArr[0]) + 1,
+				entry.getMaximumLength(),
 				Strand.fromSymbol(prevArr[2].charAt(0)), seq);
 		a.add(s);
 		ma.addSpecies(prevArr[3]);

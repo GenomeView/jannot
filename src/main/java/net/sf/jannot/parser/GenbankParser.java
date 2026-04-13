@@ -4,6 +4,7 @@
 package net.sf.jannot.parser;
 
 import java.io.InputStream;
+import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
@@ -13,6 +14,7 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
 import net.sf.jannot.refseq.MemorySequence;
+import tudelft.utilities.logging.Reporter;
 
 /*
  * http://www.ncbi.nlm.nih.gov/Sitemap/samplerecord.html
@@ -23,17 +25,10 @@ public class GenbankParser extends Parser {
 
 	/**
 	 * @param dataKey
+	 * @param log     the {@link Reporter} to log issues to
 	 */
-	public GenbankParser() {
-		this(null);
-
-	}
-
-	/**
-	 * @param dataKey
-	 */
-	public GenbankParser(DataKey key) {
-		super(key);
+	public GenbankParser(DataKey key, Reporter log) {
+		super(key, log);
 
 	}
 
@@ -67,7 +62,15 @@ public class GenbankParser extends Parser {
 				if (line.startsWith("BASE COUNT")) {
 					// Ignore line
 				} else {
-					processFeatureLine(line, e, it);
+					try {
+						processFeatureLine(line, e, it);
+					} catch (ArrayIndexOutOfBoundsException
+							| NumberFormatException err) {
+						getLog().log(Level.SEVERE,
+								"Offending line: " + line + " for entry " + e,
+								err);
+						// original parser continued anyway, so do we
+					}
 				}
 
 			}
@@ -117,7 +120,8 @@ public class GenbankParser extends Parser {
 
 	private StringBuffer qualifierBuffer = new StringBuffer();
 
-	private void processFeatureLine(String line, Entry e, LineIterator it) {
+	private void processFeatureLine(String line, Entry e, LineIterator it)
+			throws ArrayIndexOutOfBoundsException, NumberFormatException {
 
 		if (line.startsWith("                     ")) {
 			if (line.trim().startsWith("/"))
@@ -135,20 +139,10 @@ public class GenbankParser extends Parser {
 			}
 
 			String[] arr = line.trim().split(" [ ]+");
-			try {
-				lastFeature = new Feature(ParserTools.parseLocation(arr[1]));
-				lastFeature.setType(Type.get(arr[0]));
-				lastFeature.setStrand(ParserTools.getStrand(arr[1]));
-				// System.out.println(arr[1]+"\t"+e.annotation.noFeatures());
-			} catch (ArrayIndexOutOfBoundsException aei) {
-				aei.printStackTrace();
-				System.err
-						.println("Offending line: " + line + " for entry " + e);
-			} catch (NumberFormatException nfe) {
-				nfe.printStackTrace();
-				System.err
-						.println("Offending line: " + line + " for entry " + e);
-			}
+			lastFeature = new Feature(ParserTools.parseLocation(arr[1]));
+			lastFeature.setType(Type.get(arr[0]));
+			lastFeature.setStrand(ParserTools.getStrand(arr[1]));
+			// System.out.println(arr[1]+"\t"+e.annotation.noFeatures());
 
 		}
 

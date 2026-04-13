@@ -13,6 +13,7 @@ import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Parser for the output of the GeneMark gene caller
@@ -25,8 +26,8 @@ public class GeneMarkParser extends Parser {
 	/**
 	 * @param dataKey
 	 */
-	public GeneMarkParser() {
-		super(null);
+	public GeneMarkParser(Reporter log) {
+		super(null, log);
 	}
 
 	@Override

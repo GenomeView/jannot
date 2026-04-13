@@ -4,6 +4,7 @@
 package net.sf.jannot.parser.software;
 
 import java.io.InputStream;
+import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.Entry;
@@ -13,6 +14,7 @@ import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -31,17 +33,10 @@ public class MaqSNPParser extends Parser {
 	/**
 	 * @param dataKey
 	 */
-	public MaqSNPParser() {
-		super(null);
-		// TODO Auto-generated constructor stub
+	public MaqSNPParser(Reporter log) {
+		super(null, log);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.parser.Parser#parse(java.io.InputStream,
-	 * net.sf.jannot.source.DataSource, net.sf.jannot.EntrySet)
-	 */
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
 		if (set == null)
@@ -53,6 +48,11 @@ public class MaqSNPParser extends Parser {
 
 		for (String line : it) {
 			String[] arr = line.split("\t");
+			if (arr.length < 12) {
+				getLog().log(Level.SEVERE,
+						"Expected at least 12 values but got " + line);
+				break;
+			}
 			Entry e = set.getOrCreateEntry(arr[0]);
 			MemoryFeatureAnnotation fa = e.getMemoryAnnotation(t);
 			int pos = Integer.parseInt(arr[1]);

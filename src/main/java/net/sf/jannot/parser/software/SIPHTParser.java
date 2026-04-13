@@ -5,6 +5,7 @@ package net.sf.jannot.parser.software;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
 import cern.colt.Arrays;
@@ -16,6 +17,7 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -24,9 +26,10 @@ import net.sf.jannot.parser.Parser;
 public class SIPHTParser extends Parser {
 	/**
 	 * @param stringKey
+	 * @param log       the {@link Reporter} to log issues to
 	 */
-	public SIPHTParser(StringKey stringKey) {
-		super(stringKey);
+	public SIPHTParser(StringKey stringKey, Reporter log) {
+		super(stringKey, log);
 	}
 
 	@Override
@@ -58,7 +61,7 @@ public class SIPHTParser extends Parser {
 			}
 
 			if (count == 2 || count == 3) {
-				System.out.println("putative: " + Arrays.toString(arr));
+				getLog().log(Level.INFO, "putative: " + Arrays.toString(arr));
 				int start = Integer.parseInt(arr[8]);
 				int end = Integer.parseInt(arr[9]);
 				Feature f = new Feature(new Location(start, end));

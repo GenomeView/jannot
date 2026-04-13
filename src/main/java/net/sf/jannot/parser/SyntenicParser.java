@@ -6,6 +6,7 @@ package net.sf.jannot.parser;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
@@ -15,6 +16,7 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.SyntenicBlock;
 import net.sf.jannot.SyntenicData;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Parses syntenic files.
@@ -48,17 +50,11 @@ public class SyntenicParser extends Parser {
 
 	/**
 	 * @param dataKey
+	 * @param log     the {@link Reporter} to log issues to
 	 */
-	public SyntenicParser(DataKey dataKey) {
-		super(dataKey);
+	public SyntenicParser(DataKey dataKey, Reporter log) {
+		super(dataKey, log);
 		// TODO Auto-generated constructor stub
-	}
-
-	/**
-	 * weird, all other parsers now have this. Makes not much sense.
-	 */
-	public SyntenicParser() {
-		this(null);
 	}
 
 	@Override
@@ -76,6 +72,11 @@ public class SyntenicParser extends Parser {
 		final List<SyntenicBlock> blocks = new ArrayList<>();
 		for (final String line : it) {
 			final String[] arr = line.split("\t");
+			if (line.length() < 8) {
+				getLog().log(Level.SEVERE,
+						"Expected at least 8 values but got " + line);
+				break;
+			}
 			final Location refLoc = new Location(Integer.parseInt(arr[1]),
 					Integer.parseInt(arr[2]));
 			final Strand refStrand = Strand.fromSymbol(arr[3].charAt(0));

@@ -17,10 +17,10 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.LineBlockCompressedInputStream;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -28,24 +28,24 @@ import net.sf.jannot.source.Locator;
  * 
  */
 public class IndexedFeatureFile extends DataSource {
+	private final static int MAX_BIN = 37450;
+	private final static int TAD_LIDX_SHIFT = 14;
+
 	// FIXME a lot of duplicated stuff from CachingQueryReader with respect to
 	// the tiling caching...
 
 	/**
 	 * Index constructed from a binary index file
 	 */
-	TabIndex idx;
+	private TabIndex idx;
 
 	/**
 	 * Compressed data file.
 	 */
-	private Locator data;
+	private final Locator data;
 	// private Locator index;
 
-	private long size;
-
-	private final static int MAX_BIN = 37450;
-	private final static int TAD_LIDX_SHIFT = 14;
+	private final long size;
 
 	// preset masks
 //	private final static int TI_PRESET_GENERIC = 0;
@@ -59,9 +59,9 @@ public class IndexedFeatureFile extends DataSource {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public IndexedFeatureFile(Locator data, Locator index)
+	public IndexedFeatureFile(Locator data, Locator index, Reporter log)
 			throws IOException, URISyntaxException {
-		super(data);
+		super(data, log);
 		this.data = data;
 		// this.index = index;
 		this.size = data.length();
@@ -738,7 +738,7 @@ public class IndexedFeatureFile extends DataSource {
 	 * @see net.sf.jannot.source.DataSource#read(net.sf.jannot.EntrySet)
 	 */
 	@Override
-	public EntrySet read(EntrySet add) throws ReadFailedException {
+	public EntrySet read(EntrySet add) {
 		if (add == null)
 			add = new EntrySet();
 		// System.out.println("Tabix names: " + idx.names);

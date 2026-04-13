@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import net.sf.jannot.parser.ParserFactory;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -21,30 +22,35 @@ public class URLSource extends AbstractStreamDataSource {
 	protected URL url;
 
 	/*
-	 * Only for use by subclasses. The extra object is only to distinguish
-	 * constructors and is ignored
+	 * Only for internal use by subclasses. The extra object is only to
+	 * distinguish constructors and is ignored
 	 */
-	protected URLSource(URL url, Object x) throws IOException {
-		super(new Locator(url.toString()));
+	protected URLSource(URL url, Object x, Reporter log) throws IOException {
+		super(new Locator(url.toString()), log);
 		this.url = url;
 	}
 
-	private void init() throws MalformedURLException, IOException {
+	private void init(Reporter log) throws MalformedURLException, IOException {
 		PushbackInputStream pis = new PushbackInputStream(url.openStream(),
 				16 * 1024);
 		byte[] buffer = new byte[16 * 1024];
 		int i = pis.read(buffer);
-		super.setParser(ParserFactory
-				.detectParser(new ByteArrayInputStream(buffer, 0, i), url));
+		super.setParser(ParserFactory.detectParser(
+				new ByteArrayInputStream(buffer, 0, i), url, log));
 		pis.unread(buffer, 0, i);
 		super.setIos(pis);
 
 	}
 
-	public URLSource(URL url) throws IOException {
-		this(url, null);
+	/**
+	 * @param url
+	 * @param log the {@link Reporter} to log to
+	 * @throws IOException
+	 */
+	public URLSource(URL url, Reporter log) throws IOException {
+		this(url, null, log);
 		SSL.certify(url);
-		init();
+		init(log);
 
 	}
 
@@ -112,11 +118,6 @@ public class URLSource extends AbstractStreamDataSource {
 
 	private long cachedSize = -2;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.source.DataSource#size()
-	 */
 	@Override
 	public long size() {
 		if (cachedSize == -2)

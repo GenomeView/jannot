@@ -6,8 +6,8 @@ package net.sf.jannot.source;
 import java.io.InputStream;
 
 import net.sf.jannot.EntrySet;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.parser.Parser;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Extends DataSource.
@@ -22,8 +22,8 @@ public abstract class AbstractStreamDataSource extends DataSource {
 
 	private InputStream ios;
 
-	protected AbstractStreamDataSource(Locator l) {
-		super(l);
+	protected AbstractStreamDataSource(Locator l, Reporter log) {
+		super(l, log);
 	}
 
 	public final void setParser(Parser parser) {
@@ -35,9 +35,8 @@ public abstract class AbstractStreamDataSource extends DataSource {
 	}
 
 	@Override
-	public EntrySet read(EntrySet set) throws ReadFailedException {
+	public EntrySet read(EntrySet set) {
 		return parser.parse(ios, set);
-
 	}
 
 	public InputStream getIos() {

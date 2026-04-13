@@ -6,6 +6,7 @@ package net.sf.jannot.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.Data;
@@ -13,6 +14,7 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.wiggle.TroveArrayWiggle;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -21,8 +23,8 @@ import net.sf.jannot.wiggle.TroveArrayWiggle;
  */
 public class WiggleParser extends Parser {
 
-	public WiggleParser() {
-		super(null);
+	public WiggleParser(Reporter log) {
+		super(null, log);
 	}
 
 	@Override
@@ -115,7 +117,7 @@ public class WiggleParser extends Parser {
 			}
 			add(e, name, daw);
 		} catch (IOException ioex) {
-			throw new RuntimeException(ioex);
+			getLog().log(Level.SEVERE, "Failed to read data", ioex);
 		}
 
 		return set;

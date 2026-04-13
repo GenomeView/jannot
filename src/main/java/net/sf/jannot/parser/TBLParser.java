@@ -13,6 +13,7 @@ import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -29,17 +30,14 @@ import net.sf.jannot.Type;
 public class TBLParser extends Parser {
 
 	/**
+	 * @param log
 	 * @param dataKey
 	 */
-	public TBLParser() {
-		super(null);
+	public TBLParser(Reporter log) {
+		super(null, log);
 		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @see net.sf.jannot.parser.Parser#parse(java.io.InputStream,
-	 *      net.sf.jannot.source.DataSource, net.sf.jannot.EntrySet)
-	 **/
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
 		if (set == null)

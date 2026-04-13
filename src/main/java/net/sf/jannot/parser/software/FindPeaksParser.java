@@ -4,6 +4,7 @@
 package net.sf.jannot.parser.software;
 
 import java.io.InputStream;
+import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.Entry;
@@ -14,6 +15,7 @@ import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -24,16 +26,10 @@ public class FindPeaksParser extends Parser {
 	/**
 	 * @param dataKey
 	 */
-	public FindPeaksParser() {
-		super(null);
+	public FindPeaksParser(Reporter log) {
+		super(null, log);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.parser.Parser#parse(java.io.InputStream,
-	 * net.sf.jannot.source.DataSource, net.sf.jannot.EntrySet)
-	 */
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
 		if (set == null)
@@ -47,6 +43,11 @@ public class FindPeaksParser extends Parser {
 		Type t = Type.get("peak");
 		for (String line : it) {
 			String[] arr = line.split("[ \t]+");
+			if (arr.length < 5) {
+				getLog().log(Level.SEVERE,
+						"Expected at least 5 columns but found " + line);
+				break;
+			}
 			Entry e = set.getOrCreateEntry(arr[1]);
 			int start = Integer.parseInt(arr[2]);
 			int end = Integer.parseInt(arr[3]);

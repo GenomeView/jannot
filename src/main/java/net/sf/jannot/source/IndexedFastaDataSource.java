@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
 
 import htsjdk.samtools.seekablestream.SeekableFileStream;
 import htsjdk.samtools.seekablestream.SeekableStream;
@@ -18,6 +19,7 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.refseq.FaidxData;
 import net.sf.jannot.refseq.FaidxIndex;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -26,18 +28,19 @@ import net.sf.jannot.refseq.FaidxIndex;
  */
 public class IndexedFastaDataSource extends DataSource {
 
-	private SeekableStream content;
-	private Locator index;
-	private Locator data;
+	private final SeekableStream content;
+	private final Locator index;
+	private final Locator data;
 
 	/**
 	 * @param data  the data file
 	 * @param index the index file that indexes the data
+	 * @param log   the {@link Reporter} to log issues to
 	 */
-	public IndexedFastaDataSource(Locator data, Locator index)
+	public IndexedFastaDataSource(Locator data, Locator index, Reporter log)
 			throws MalformedURLException, IOException, ReadFailedException,
 			URISyntaxException {
-		super(data);
+		super(data, log);
 		if (data.isURL())
 			content = new SeekableFileCachedHTTPStream(data.url());
 		else
@@ -48,7 +51,7 @@ public class IndexedFastaDataSource extends DataSource {
 	}
 
 	@Override
-	public EntrySet read(EntrySet set) throws ReadFailedException {
+	public EntrySet read(EntrySet set) {
 		if (content == null)
 			throw new RuntimeException("Boenk!");
 		if (set == null)
@@ -59,22 +62,17 @@ public class IndexedFastaDataSource extends DataSource {
 		if (index.isURL())
 			try {
 				iis = index.url().openStream();
-			} catch (MalformedURLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (URISyntaxException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (IOException | URISyntaxException e1) {
+				getLog().log(Level.WARNING, "failed to open stream to " + index,
+						e1);
+				// just proceed as original code did. Maybe we should return?
 			}
 		else
 			try {
 				iis = new FileInputStream(index.file());
 			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				getLog().log(Level.WARNING, "file not found " + index, e1);
+				// just proceed as original code did. Maybe we should return?
 			}
 
 		FaidxIndex index = new FaidxIndex(iis);
@@ -87,10 +85,9 @@ public class IndexedFastaDataSource extends DataSource {
 			try {
 				e.setSequence(new FaidxData(index, content, name));
 			} catch (Exception ex) {
-				System.err.println("Faidx error locator: " + data);
-				System.err.println("Faidx error index locator: " + index);
-				throw new ReadFailedException(ex);
-
+				getLog().log(Level.SEVERE,
+						"Faidx error, locator=" + data + " index=" + index, ex);
+				return set; // abort immediately as original code
 			}
 		}
 		return set;

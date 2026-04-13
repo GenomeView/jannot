@@ -10,6 +10,7 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Type;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Base class for all genome data file parsers.
@@ -22,9 +23,20 @@ public abstract class Parser {
 	 * determine the name of the data
 	 */
 	protected final DataKey dataKey;
+	private final Reporter log;
 
-	public Parser(DataKey dataKey) {
+	/**
+	 * 
+	 * @param dataKey
+	 * @param log     the {@link Reporter} to report parser issues to.
+	 */
+	public Parser(DataKey dataKey, Reporter log) {
 		this.dataKey = dataKey;
+		this.log = log;
+	}
+
+	public Reporter getLog() {
+		return log;
 	}
 
 	@Override
@@ -43,6 +55,10 @@ public abstract class Parser {
 	 * the parsed file itself, If multiple files are read, all referring to the
 	 * same {@link Entry}, it is assumed that different parsers store their
 	 * results under different keys in the {@link Entry}'s data.
+	 * <p>
+	 * Can not throw because parsers usually run in a separate thread. Just
+	 * return an empty entryset in the worst case.
+	 * 
 	 * 
 	 * @param is  inputStream
 	 * @param set an EntrySet to add the parse results to. If null, a new

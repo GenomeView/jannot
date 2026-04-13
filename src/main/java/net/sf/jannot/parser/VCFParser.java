@@ -5,6 +5,7 @@ package net.sf.jannot.parser;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.Entry;
@@ -13,6 +14,7 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -29,9 +31,10 @@ public class VCFParser extends Parser {
 
 	/**
 	 * @param dataKey
+	 * @param log     the {@link Reporter} to log issues to
 	 */
-	VCFParser(String fileName) {
-		super(getType(fileName));
+	VCFParser(String fileName, Reporter log) {
+		super(getType(fileName), log);
 	}
 
 	private static Type getType(String fileName) {
@@ -54,10 +57,11 @@ public class VCFParser extends Parser {
 			final String[] arr = line.trim().split("\\s+");
 			Entry e = set.getOrCreateEntry(arr[0]);
 			MemoryFeatureAnnotation annot = e.getMemoryAnnotation(dataKey);
-			if (arr.length < 7)
-				throw new RuntimeException(
+			if (arr.length < 7) {
+				getLog().log(Level.SEVERE,
 						"Not sufficient columns " + Arrays.toString(arr));
-
+				break;
+			}
 			/*
 			 * Only parse lines that pass the filters
 			 */
@@ -82,7 +86,13 @@ public class VCFParser extends Parser {
 				int refLength = ref.length();
 
 				int altLength = alt.length();
-				Variation variation = getVariation(ref, alt);
+				Variation variation;
+				try {
+					variation = getVariation(ref, alt);
+				} catch (IllegalArgumentException err) {
+					getLog().log(Level.SEVERE, "Failed to get variation", err);
+					break;
+				}
 				/*
 				 * Only include differences, don't load matches
 				 */
@@ -158,8 +168,10 @@ public class VCFParser extends Parser {
 	 * @param ref
 	 * @param alt
 	 * @return the {@link Variation}
+	 * @throws IllegalArgumentException if the values are inconsistent
 	 */
-	private Variation getVariation(final String ref, String alt) {
+	private Variation getVariation(final String ref, String alt)
+			throws IllegalArgumentException {
 		if (ref.length() == alt.length()) {
 			if (alt.equals(".") || ref.equals(alt))
 				return Variation.Match;
@@ -183,8 +195,8 @@ public class VCFParser extends Parser {
 				else if (diff < 0)
 					return Variation.SingleInsertion;
 				else
-					throw new RuntimeException(
-							"This is not supposed to happen!");
+					throw new IllegalArgumentException(
+							"illegal value for diff");
 			} else {
 				return Variation.LongSubstitution;
 			}

@@ -27,25 +27,24 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
-
-import net.sf.jannot.Data;
-import net.sf.jannot.DataKey;
-import net.sf.jannot.Entry;
-import net.sf.jannot.EntrySet;
-import net.sf.jannot.StringKey;
-import net.sf.jannot.Type;
-import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.DataSourceFactory;
-import net.sf.jannot.source.Locator;
+import java.util.logging.Level;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import be.abeel.io.LineIterator;
-
+import net.sf.jannot.Data;
+import net.sf.jannot.DataKey;
+import net.sf.jannot.Entry;
+import net.sf.jannot.EntrySet;
+import net.sf.jannot.Type;
+import net.sf.jannot.exception.ReadFailedException;
+import net.sf.jannot.source.DataSource;
+import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.source.Locator;
 import support.DataManager;
+import tudelft.utilities.logging.ReportToLogger;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -53,13 +52,14 @@ import support.DataManager;
  * 
  */
 public class TestBEDParser {
-	private static Logger log = Logger.getLogger(TestBEDParser.class.toString());
+	private static Reporter log = new ReportToLogger(
+			TestBEDParser.class.toString());
 
 	@Test
 	public void testParserMini() {
 		File f = DataManager.file("minibed.bed");
 		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f));
+			DataSource ds = DataSourceFactory.create(new Locator(f), log);
 			EntrySet es = ds.read();
 			// System.out.println(es.firstEntry());
 			Assert.assertEquals("chr7", es.firstEntry().getID());
@@ -90,7 +90,7 @@ public class TestBEDParser {
 	public void testParserBare() {
 		File f = DataManager.file("barebed.bed");
 		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f));
+			DataSource ds = DataSourceFactory.create(new Locator(f), log);
 			EntrySet es = ds.read();
 			// System.out.println(es.firstEntry());
 			Assert.assertEquals("chr7", es.firstEntry().getID());
@@ -120,24 +120,25 @@ public class TestBEDParser {
 	@Test
 	public void testSave() {
 		File f = DataManager.file("barebed.bed");
-		try{
-			DataSource ds = DataSourceFactory.create(new Locator(f));
+		try {
+			DataSource ds = DataSourceFactory.create(new Locator(f), log);
 			EntrySet es = ds.read();
-			BEDParser output=new BEDParser("save.bed");
+			BEDParser output = new BEDParser("save.bed", log);
 			FileOutputStream fos = new FileOutputStream("save.bed");
-			for(Entry e:es){
+			for (Entry e : es) {
 				output.write(fos, e);
 			}
 			fos.close();
-			LineIterator it=new LineIterator(new File("save.bed"));
+			LineIterator it = new LineIterator(new File("save.bed"));
 			Assert.assertEquals("track name=\"barebed.bed\"", it.next());
-			LineIterator expected=new LineIterator(f);
-			for(String line:it){
-				Assert.assertEquals(expected.next(),line.replaceAll("0\\.0", "0"));
+			LineIterator expected = new LineIterator(f);
+			for (String line : it) {
+				Assert.assertEquals(expected.next(),
+						line.replaceAll("0\\.0", "0"));
 			}
 			it.close();
 			expected.close();
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();
 		}
@@ -145,25 +146,28 @@ public class TestBEDParser {
 
 	@Test
 	public void test_loadEntries() {
-		log.info("BEGIN test_loadEntries");
+		log.log(Level.INFO, "BEGIN test_loadEntries");
 		try {
 			File fileData = DataManager.file("ItemRGBDemo.txt");
 			InputStream is = new FileInputStream(fileData);
 
 			EntrySet entries = new EntrySet();
-			BEDParser parser = new BEDParser(fileData.getName());
-			log.info("	> fileData: " + fileData + "( " + fileData.length() + " KB)");
+			BEDParser parser = new BEDParser(fileData.getName(), log);
+			log.log(Level.INFO, "	> fileData: " + fileData + "( "
+					+ fileData.length() + " KB)");
 			try {
 				// We parse the sample file
 				entries = parser.parse(is, null);
-				log.info("		> Number of entries: " + entries.size());
+				log.log(Level.INFO,
+						"		> Number of entries: " + entries.size());
 				// assertTrue(entries.size() > 0);
 				// We build an ArrayList to access randonmly to a entry
 				List<Entry> list = new ArrayList<Entry>();
 				for (Entry entry : entries) {
 					list.add(entry);
 				}
-				int selectedIndex = Math.max(0, (int) Math.round(Math.random() * list.size()) - 1);
+				int selectedIndex = Math.max(0,
+						(int) Math.round(Math.random() * list.size()) - 1);
 				Entry selectedEntry = list.get(selectedIndex);
 
 				Iterator<DataKey> it = selectedEntry.iterator();
@@ -171,7 +175,8 @@ public class TestBEDParser {
 				while (it.hasNext()) {
 					list2.add(it.next());
 				}
-				int keyIndex = Math.max(0, (int) Math.round(Math.random() * list2.size()) - 1);
+				int keyIndex = Math.max(0,
+						(int) Math.round(Math.random() * list2.size()) - 1);
 
 				/* retrieve some data from some entry */
 				long t3 = System.currentTimeMillis();
@@ -180,7 +185,8 @@ public class TestBEDParser {
 				System.out.println("DD: " + data);
 
 				long t4 = System.currentTimeMillis();
-				log.info("		> Time consumed fetching data: " + Math.abs(t4 - t3));
+				log.log(Level.INFO, "		> Time consumed fetching data: "
+						+ Math.abs(t4 - t3));
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -190,7 +196,7 @@ public class TestBEDParser {
 			e.printStackTrace();
 			assertTrue(false);
 		}
-		log.info("END test_loadEntries");
+		log.log(Level.INFO, "END test_loadEntries");
 	}
 
 }

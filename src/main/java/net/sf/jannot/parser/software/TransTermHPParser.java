@@ -14,6 +14,7 @@ import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Parser for the output of the TransTermHP program as described in
@@ -40,7 +41,7 @@ public class TransTermHPParser extends Parser {
 	}
 
 	@Override
-	public EntrySet parse(InputStream is, EntrySet set) {
+	public EntrySet parse(InputStream is, EntrySet set, Reporter log) {
 		if (set == null)
 			set = new EntrySet();
 		LineIterator it = new LineIterator(is);

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.apache.commons.collections.map.Flat3Map;
 
@@ -24,6 +25,7 @@ import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -35,8 +37,8 @@ public class GFF3Parser extends Parser {
 	/**
 	 * @param dataKey
 	 */
-	GFF3Parser() {
-		super(null);
+	GFF3Parser(Reporter log) {
+		super(null, log);
 
 	}
 
@@ -121,9 +123,8 @@ public class GFF3Parser extends Parser {
 				}
 
 			} catch (Exception e) {
-				e.printStackTrace();
-				System.err.println(
-						"Could not parse line: " + Arrays.toString(arr));
+				getLog().log(Level.SEVERE,
+						"Could not parse line: " + Arrays.toString(arr), e);
 			}
 
 		}
