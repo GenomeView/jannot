@@ -28,22 +28,24 @@ import tudelft.utilities.logging.Reporter;
  */
 public abstract class ParserFactory {
 
-//	public static final Parser GFF3 = new GFF3Parser();
-//
-//	public static final Parser EMBL = new EMBLParser();
-//
-//	private static Logger log = Logger.getLogger(Parser.class.toString());
-//
-//	// FIXME this should be dynamically determined
-//	public static Parser[] parsers(Object source) {
-//		return new Parser[] { GFF3, new BEDParser(source.toString()), EMBL,
-//				new GTFParser(), new BlastM8Parser(), new FindPeaksParser(),
-//				new GeneMarkParser(), new MaqSNPParser(),
-//				new TransTermHPParser(), new TRNAscanParser(), new EMBLParser(),
-//				new FastaParser(), new GenbankParser(), new PTTParser(),
-//				new TBLParser(), new VCFParser(source.toString()),
-//				new WiggleParser(), new SyntenicParser() };
-//	}
+	/**
+	 * 
+	 * @param source
+	 * @param log
+	 * @return
+	 */
+	public static Parser[] parsers(Object source, Reporter log) {
+		return new Parser[] { new GFF3Parser(log),
+				new BEDParser(source.toString(), log), new EMBLParser(log),
+				new GTFParser(log), new BlastM8Parser(log),
+				new FindPeaksParser(log), new GeneMarkParser(log),
+				new MaqSNPParser(log), new TransTermHPParser(log),
+				new TRNAscanParser(log), new EMBLParser(log),
+				new FastaParser(log), new GenbankParser(null, log),
+				new PTTParser(log), new TBLParser(log),
+				new VCFParser(source.toString(), log), new WiggleParser(log),
+				new SyntenicParser(null, log) };
+	}
 
 	// this is singleton class
 	private ParserFactory() {
@@ -63,20 +65,20 @@ public abstract class ParserFactory {
 	 *         parser is found.
 	 * @throws IOException
 	 */
-	public static Parser detectParser(InputStream is, Object source,
-			Reporter log) throws IOException {
+	public static Parser create(InputStream is, Object source, Reporter log)
+			throws IOException {
 
 		Parser p = findParser(is, source, log);
-		log.log(Level.INFO, "parser: " + p);
+		log.log(Level.INFO, "Created parser: " + p);
 		return p;
 
 	}
 
 	/**
-	 * Method to automagically detect parsers. This relies on detailed knowledge
-	 * of header contents and rules for comments and empty lines for the parsers
-	 * at our disposal. In some cases trial reads are done to see if errors
-	 * occur.
+	 * Method to find a parser suited for an input stream. This relies on
+	 * detailed knowledge of header contents and rules for comments and empty
+	 * lines for the parsers at our disposal. In some cases trial reads are done
+	 * to see if errors occur.
 	 * 
 	 * @param is     the inputstream of the data to parse
 	 * @param source the filename or so representing the original source. Some
@@ -103,7 +105,7 @@ public abstract class ParserFactory {
 
 		}
 		if (firstLine.contains("fileformat=VCF"))
-			return new VCFParser(source.toString());
+			return new VCFParser(source.toString(), log);
 
 		if (firstLine.contains("Mauve1"))
 			return new MauveParser(new StringKey(source.toString()), log);
@@ -120,7 +122,7 @@ public abstract class ParserFactory {
 		if (nonCommentLine.startsWith("GeneMark"))
 			return new GeneMarkParser(log);
 		if (nonCommentLine.startsWith("TransTermHP"))
-			return new TransTermHPParser();
+			return new TransTermHPParser(log);
 		if (nonCommentLine.startsWith("gvheader:syntenic")) {
 			// old style syntenic files. We don't have these anymore
 			// and maybe we should remove this type.

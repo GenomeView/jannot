@@ -35,7 +35,7 @@ public class URLSource extends AbstractStreamDataSource {
 				16 * 1024);
 		byte[] buffer = new byte[16 * 1024];
 		int i = pis.read(buffer);
-		super.setParser(ParserFactory.detectParser(
+		super.setParser(ParserFactory.create(
 				new ByteArrayInputStream(buffer, 0, i), url, log));
 		pis.unread(buffer, 0, i);
 		super.setIos(pis);

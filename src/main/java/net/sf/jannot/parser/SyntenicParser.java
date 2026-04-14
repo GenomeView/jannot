@@ -54,7 +54,6 @@ public class SyntenicParser extends Parser {
 	 */
 	public SyntenicParser(DataKey dataKey, Reporter log) {
 		super(dataKey, log);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

@@ -34,7 +34,7 @@ import tudelft.utilities.logging.Reporter;
  */
 public class EMBLParser extends Parser {
 
-	EMBLParser(Reporter log) {
+	public EMBLParser(Reporter log) {
 		super(null, log);
 	}
 

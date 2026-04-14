@@ -1,11 +1,10 @@
 package net.sf.jannot.vcf;
 
-import static org.junit.Assert.assertTrue;
-
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,13 +14,13 @@ import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import net.sf.jannot.variation.Variation;
 import support.DataManager;
 import tudelft.utilities.logging.ReportToLogger;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * IMPORTANT!!!: This test requires the data in test/resource to be prepared.
@@ -37,8 +36,6 @@ public class TestVCF {
 
 	// private String[] files =DataManager.vcfFiles();
 
-	private static Reporter log = new ReportToLogger(TestVCF.class.toString());
-
 	@Before
 	public void init() {
 	}
@@ -49,87 +46,70 @@ public class TestVCF {
 	}
 
 	@Test
-	public void test_dummyTest() {
-		log.log(Level.INFO, "BEGIN test_dummyTest");
-		assertTrue(true);
-		log.log(Level.INFO, "END test_dummyTest");
-	}
+	public void test_loadEntries()
+			throws URISyntaxException, IOException, ReadFailedException {
+		ReportToLogger log = new ReportToLogger(getClass().getSimpleName());
 
-	@Test
-	public void test_loadEntries() {
-		log.log(Level.INFO, "BEGIN test_loadEntries");
-		try {
-			int i = 0;
+		int i = 0;
 
-			String dataIdentifier = "CEU.trio.2010_03.genotypes.vcf.gz";
-			String indexIdentifier = dataIdentifier + ".tbi";
+		String dataIdentifier = "CEU.trio.2010_03.genotypes.vcf.gz";
+		String indexIdentifier = dataIdentifier + ".tbi";
 
-			EntrySet entries = new EntrySet();
-			Locator fIndex = new Locator(DataManager.file(indexIdentifier));
-			Locator fData = new Locator(DataManager.file(dataIdentifier));
-			DataSource ds = DataSourceFactory.create(fData, fIndex, log);
+		EntrySet entries = new EntrySet();
+		Locator fIndex = new Locator(DataManager.file(indexIdentifier));
+		Locator fData = new Locator(DataManager.file(dataIdentifier));
+		DataSource ds = DataSourceFactory.create(fData, fIndex, log);
 
-			// File fileData = new File(dataFile);
-			// File indexData = new File(indexFile);
+		// File fileData = new File(dataFile);
+		// File indexData = new File(indexFile);
 
-			log.log(Level.INFO, "------ Sample # " + i + " ---------");
-			log.log(Level.INFO, "	> fileData: " + fData.file() + "( "
-					+ fData.file().length() + " KB)");
-			log.log(Level.INFO, "	> indexData: " + fIndex.file() + "( "
-					+ fIndex.file().length() + " KB)");
-			i++;
-			log.log(Level.INFO, "	> Reading source:" + ds);
-			try {
-				long t1 = System.currentTimeMillis();
-				ds.read(entries);
-				long t2 = System.currentTimeMillis();
-				log.log(Level.INFO, "		> Time consumed loading files: "
-						+ Math.abs(t2 - t1));
-				log.log(Level.INFO,
-						"		> Number of entries: " + entries.size());
-				// assertTrue(entries.size() > 0);
-				// We build an ArrayList to access randonmly to a entry
-				List<Entry> list = new ArrayList<Entry>();
-				for (Entry entry : entries) {
-					list.add(entry);
-				}
-				int selectedIndex = Math.max(0,
-						(int) Math.round(Math.random() * list.size()) - 1);
-				Entry selectedEntry = list.get(selectedIndex);
-
-				Iterator<DataKey> it = selectedEntry.iterator();
-				List<DataKey> list2 = new ArrayList<DataKey>();
-				while (it.hasNext()) {
-					list2.add(it.next());
-				}
-				int keyIndex = Math.max(0,
-						(int) Math.round(Math.random() * list2.size()) - 1);
-
-				/* retrieve some data from some entry */
-				long t3 = System.currentTimeMillis();
-				DataKey dataKey = list2.get(keyIndex);
-				Data<?> data = selectedEntry.get(dataKey);
-				// System.out.println("DD: " + data);
-				Iterable<?> resultSet = data.get(500000, 2000000);
-				long t4 = System.currentTimeMillis();
-				log.log(Level.INFO, "		> Time consumed fetching data: "
-						+ Math.abs(t4 - t3));
-				for (Object o : resultSet) {
-					// System.out.println(o);
-					Variation v = (Variation) o;
-					// System.out.println(o+"\t"+v.start()+"\t"+v.alleles());
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				assertTrue(false);
-			}
-			// }
-			// }
-		} catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
+		System.out.println("------ Sample # " + i + " ---------");
+		System.out.println("	> fileData: " + fData.file() + "( "
+				+ fData.file().length() + " KB)");
+		System.out.println("	> indexData: " + fIndex.file() + "( "
+				+ fIndex.file().length() + " KB)");
+		i++;
+		System.out.println("	> Reading source:" + ds);
+		long t1 = System.currentTimeMillis();
+		ds.read(entries);
+		long t2 = System.currentTimeMillis();
+		System.out.println(
+				"		> Time consumed loading files: " + Math.abs(t2 - t1));
+		System.out.println("		> Number of entries: " + entries.size());
+		// assertTrue(entries.size() > 0);
+		// We build an ArrayList to access randonmly to a entry
+		List<Entry> list = new ArrayList<Entry>();
+		for (Entry entry : entries) {
+			list.add(entry);
 		}
-		log.info("END test_loadEntries");
+		int selectedIndex = Math.max(0,
+				(int) Math.round(Math.random() * list.size()) - 1);
+		Entry selectedEntry = list.get(selectedIndex);
+
+		Iterator<DataKey> it = selectedEntry.iterator();
+		List<DataKey> list2 = new ArrayList<DataKey>();
+		while (it.hasNext()) {
+			list2.add(it.next());
+		}
+		int keyIndex = Math.max(0,
+				(int) Math.round(Math.random() * list2.size()) - 1);
+
+		/* retrieve some data from some entry */
+		long t3 = System.currentTimeMillis();
+		DataKey dataKey = list2.get(keyIndex);
+		Data<?> data = selectedEntry.get(dataKey);
+		// System.out.println("DD: " + data);
+		Iterable<?> resultSet = data.get(500000, 2000000);
+		long t4 = System.currentTimeMillis();
+		System.out.println(
+				"		> Time consumed fetching data: " + Math.abs(t4 - t3));
+		for (Object o : resultSet) {
+			// System.out.println(o);
+			Variation v = (Variation) o;
+			// System.out.println(o+"\t"+v.start()+"\t"+v.alleles());
+		}
+		// }
+		// }
 	}
 
 }

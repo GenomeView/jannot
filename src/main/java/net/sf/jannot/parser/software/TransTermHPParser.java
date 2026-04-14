@@ -33,15 +33,14 @@ import tudelft.utilities.logging.Reporter;
 public class TransTermHPParser extends Parser {
 
 	/**
-	 * @param dataKey
+	 * @param log the reporter to log issues to
 	 */
-	public TransTermHPParser() {
-		super(null);
-		// TODO Auto-generated constructor stub
+	public TransTermHPParser(Reporter log) {
+		super(null, log);
 	}
 
 	@Override
-	public EntrySet parse(InputStream is, EntrySet set, Reporter log) {
+	public EntrySet parse(InputStream is, EntrySet set) {
 		if (set == null)
 			set = new EntrySet();
 		LineIterator it = new LineIterator(is);

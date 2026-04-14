@@ -44,7 +44,7 @@ public class TestParserDetection {
 	@Test
 	public void testBED() throws FileNotFoundException, IOException {
 		File f = DataManager.file("minibed.bed");
-		Parser p = ParserFactory.detectParser(new FileInputStream(f), "file",
+		Parser p = ParserFactory.create(new FileInputStream(f), "file",
 				log);
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
@@ -55,7 +55,7 @@ public class TestParserDetection {
 	@Test
 	public void testVCF() throws FileNotFoundException, IOException {
 		File f = DataManager.file("tiny.vcf");
-		Parser p = ParserFactory.detectParser(new FileInputStream(f), "file",
+		Parser p = ParserFactory.create(new FileInputStream(f), "file",
 				log);
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
@@ -66,7 +66,7 @@ public class TestParserDetection {
 	@Test
 	public void testBlast() throws FileNotFoundException, IOException {
 		File f = DataManager.file("testblast.m8");
-		Parser p = ParserFactory.detectParser(new FileInputStream(f), "file",
+		Parser p = ParserFactory.create(new FileInputStream(f), "file",
 				log);
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
@@ -77,7 +77,7 @@ public class TestParserDetection {
 	@Test
 	public void testPAF() throws FileNotFoundException, IOException {
 		File f = DataManager.file("minibed.bed");
-		Parser p = ParserFactory.detectParser(new FileInputStream(f), "file",
+		Parser p = ParserFactory.create(new FileInputStream(f), "file",
 				log);
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
@@ -88,7 +88,7 @@ public class TestParserDetection {
 	@Test
 	public void testSyntenic() throws FileNotFoundException, IOException {
 		File f = DataManager.file(PAF);
-		Parser p = ParserFactory.detectParser(new FileInputStream(f), "file",
+		Parser p = ParserFactory.create(new FileInputStream(f), "file",
 				log);
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),

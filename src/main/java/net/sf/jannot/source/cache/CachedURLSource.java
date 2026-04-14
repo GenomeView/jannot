@@ -28,7 +28,7 @@ public class CachedURLSource extends URLSource {
 		if (!SourceCache.contains(url)) {
 			SSL.certify(url);
 			try {
-				super.setParser(ParserFactory.detectParser(url.openStream(),
+				super.setParser(ParserFactory.create(url.openStream(),
 						url, getLog()));
 				final PipedInputStream in = new PipedInputStream();
 				final PipedOutputStream forParser = new PipedOutputStream(in);

@@ -35,9 +35,9 @@ import tudelft.utilities.logging.Reporter;
 public class GFF3Parser extends Parser {
 
 	/**
-	 * @param dataKey
+	 * @param log the reporter to log to
 	 */
-	GFF3Parser(Reporter log) {
+	public GFF3Parser(Reporter log) {
 		super(null, log);
 
 	}

@@ -31,7 +31,7 @@ public class FileSource extends AbstractStreamDataSource {
 		InputStream ios1, ios2;
 		ios1 = new FileInputStream(file);
 		ios2 = new FileInputStream(file);
-		Parser p = ParserFactory.detectParser(ios1, file, log);
+		Parser p = ParserFactory.create(ios1, file, log);
 		ios1.close();
 		super.setParser(p);
 		super.setIos(ios2);
