@@ -193,8 +193,8 @@ public class Locator {
 	}
 
 	/**
-	 * @return the file extension tbi,fasta,bai,mfi
-	 * @throws IllegalStateException if we don't have proper postfix for this
+	 * @return the file extension tbi,fasta,bai,mfi, or null if we don't have
+	 *         proper postfix for this
 	 */
 	public String getPostfix() {
 
@@ -206,7 +206,7 @@ public class Locator {
 			return "bai";
 		if (isMaf())
 			return "mfi";
-		throw new IllegalStateException("no known postfix for this");
+		return null;
 	}
 
 	public boolean isURL() {
