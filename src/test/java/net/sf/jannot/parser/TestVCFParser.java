@@ -53,7 +53,7 @@ public class TestVCFParser {
 			throws URISyntaxException, IOException, ReadFailedException {
 
 		File f = DataManager.file("tiny.vcf");
-		DataSource ds = DataSourceFactory.create(new Locator(f), log);
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 		EntrySet es = ds.read();
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("20", es.firstEntry().getID());
@@ -82,7 +82,7 @@ public class TestVCFParser {
 			throws URISyntaxException, IOException, ReadFailedException {
 
 		File f = DataManager.file("regular.vcf");
-		DataSource ds = DataSourceFactory.create(new Locator(f), log);
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 		EntrySet es = ds.read();
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("gi|395136682|gb|CP003248.1|",

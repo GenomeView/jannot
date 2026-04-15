@@ -27,7 +27,7 @@ public class FileSource extends AbstractStreamDataSource {
 	}
 
 	public FileSource(File file, Reporter log) throws IOException {
-		super(new Locator(file.toString()), log);
+		super(new Locator(file.toString(), log), log);
 		InputStream ios1, ios2;
 		ios1 = new FileInputStream(file);
 		ios2 = new FileInputStream(file);

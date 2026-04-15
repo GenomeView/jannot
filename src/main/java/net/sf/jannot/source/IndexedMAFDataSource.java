@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import htsjdk.samtools.seekablestream.SeekableFileStream;
 import htsjdk.samtools.seekablestream.SeekableStream;
@@ -103,15 +102,12 @@ public class IndexedMAFDataSource extends DataSource {
 			}
 
 		} catch (Exception ex) {
-			log.log(Level.SEVERE, "Mafix error data: " + data + "\n\n"
+			getLog().log(Level.SEVERE, "Mafix error data: " + data + "\n\n"
 					+ "Mafix error index: " + index, ex);
 			return set;
 		}
 		return set;
 	}
-
-	private static Logger log = Logger
-			.getLogger(IndexedMAFDataSource.class.getCanonicalName());
 
 	@Override
 	public void finalize() {

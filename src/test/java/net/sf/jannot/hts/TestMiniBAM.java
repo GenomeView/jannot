@@ -26,8 +26,8 @@ public class TestMiniBAM {
 	@Test
 	public void testShortRead() {
 
-		Locator fData = new Locator(DataManager.file("tworead.bam"));
-		Locator fIndex = new Locator(DataManager.file("tworead.bam.bai"));
+		Locator fData = new Locator(DataManager.file("tworead.bam"), log);
+		Locator fIndex = new Locator(DataManager.file("tworead.bam.bai"), log);
 
 		try {
 			DataSource ds = DataSourceFactory.create(fData, fIndex, log);

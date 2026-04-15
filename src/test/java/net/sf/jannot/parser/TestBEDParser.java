@@ -59,7 +59,7 @@ public class TestBEDParser {
 	public void testParserMini() {
 		File f = DataManager.file("minibed.bed");
 		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f), log);
+			DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 			EntrySet es = ds.read();
 			// System.out.println(es.firstEntry());
 			Assert.assertEquals("chr7", es.firstEntry().getID());
@@ -90,7 +90,7 @@ public class TestBEDParser {
 	public void testParserBare() {
 		File f = DataManager.file("barebed.bed");
 		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f), log);
+			DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 			EntrySet es = ds.read();
 			// System.out.println(es.firstEntry());
 			Assert.assertEquals("chr7", es.firstEntry().getID());
@@ -121,7 +121,7 @@ public class TestBEDParser {
 	public void testSave() {
 		File f = DataManager.file("barebed.bed");
 		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f), log);
+			DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 			EntrySet es = ds.read();
 			BEDParser output = new BEDParser("save.bed", log);
 			FileOutputStream fos = new FileOutputStream("save.bed");

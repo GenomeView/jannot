@@ -33,7 +33,7 @@ public class TestFastaParser {
 	private void testFile(File file)
 			throws URISyntaxException, IOException, ReadFailedException {
 
-		DataSource ds = DataSourceFactory.create(new Locator(file), log);
+		DataSource ds = DataSourceFactory.create(new Locator(file, log), log);
 		EntrySet es = ds.read();
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("TestFasta", es.firstEntry().getID());
@@ -60,7 +60,7 @@ public class TestFastaParser {
 	public void testWrite()
 			throws URISyntaxException, IOException, ReadFailedException {
 		File f = DataManager.file("mini.fasta");
-		DataSource ds = DataSourceFactory.create(new Locator(f), log);
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 		EntrySet es = ds.read();
 
 		File out = File.createTempFile("unittesting.", ".fasta");
@@ -79,8 +79,8 @@ public class TestFastaParser {
 	public void testMFasta()
 			throws URISyntaxException, IOException, ReadFailedException {
 
-		DataSource ds = DataSourceFactory
-				.create(new Locator(DataManager.file("10313-CDS.fasta")), log);
+		DataSource ds = DataSourceFactory.create(
+				new Locator(DataManager.file("10313-CDS.fasta"), log), log);
 		EntrySet es = ds.read();
 
 		assertEquals(11386 / 2, es.size());

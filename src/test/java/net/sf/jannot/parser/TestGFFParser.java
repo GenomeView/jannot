@@ -46,7 +46,7 @@ public class TestGFFParser {
 	public void testParserMini()
 			throws URISyntaxException, IOException, ReadFailedException {
 		File f = DataManager.file("doubleScore.gff3");
-		DataSource ds = DataSourceFactory.create(new Locator(f), log);
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 		EntrySet es = ds.read();
 		double score = es.firstEntry().getMemoryAnnotation(Type.get("gene"))
 				.get(0).getScore();

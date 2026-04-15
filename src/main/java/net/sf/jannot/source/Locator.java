@@ -11,7 +11,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import be.abeel.net.URIFactory;
 import htsjdk.samtools.seekablestream.SeekableStream;
@@ -19,6 +18,7 @@ import htsjdk.samtools.seekablestream.SeekableStreamFactory;
 import net.sf.jannot.Data;
 import net.sf.jannot.tabix.TabixWriter;
 import net.sf.jannot.tabix.TabixWriter.Conf;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -30,8 +30,8 @@ import net.sf.jannot.tabix.TabixWriter.Conf;
  * 
  */
 public class Locator {
-	private static Logger log = Logger
-			.getLogger(Locator.class.getCanonicalName());
+//	private static Logger log = Logger
+//			.getLogger(Locator.class.getCanonicalName());
 	private String locator;
 	private long length = -1;
 	private boolean exists = false; // exists and can be read
@@ -39,19 +39,23 @@ public class Locator {
 	private boolean blockCompressed = false;
 	private String ext;
 	private long lastModified = -1;
+	private final Reporter log;
 
-	public Locator(File f) {
-		this(f.toString());
+	public Locator(File f, Reporter log) {
+		this(f.toString(), log);
 	}
 
 	/**
 	 * 
-	 * @param l the link to the file or URL. Files may start with file://
-	 *          http:// or https: If neither, it is assumed to be a file.
-	 *          Leading and trailing whitespaces are removed, so it is not
-	 *          possible to use filenames starting or ending with whitespace.
+	 * @param l   the link to the file or URL. Files may start with file://
+	 *            http:// or https: If neither, it is assumed to be a file.
+	 *            Leading and trailing whitespaces are removed, so it is not
+	 *            possible to use filenames starting or ending with whitespace.
+	 * @param log a Reporter to log problems with the URL. Locators never throw
+	 *            but they report issues accessing the URL.
 	 */
-	public Locator(String l) {
+	public Locator(String l, Reporter log) {
+		this.log = log;
 		if (l.startsWith("file://")) {
 			l = l.substring(7);
 		}
@@ -127,24 +131,24 @@ public class Locator {
 	 */
 	private void initURL() {
 		try {
-			log.fine("Checking: " + locator);
+			// log.fine("Checking: " + locator);
 			URLConnection conn = URIFactory.url(locator).openConnection();
 			conn.setUseCaches(false);
-			log.info(conn.getHeaderFields().toString());
+			// log.info(conn.getHeaderFields().toString());
 
 			// #3 URLConnection doesn't parse the response code
 			// so we have to do it here...
 			String header = conn.getHeaderField(null);
 			// we expect "HTTP/1.1 432 stringmessage"
 			if (!header.matches("HTTP/.*\\s\\d\\d\\d\\s.*")) {
-				log.warning("Unexpected server response from " + locator + ":"
-						+ header);
+				log.log(Level.WARNING, "Unexpected server response from "
+						+ locator + ":" + header);
 				return;
 			}
 			// received expected response
 			Integer responseCode = Integer.valueOf(header.split(" ")[1]);
 			if (responseCode >= 400) {
-				log.warning(
+				log.log(Level.WARNING,
 						"Server eror: " + header + ". Can't read " + locator);
 				return;
 			}
@@ -153,7 +157,8 @@ public class Locator {
 
 			if (len < 0) {
 				// happens eg with https://tudelft.nl
-				log.warning("Server eror: file has negative size: " + locator);
+				log.log(Level.WARNING,
+						"Server eror: file has negative size: " + locator);
 				return;
 			}
 
@@ -171,12 +176,8 @@ public class Locator {
 			exists = true;
 			length = len;
 			lastModified = conn.getLastModified();
-		} catch (
-
-		Exception ioe) {
+		} catch (Exception ioe) {
 			log.log(Level.WARNING, "Failed to open " + locator, ioe);
-			// System.err.println(ioe);
-			// ioe.printStackTrace();
 		}
 
 	}
@@ -192,7 +193,8 @@ public class Locator {
 	}
 
 	/**
-	 * @return the file extension tbi,fasta,bai,mfi or null if other
+	 * @return the file extension tbi,fasta,bai,mfi
+	 * @throws IllegalStateException if we don't have proper postfix for this
 	 */
 	public String getPostfix() {
 
@@ -204,7 +206,7 @@ public class Locator {
 			return "bai";
 		if (isMaf())
 			return "mfi";
-		return null;
+		throw new IllegalStateException("no known postfix for this");
 	}
 
 	public boolean isURL() {

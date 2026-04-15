@@ -26,7 +26,7 @@ public class URLSource extends AbstractStreamDataSource {
 	 * distinguish constructors and is ignored
 	 */
 	protected URLSource(URL url, Object x, Reporter log) throws IOException {
-		super(new Locator(url.toString()), log);
+		super(new Locator(url.toString(), log), log);
 		this.url = url;
 	}
 
@@ -35,8 +35,8 @@ public class URLSource extends AbstractStreamDataSource {
 				16 * 1024);
 		byte[] buffer = new byte[16 * 1024];
 		int i = pis.read(buffer);
-		super.setParser(ParserFactory.create(
-				new ByteArrayInputStream(buffer, 0, i), url, log));
+		super.setParser(ParserFactory
+				.create(new ByteArrayInputStream(buffer, 0, i), url, log));
 		pis.unread(buffer, 0, i);
 		super.setIos(pis);
 

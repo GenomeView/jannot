@@ -45,7 +45,7 @@ public class TestSyntenicParser {
 	public void testParserMini()
 			throws URISyntaxException, IOException, ReadFailedException {
 		File f = DataManager.file(SYN_FILE);
-		DataSource ds = DataSourceFactory.create(new Locator(f), log);
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 		EntrySet es = ds.read();
 
 		Data<?> data = es.getOrCreateEntry("anthracis")

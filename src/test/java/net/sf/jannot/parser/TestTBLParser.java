@@ -43,7 +43,7 @@ public class TestTBLParser {
 		File f = DataManager.file("sequin.tbl");
 		// following is copy of another test.
 		// It was expected to fail but apparently works. No idea what it does...
-		DataSource ds = DataSourceFactory.create(new Locator(f), log);
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 		EntrySet es = ds.read();
 		double score = es.firstEntry().getMemoryAnnotation(Type.get("gene"))
 				.get(0).getScore();

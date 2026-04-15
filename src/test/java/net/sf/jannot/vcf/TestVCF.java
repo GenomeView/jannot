@@ -56,8 +56,8 @@ public class TestVCF {
 		String indexIdentifier = dataIdentifier + ".tbi";
 
 		EntrySet entries = new EntrySet();
-		Locator fIndex = new Locator(DataManager.file(indexIdentifier));
-		Locator fData = new Locator(DataManager.file(dataIdentifier));
+		Locator fIndex = new Locator(DataManager.file(indexIdentifier), log);
+		Locator fData = new Locator(DataManager.file(dataIdentifier), log);
 		DataSource ds = DataSourceFactory.create(fData, fIndex, log);
 
 		// File fileData = new File(dataFile);

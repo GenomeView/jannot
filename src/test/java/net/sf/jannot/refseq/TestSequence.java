@@ -29,9 +29,11 @@ public class TestSequence {
 	public void testFaidx() throws URISyntaxException, MalformedURLException,
 			ReadFailedException, IOException {
 		Locator l = new Locator(
-				"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta");
+				"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta",
+				log);
 		Locator i = new Locator(
-				"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta.fai");
+				"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta.fai",
+				log);
 
 		EntrySet es = new IndexedFastaDataSource(l, i, log).read();
 		Sequence seq = es.firstEntry().sequence();

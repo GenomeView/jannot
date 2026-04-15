@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.broad.igv.tdf.TDFBedTile;
 import org.broad.igv.tdf.TDFDataset;
@@ -49,6 +48,7 @@ import org.broad.igv.util.collections.IntArrayList;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.source.Locator;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -57,8 +57,8 @@ import net.sf.jannot.source.Locator;
  */
 public class ConvertWig2TDF {
 
-	private static Logger log = Logger
-			.getLogger(ConvertWig2TDF.class.toString());
+//	private static Logger log = Logger
+//			.getLogger(ConvertWig2TDF.class.toString());
 	private boolean compressed = true;
 	private boolean skipZeroes = false;
 	private int nZoom;
@@ -73,7 +73,7 @@ public class ConvertWig2TDF {
 	private HashSet<String> skippedChromosomes = new HashSet<String>();
 	private TDFWriter writer;
 	private Raw rawData;
-	private File outputFile;
+	private final File outputFile;
 	private Accumulator allDataStats;
 	private List<String> chromosomes = new ArrayList<String>();
 	private Set<String> visitedChromosomes = new HashSet<String>();
@@ -84,10 +84,15 @@ public class ConvertWig2TDF {
 			WindowFunction.mean, WindowFunction.min, WindowFunction.max);// ,
 	// WindowFunction.median,
 	// WindowFunction.min, WindowFunction.max);
-	private String trackName;
-	private int noDataColumns;
+	private final String trackName;
+	private final int noDataColumns;
+	private final Reporter log;
 
-	private ConvertWig2TDF(String gID, File output, int noDataColumns) {
+	private static HashMap<String, Integer> mapLength = new HashMap<String, Integer>();
+
+	private ConvertWig2TDF(String gID, File output, int noDataColumns,
+			Reporter log) {
+		this.log = log;
 		this.noDataColumns = noDataColumns;
 		this.trackName = gID;
 		this.outputFile = output;
@@ -95,13 +100,21 @@ public class ConvertWig2TDF {
 		allDataStats = new Accumulator(windowFunctions);
 	}
 
-	public static void main(String[] args)
-			throws IOException, URISyntaxException {
-		ConvertWig2TDF.convertWig2TDF(new Locator(
-				"z:/workspace/NetworkReconstruction/info/hotregions.wig"),
-				new File(
-						"z:/workspace/NetworkReconstruction/info/hotregions.wig.tdf"));
-	}
+//	/**
+//	 * What's this? Manual tool entry?
+//	 * 
+//	 * @param args
+//	 * @throws IOException
+//	 * @throws URISyntaxException
+//	 */
+//	public static void main(String[] args)
+//			throws IOException, URISyntaxException {
+//		Reporter log = new ReportToLogger(ConvertWig2TDF.class.getSimpleName());
+//		ConvertWig2TDF.convertWig2TDF(new Locator(
+//				"z:/workspace/NetworkReconstruction/info/hotregions.wig", log),
+//				new File(
+//						"z:/workspace/NetworkReconstruction/info/hotregions.wig.tdf"));
+//	}
 
 	/**
 	 * Called to set inital parameters. It is required that this be called prior
@@ -173,9 +186,10 @@ public class ConvertWig2TDF {
 											// genome.getChromosome(chr).getLength();
 
 		if (start > chrLength) {
-			log.info("Ignoring data from non-existent locus.  Probe = " + name
-					+ "  Locus = " + chr + ":" + start + "-" + end + ". " + chr
-					+ " length = " + chrLength);
+			log.log(Level.WARNING,
+					"Ignoring data from non-existent locus.  Probe = " + name
+							+ "  Locus = " + chr + ":" + start + "-" + end
+							+ ". " + chr + " length = " + chrLength);
 			return;
 		}
 
@@ -317,12 +331,12 @@ public class ConvertWig2TDF {
 			initDataArray(data.length);
 
 			if (start > tileEnd) {
-				log.info("Warning: start position > tile end");
+				log.log(Level.WARNING, "start position > tile end");
 
 			}
 
 			if (end < tileStart) {
-				log.info("Warning: end position > tile end");
+				log.log(Level.WARNING, "end position > tile end");
 			}
 
 			if (name != null && nameList == null) {
@@ -787,9 +801,7 @@ public class ConvertWig2TDF {
 		return out;
 	}
 
-	private static HashMap<String, Integer> mapLength = new HashMap<String, Integer>();
-
-	public static void convertWig2TDF(Locator data, File output)
+	public static void convertWig2TDF(Locator data, File output, Reporter log)
 			throws IOException, URISyntaxException {
 		// this.dnaproperty = (ConversionMapDNAProperty) prop;
 		BufferedInputStream bis = new BufferedInputStream(data.stream(),
@@ -902,7 +914,8 @@ public class ConvertWig2TDF {
 		} else if (!wiggleMode) {
 			maxColumns -= 3;
 		}
-		ConvertWig2TDF cv = new ConvertWig2TDF(trackName, output, maxColumns);
+		ConvertWig2TDF cv = new ConvertWig2TDF(trackName, output, maxColumns,
+				log);
 		cv.count(zoom, data);
 		cv.finish();
 

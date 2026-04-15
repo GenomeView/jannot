@@ -3,6 +3,7 @@ package net.sf.jannot.source;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import org.junit.Test;
 
 import be.abeel.io.LineIterator;
 import htsjdk.samtools.seekablestream.SeekableStream;
+import tudelft.utilities.logging.Reporter;
 
 public class TestLocator {
 	private static final String EMPTYURL = "https://raw.githubusercontent.com/GenomeView/jannot/refs/heads/main/src/test/resources/empty";
@@ -26,15 +28,16 @@ public class TestLocator {
 			+ SRC_TEST_RESOURCES_JUNIT_TXT;
 	private static final String JUNIT_TXT = "file://"
 			+ SRC_TEST_RESOURCES_JUNIT_TXT;
+	private Reporter log = mock(Reporter.class);
 
 	@Test
 	public void smoke() {
-		Locator l = new Locator(SRC_TEST_RESOURCES_JUNIT_TXT);
+		Locator l = new Locator(SRC_TEST_RESOURCES_JUNIT_TXT, log);
 	}
 
 	@Test
 	public void testPlainFile() throws IOException, URISyntaxException {
-		Locator l = new Locator(SRC_TEST_RESOURCES_JUNIT_TXT);
+		Locator l = new Locator(SRC_TEST_RESOURCES_JUNIT_TXT, log);
 		assertTrue(l.exists());
 		SeekableStream stream = l.stream();
 		assertEquals(45, stream.available());
@@ -50,7 +53,7 @@ public class TestLocator {
 	@Test
 	public void testURLLocalFile() throws URISyntaxException, IOException {
 
-		Locator l = new Locator(JUNIT_TXT);
+		Locator l = new Locator(JUNIT_TXT, log);
 		assertEquals(45, l.length());
 		for (String line : new LineIterator(l.stream())) {
 			System.out.println(line);
@@ -62,7 +65,7 @@ public class TestLocator {
 	public void testLocalAbsoluteFile() throws URISyntaxException, IOException {
 		String path = new java.io.File(".").getCanonicalPath()
 				+ TEST_RESOURCES_JUNIT_TXT;
-		Locator l = new Locator(path);
+		Locator l = new Locator(path, log);
 		for (String line : new LineIterator(l.stream())) {
 			System.out.println(line);
 		}
@@ -74,7 +77,7 @@ public class TestLocator {
 			throws URISyntaxException, IOException {
 		String path = "file://" + new java.io.File(".").getCanonicalPath()
 				+ TEST_RESOURCES_JUNIT_TXT;
-		Locator l = new Locator(path);
+		Locator l = new Locator(path, log);
 		for (String line : new LineIterator(l.stream())) {
 			System.out.println(line);
 		}
@@ -83,7 +86,7 @@ public class TestLocator {
 
 	@Test
 	public void testURL() throws URISyntaxException, IOException {
-		Locator l = new Locator(TINYVCF);
+		Locator l = new Locator(TINYVCF, log);
 		SeekableStream s = l.stream();
 		assertEquals(1770, s.available());
 		for (String line : new LineIterator(s)) {
@@ -101,13 +104,13 @@ public class TestLocator {
 		writer.close();
 		f.setReadable(false);
 
-		Locator l = new Locator(f);
+		Locator l = new Locator(f, log);
 		assertFalse(l.exists());
 	}
 
 	@Test(expected = IOException.class)
 	public void testDoesntExist() throws IOException, URISyntaxException {
-		Locator l = new Locator(NONEXISTINGURL);
+		Locator l = new Locator(NONEXISTINGURL, log);
 		assertFalse(l.exists());
 		assertEquals(-1, l.length());
 		l.stream(); // should throw
@@ -116,21 +119,21 @@ public class TestLocator {
 	@Test(expected = IOException.class)
 	public void testAccessDenied() throws IOException, URISyntaxException {
 		// access denined
-		Locator l = new Locator(HG19_ACCESS_DENIED);
+		Locator l = new Locator(HG19_ACCESS_DENIED, log);
 		l.stream(); // should throw
 	}
 
 	@Test
 	public void testOpenURL() throws IOException, URISyntaxException {
 		// This one's interesting, exists but reports length -1
-		Locator l = new Locator(TUDELFT);
+		Locator l = new Locator(TUDELFT, log);
 		assertFalse(l.exists());
 	}
 
 	@Test
 	public void testOpenEmptyURL() throws IOException, URISyntaxException {
 		// open URL that has empty content.
-		Locator l = new Locator(EMPTYURL);
+		Locator l = new Locator(EMPTYURL, log);
 		assertTrue(l.exists());
 		assertEquals(0, l.length());
 	}
