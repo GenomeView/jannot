@@ -113,8 +113,8 @@ public abstract class ParserFactory {
 		if (nonCommentLine.equals("id	chrom	start	end	max_coord"))
 			return new FindPeaksParser(log);
 
-		log.log(Level.FINEST, "firstLine: " + firstLine);
-		log.log(Level.FINEST, "nonCommentLine: " + nonCommentLine);
+		// log.log(Level.FINEST, "firstLine: " + firstLine);
+		// log.log(Level.FINEST, "nonCommentLine: " + nonCommentLine);
 		if (firstLine.startsWith("Guide for interpreting SIPHT output"))
 			return new SIPHTParser(new StringKey(source.toString()), log);
 		if (firstLine.startsWith("##maf"))

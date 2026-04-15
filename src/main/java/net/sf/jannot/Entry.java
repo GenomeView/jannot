@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.refseq.Sequence;
@@ -46,14 +45,10 @@ import net.sf.nameservice.NameService;
 public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	/**
-	 * A key that I assume is used to store the reference sequence in this
-	 * entry.
+	 * A key that is used to store the actual sequence in this entry.
 	 */
 	private static final StringKey seqKey = new StringKey(
 			"SEQ*(^#%(@#%)@#^@#^))^)@#)^(@#%^*()SEQ");
-
-	private static final Logger log = Logger
-			.getLogger(Entry.class.getCanonicalName());
 
 	public final Description description = new Description();
 
@@ -102,7 +97,8 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	/**
 	 * 
 	 * @param key     the key ID
-	 * @param newData the data to add to this entry.
+	 * @param newData the data to add to this entry. Nothing happens if the key
+	 *                is already used
 	 */
 	public void add(DataKey key, Data<?> newData) {
 
@@ -110,12 +106,14 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 			data.put(key, newData);
 			// if (newData instanceof AlignmentAnnotation)
 			// align = (AlignmentAnnotation) newData;
-		} else {
-			// FIXME implement for feature data */
-			log.severe("Entry already contains data for " + key
-					+ ". new data is ignored");
-
 		}
+		// else {
+		// FIXME implement for feature data
+		// FIXME don't log 'severe' if it's actually ignored.
+		// FIXME maybe do warning, for now just ignore the whole thing
+		// log.severe("Entry already contains data for " + key
+		// + ". new data is ignored");
+		// }
 
 	}
 
@@ -208,7 +206,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	/**
 	 * 
-	 * @param seq the (reference?) {@link Sequence}
+	 * @param seq the {@link Sequence}
 	 */
 	public void setSequence(Sequence seq) {
 		data.put(seqKey, seq);
