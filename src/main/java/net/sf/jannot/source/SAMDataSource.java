@@ -8,9 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.logging.Level;
 
 import htsjdk.samtools.SAMSequenceDictionary;
 import htsjdk.samtools.SAMSequenceRecord;
@@ -37,31 +37,64 @@ import tudelft.utilities.logging.Reporter;
  */
 public class SAMDataSource extends DataSource {
 
-	class SAMKey implements DataKey {
+	private SeekableStream content;
 
-		private String string;
+	/* File containing the BAM index */
+	private File index;
+	/* Display name for this data */
+	private DataKey sourceKey;
 
-		SAMKey(String file) {
-			this.string = file;
+	private SamReader sfr = null;
+	private long size;
+	private boolean deleteIndex = false;
+
+	/**
+	 * @param data
+	 * @param index2
+	 * @param log    the {@link Reporter} to log issues to
+	 */
+	public SAMDataSource(Locator data, Locator index, Reporter log) {
+		super(data, log);
+		if (data == null || index == null)
+			throw new NullPointerException(
+					"Neither data nor index provided: " + data + "; " + index);
+		try {
+			if (data.isURL()) {
+				if (index.isURL())
+					init(data.url(), index.url());
+				else
+					init(data.url(), index.file());
+			} else {
+				init(data.file(), index.file());
+			}
+		} catch (IOException | ReadFailedException | URISyntaxException e) {
+			log.log(Level.WARNING, "failed to init SAMDataSource", e);
 		}
-
-		@Override
-		public String toString() {
-			return this.string;
-		}
-
-		public int compareTo(DataKey o) {
-			return toString().compareTo(toString());
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			return toString().equals(o.toString());
-		}
-
 	}
 
-	private SeekableStream content;
+	/**
+	 * @return a {@link SamReader} of the data source, set at index and with
+	 *         {@link ValidationStringency#SILENT} and
+	 *         {@link Option#EAGERLY_DECODE}
+	 */
+	public SamReader getReader() {
+		// System.out.println(content);
+		// System.out.println(content.getSource());
+		if (sfr == null) {
+			// FIXME we should not change the default strategy.
+			SamReaderFactory.setDefaultValidationStringency(
+					ValidationStringency.SILENT);
+			getLog().log(Level.FINE, "SDS: " + content + "\t" + index);
+			sfr = SamReaderFactory.makeDefault().enable(Option.EAGERLY_DECODE)
+					.validationStringency(ValidationStringency.SILENT)
+					.open(SamInputResource.of(content).index(index));
+			Cleaner.register(sfr, content, deleteIndex ? index : null);
+
+		}
+		return sfr;
+		// return new SAMFileReader(content, index, false);
+
+	}
 
 	@Override
 	public int hashCode() {
@@ -94,155 +127,6 @@ public class SAMDataSource extends DataSource {
 		return true;
 	}
 
-	/* File containing the BAM index */
-	private File index;
-	/* Display name for this data */
-	private DataKey sourceKey;
-
-	private SamReader sfr = null;
-	private long size;
-
-	/**
-	 * @return a {@link SamReader} of the data source, set at index and with
-	 *         {@link ValidationStringency#SILENT} and
-	 *         {@link Option#EAGERLY_DECODE}
-	 */
-	public SamReader getReader() {
-		// System.out.println(content);
-		// System.out.println(content.getSource());
-		if (sfr == null) {
-			// FIXME we should not change the default strategy.
-			SamReaderFactory.setDefaultValidationStringency(
-					ValidationStringency.SILENT);
-			System.out.println("SDS: " + content + "\t" + index);
-			sfr = SamReaderFactory.makeDefault().enable(Option.EAGERLY_DECODE)
-					.validationStringency(ValidationStringency.SILENT)
-					.open(SamInputResource.of(content).index(index));
-			Cleaner.register(sfr, content, deleteIndex ? index : null);
-
-		}
-		return sfr;
-		// return new SAMFileReader(content, index, false);
-
-	}
-
-	/**
-	 * BAM file URL
-	 * 
-	 * @param url
-	 * @throws IOException
-	 * @throws ReadFailedException
-	 * @throws URISyntaxException
-	 */
-	private void init(URL url, URL idx)
-			throws IOException, ReadFailedException, URISyntaxException {
-		setSourceKey(new SAMKey(url.toString()));
-		/* BAM file */
-		// content =new SeekableHTTPStream(url);
-		content = new SeekableFileCachedHTTPStream(url);
-		size = url.openConnection().getContentLength();
-
-		/* Index file */
-		File tmpBAI = File.createTempFile("urlbam", ".bai");
-		tmpBAI.deleteOnExit();
-//		url = URIFactory.url(idx);
-		copy(idx.openStream(), tmpBAI);
-		index = tmpBAI;
-		deleteIndex = true;
-
-	}
-
-	/**
-	 * BAM file URL, index is local
-	 * 
-	 * @param url
-	 * @throws IOException
-	 * @throws ReadFailedException
-	 * @throws URISyntaxException
-	 */
-	private void init(URL url, File idx)
-			throws IOException, ReadFailedException, URISyntaxException {
-		setSourceKey(new SAMKey(url.toString()));
-		/* BAM file */
-		// content =new SeekableHTTPStream(url);
-		content = new SeekableFileCachedHTTPStream(url);
-		size = url.openConnection().getContentLength();
-
-		index = idx;
-
-	}
-
-	private boolean deleteIndex = false;
-
-	private static void copy(InputStream in, File file) throws IOException {
-		OutputStream out = new FileOutputStream(file);
-
-		byte[] buffer = new byte[100000];
-		while (true) {
-			int amountRead = in.read(buffer);
-			if (amountRead == -1) {
-				break;
-			}
-			out.write(buffer, 0, amountRead);
-
-		}
-		out.close();
-
-	}
-
-	/**
-	 * BAM file
-	 * 
-	 * @param file
-	 * @throws IOException
-	 */
-	private void init(File file, File index) throws IOException {
-		setSourceKey(new SAMKey(file.toString()));
-		size = file.length();
-		content = new SeekableFileStream(file);
-		this.index = index;
-	}
-
-	/**
-	 * @param data
-	 * @param index2
-	 * @param log    the {@link Reporter} to log issues to
-	 */
-	public SAMDataSource(Locator data, Locator index, Reporter log) {
-		super(data, log);
-		if (data == null || index == null)
-			throw new RuntimeException("Either data or index are not provided: "
-					+ data + "; " + index);
-		if (data.isURL()) {
-			try {
-				if (index.isURL())
-					init(data.url(), index.url());
-				else
-					init(data.url(), index.file());
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ReadFailedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				init(data.file(), index.file());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-	}
-
 	@Override
 	public EntrySet read(EntrySet set) {
 		if (set == null)
@@ -271,7 +155,7 @@ public class SAMDataSource extends DataSource {
 		try {
 			sfr.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			getLog().log(Level.WARNING, "failed to close", e);
 		}
 		if (content instanceof SeekableFileCachedHTTPStream)
 			((SeekableFileCachedHTTPStream) content).closeAll();
@@ -286,24 +170,112 @@ public class SAMDataSource extends DataSource {
 		return sourceKey;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.source.DataSource#isIndexed()
-	 */
 	@Override
 	public boolean isIndexed() {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.source.DataSource#size()
-	 */
 	@Override
 	public long size() {
 		return size;
+	}
+
+	/**
+	 * @param url BAM file URL
+	 * @throws IOException
+	 * @throws ReadFailedException
+	 * @throws URISyntaxException
+	 */
+	private void init(URL url, URL idx)
+			throws IOException, ReadFailedException, URISyntaxException {
+		setSourceKey(new SAMKey(url.toString()));
+		/* BAM file */
+		// content =new SeekableHTTPStream(url);
+		content = new SeekableFileCachedHTTPStream(url);
+		size = url.openConnection().getContentLength();
+
+		/* Index file */
+		File tmpBAI = File.createTempFile("urlbam", ".bai");
+		tmpBAI.deleteOnExit();
+//		url = URIFactory.url(idx);
+		copy(idx.openStream(), tmpBAI);
+		index = tmpBAI;
+		deleteIndex = true;
+
+	}
+
+	/**
+	 * 
+	 * @param url BAM file
+	 * @param idx index is local
+	 * 
+	 * @throws IOException
+	 * @throws ReadFailedException
+	 * @throws URISyntaxException
+	 */
+	private void init(URL url, File idx)
+			throws IOException, ReadFailedException, URISyntaxException {
+		setSourceKey(new SAMKey(url.toString()));
+		/* BAM file */
+		// content =new SeekableHTTPStream(url);
+		content = new SeekableFileCachedHTTPStream(url);
+		size = url.openConnection().getContentLength();
+
+		index = idx;
+
+	}
+
+	private void copy(InputStream in, File file) throws IOException {
+		OutputStream out = new FileOutputStream(file);
+
+		byte[] buffer = new byte[100000];
+		while (true) {
+			int amountRead = in.read(buffer);
+			if (amountRead == -1) {
+				break;
+			}
+			out.write(buffer, 0, amountRead);
+
+		}
+		out.close();
+
+	}
+
+	/**
+	 * BAM file
+	 * 
+	 * @param file
+	 * @throws IOException
+	 */
+	private void init(File file, File index) throws IOException {
+		setSourceKey(new SAMKey(file.toString()));
+		size = file.length();
+		content = new SeekableFileStream(file);
+		this.index = index;
+	}
+
+}
+
+class SAMKey implements DataKey {
+
+	private String string;
+
+	SAMKey(String file) {
+		this.string = file;
+	}
+
+	@Override
+	public String toString() {
+		return this.string;
+	}
+
+	public int compareTo(DataKey o) {
+		return toString().compareTo(toString());
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return toString().equals(o.toString());
 	}
 
 }

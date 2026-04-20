@@ -38,32 +38,6 @@ public class FileSource extends AbstractStreamDataSource {
 		this.file = file;
 	}
 
-//	@Override
-//	public void saveOwn(EntrySet entries) {
-//		try {
-//			int count = 0;
-//			File bak = new File(file + ".bak." + count++);
-//			while (infiniteBackups && bak.exists()) {
-//				bak = new File(file + ".bak." + count);
-//			}
-//			file.renameTo(bak);
-//
-//			OutputStream os = new FileOutputStream(file);
-//			for (Entry e : entries) {
-//				super.getParser().write(os, e, this);
-//			}
-//			os.close();
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//
-//	}
-
 	@Override
 	public String toString() {
 		if (file.getParentFile() != null) {

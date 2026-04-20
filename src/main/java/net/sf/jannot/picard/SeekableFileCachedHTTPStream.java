@@ -7,15 +7,11 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.BitSet;
 
-import be.abeel.net.URIFactory;
 import htsjdk.samtools.seekablestream.SeekableHTTPStream;
-import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Cleaner;
 import net.sf.jannot.exception.ReadFailedException;
 
@@ -63,25 +59,11 @@ public class SeekableFileCachedHTTPStream
 			for (RandomAccessFile raf : cache.rafs)
 				raf.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// can't do much. print ends up nowhere and use can't do anything
+			// with it
 		}
 	}
 
-	public SeekableStream stream() {
-		try {
-			return new SeekableFileCachedHTTPStream(
-					URIFactory.url(super.getSource()), cache);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
 }
 
 class Cache {

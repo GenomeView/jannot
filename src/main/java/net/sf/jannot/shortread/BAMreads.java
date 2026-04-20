@@ -23,11 +23,6 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 
 	private String key;
 
-	private synchronized Iterable<SAMRecord> get(Location r) {
-		return qFast(r);
-
-	}
-
 	/* qFast */
 	private List<SAMRecord> qFastBuffer = new ArrayList<SAMRecord>();
 	private Location qFastBufferLocation = new Location(-5, -5);
@@ -36,6 +31,83 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 	private int qFastMaxPairedLenght;
 
 	private Logger log = Logger.getLogger(BAMreads.class.getCanonicalName());
+
+	private CachingQueryReader cqr;
+	private int keyIndex;
+	private SAMDataSource source;
+
+	public int getPairLength() {
+		return qFastMaxPairedLenght;
+	}
+
+	private int maxLenght = 0;
+
+	@Override
+	public Iterable<SAMRecord> get(int start, int end) {
+		return get(new Location(start, end));
+	}
+
+	@Override
+	public Iterable<SAMRecord> get() {
+		return this;
+
+	}
+
+	@Override
+	public Iterator<SAMRecord> iterator() {
+		return new BAMiterator(cqr.iterator(), keyIndex);
+	}
+
+	public String label() {
+		return source.getSourceKey().toString();
+	}
+
+	private static final Logger logger = Logger
+			.getLogger(BAMreads.class.getCanonicalName());
+
+	public BAMreads(SAMDataSource source, String key) {
+		this.source = source;
+		// returned reader is already silent. Changing default here is indirect.
+		// SamReaderFactory.setDefaultValidationStringency(ValidationStringency.SILENT);
+		this.keyIndex = source.getReader().getFileHeader()
+				.getSequenceIndex(key.toString());
+		cqr = CachingQueryReader.create(source);
+		this.key = key;
+
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	@Override
+	public int readLength() {
+		return maxLenght;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.jannot.shortread.ReadGroup#getSecondRead(net.sf.samtools.SAMRecord
+	 * )
+	 */
+	@Override
+	public SAMRecord getSecondRead(SAMRecord one) {
+		return qFastSecond.get(one.getReadName());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.jannot.shortread.ReadGroup#getSecondRead(net.sf.samtools.SAMRecord
+	 * )
+	 */
+	@Override
+	public SAMRecord getFirstRead(SAMRecord second) {
+		return qFastFirst.get(second.getReadName());
+	}
 
 	private synchronized Iterable<SAMRecord> qFast(Location r) {
 		if (r.start() != qFastBufferLocation.start()
@@ -98,142 +170,69 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 		return qFastBuffer;
 	}
 
-	public int getPairLength() {
-		return qFastMaxPairedLenght;
+	private synchronized Iterable<SAMRecord> get(Location r) {
+		return qFast(r);
+
 	}
 
-	private int maxLenght = 0;
+}
+
+class BAMiterator implements CloseableIterator<SAMRecord> {
+	private CloseableIterator<SAMRecord> it;
+	private int keyIndex;
+	private SAMRecord next; // null means there's no next
+
+	public BAMiterator(CloseableIterator<SAMRecord> in, int key) {
+		this.keyIndex = key;
+		it = in;
+		makeNext();
+	}
 
 	@Override
-	public Iterable<SAMRecord> get(int start, int end) {
-		return get(new Location(start, end));
+	public boolean hasNext() {
+		if (next == null)
+			it.close();
+		return next != null;
 	}
 
-	@Override
-	public Iterable<SAMRecord> get() {
-		return this;
+	private void makeNext() {
 
-	}
-
-	static class BAMiterator implements CloseableIterator<SAMRecord> {
-		private CloseableIterator<SAMRecord> it;
-		private int keyIndex;
-
-		public BAMiterator(CloseableIterator<SAMRecord> in, int key) {
-			this.keyIndex = key;
-			it = in;
-			makeNext();
-		}
-
-		@Override
-		public boolean hasNext() {
-			if (next == null)
-				it.close();
-			return next != null;
-		}
-
-		private void makeNext() {
-
-			if (!it.hasNext()) {
-				next = null;
-			} else {
-				boolean found = false;
-				while (!found) {
-					try {
-						SAMRecord tmp = it.next();
-						if (tmp == null
-								|| tmp.getReferenceIndex() == keyIndex) {
-							next = tmp;
-							found = true;
-						} else {
-							next = null;
-						}
-					} catch (RuntimeException e) {
-						e.printStackTrace();
+		if (!it.hasNext()) {
+			next = null;
+		} else {
+			boolean found = false;
+			while (!found) {
+				try {
+					SAMRecord tmp = it.next();
+					if (tmp == null || tmp.getReferenceIndex() == keyIndex) {
+						next = tmp;
+						found = true;
+					} else {
+						next = null;
 					}
+				} catch (RuntimeException e) {
+					// ignore errors. next should be null now
 				}
 			}
 		}
-
-		private SAMRecord next = null;
-
-		@Override
-		public SAMRecord next() {
-			SAMRecord tmp = next;
-			makeNext();
-			return tmp;
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException("Remove not supported");
-
-		}
-
-		@Override
-		public void close() {
-			it.close();
-
-		}
 	}
 
 	@Override
-	public Iterator<SAMRecord> iterator() {
-		return new BAMiterator(cqr.iterator(), keyIndex);
-	}
-
-	public String label() {
-		return source.getSourceKey().toString();
-	}
-
-	private CachingQueryReader cqr;
-	private int keyIndex;
-	private SAMDataSource source;
-
-	private static final Logger logger = Logger
-			.getLogger(BAMreads.class.getCanonicalName());
-
-	public BAMreads(SAMDataSource source, String key) {
-		this.source = source;
-		// returned reader is already silent. Changing default here is indirect.
-		// SamReaderFactory.setDefaultValidationStringency(ValidationStringency.SILENT);
-		this.keyIndex = source.getReader().getFileHeader()
-				.getSequenceIndex(key.toString());
-		cqr = CachingQueryReader.create(source);
-		this.key = key;
-
-	}
-
-	public String getKey() {
-		return key;
+	public SAMRecord next() {
+		SAMRecord tmp = next;
+		makeNext();
+		return tmp;
 	}
 
 	@Override
-	public int readLength() {
-		return maxLenght;
+	public void remove() {
+		throw new UnsupportedOperationException("Remove not supported");
+
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.jannot.shortread.ReadGroup#getSecondRead(net.sf.samtools.SAMRecord
-	 * )
-	 */
 	@Override
-	public SAMRecord getSecondRead(SAMRecord one) {
-		return qFastSecond.get(one.getReadName());
-	}
+	public void close() {
+		it.close();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.jannot.shortread.ReadGroup#getSecondRead(net.sf.samtools.SAMRecord
-	 * )
-	 */
-	@Override
-	public SAMRecord getFirstRead(SAMRecord second) {
-		return qFastFirst.get(second.getReadName());
 	}
 }

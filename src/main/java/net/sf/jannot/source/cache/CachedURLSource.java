@@ -28,8 +28,8 @@ public class CachedURLSource extends URLSource {
 		if (!SourceCache.contains(url)) {
 			SSL.certify(url);
 			try {
-				super.setParser(ParserFactory.create(url.openStream(),
-						url, getLog()));
+				super.setParser(
+						ParserFactory.create(url.openStream(), url, getLog()));
 				final PipedInputStream in = new PipedInputStream();
 				final PipedOutputStream forParser = new PipedOutputStream(in);
 
@@ -53,8 +53,8 @@ public class CachedURLSource extends URLSource {
 							out.close();
 							SourceCache.finish(url);
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							getLog().log(Level.WARNING,
+									"failed caching url " + url, e);
 						}
 
 					}

@@ -170,8 +170,7 @@ public class IndexManager {
 				tw.createIndex(idx);
 				return true;
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.log(Level.WARNING, "failed creating index", e);
 			}
 
 		}
