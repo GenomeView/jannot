@@ -12,15 +12,16 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.broad.LRUCache;
+
+import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Strand;
 import net.sf.jannot.alignment.maf.AbstractAlignmentBlock;
 import net.sf.jannot.alignment.maf.AbstractMAFMultipleAlignment;
 import net.sf.jannot.alignment.maf.LazyAlignmentBlock;
 import net.sf.jannot.alignment.maf.LazyAlignmentSequence;
 import net.sf.jannot.picard.LineBlockCompressedInputStream;
-import htsjdk.samtools.seekablestream.SeekableStream;
-
-import org.broad.LRUCache;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * @author thpar
@@ -34,22 +35,23 @@ public class IndexedMAF extends AbstractMAFMultipleAlignment {
 	private SeekableStream compressedContent;
 
 	private String selectedChrom = null;
+	private final Reporter log;
 
 	/**
 	 * Looks for a compressed version of the requested MAF file and its index
 	 * file. Creates an index from this file.
 	 * 
-	 * @param maf
-	 *            name of the compressed MAF stream.
-	 * @param index
-	 *            name of the index stream
+	 * @param maf   name of the compressed MAF stream.
+	 * @param index name of the index stream
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public IndexedMAF(SeekableStream maf, InputStream index) throws FileNotFoundException, IOException {
+	public IndexedMAF(SeekableStream maf, InputStream index, Reporter log)
+			throws FileNotFoundException, IOException {
 		this.compressedContent = maf;
 		this.idx = new MAFIndex(index);
+		this.log = log;
 	}
 
 	/**
@@ -59,9 +61,10 @@ public class IndexedMAF extends AbstractMAFMultipleAlignment {
 	 * @param chr
 	 * @param maf
 	 */
-	public IndexedMAF(String chr, IndexedMAF maf) {
+	public IndexedMAF(String chr, IndexedMAF maf, Reporter log) {
 		this.compressedContent = maf.compressedContent;
 		this.idx = maf.getIndex();
+		this.log = log;
 		setSelectedChrom(chr);
 	}
 
@@ -73,7 +76,8 @@ public class IndexedMAF extends AbstractMAFMultipleAlignment {
 			return new ArrayList<AbstractAlignmentBlock>();
 	}
 
-	private LRUCache<MAFEntry, LazyAlignmentBlock> blockCache = new LRUCache<MAFEntry, LazyAlignmentBlock>(200);
+	private LRUCache<MAFEntry, LazyAlignmentBlock> blockCache = new LRUCache<MAFEntry, LazyAlignmentBlock>(
+			200);
 
 	/**
 	 * 
@@ -141,7 +145,8 @@ public class IndexedMAF extends AbstractMAFMultipleAlignment {
 			return new BlockIterator();
 		}
 
-		private class BlockIterator implements Iterator<AbstractAlignmentBlock> {
+		private class BlockIterator
+				implements Iterator<AbstractAlignmentBlock> {
 			private Iterator<MAFEntry> entryIterator;
 			private LineBlockCompressedInputStream zr;
 
@@ -181,26 +186,33 @@ public class IndexedMAF extends AbstractMAFMultipleAlignment {
 			private LazyAlignmentBlock getOrCreate(MAFEntry mafEntry) {
 				if (!blockCache.containsKey(mafEntry)) {
 
-					LazyAlignmentBlock alBlock = new LazyAlignmentBlock(mafEntry.getStart(),  zr,
-							mafEntry.getNucStart(), mafEntry.getNucStart() + mafEntry.getAlignmentLength());
+					LazyAlignmentBlock alBlock = new LazyAlignmentBlock(
+							mafEntry.getStart(), zr, mafEntry.getNucStart(),
+							mafEntry.getNucStart()
+									+ mafEntry.getAlignmentLength(),
+							log);
 
 //					List<Strand> strands = mafEntry.getStrands();
 					int[] species = mafEntry.getSpecies();
 
-					LazyAlignmentSequence alSeq = new LazyAlignmentSequence(getSelectedChrom(), mafEntry.getNucStart(),
-							mafEntry.getAlignmentLength(), Strand.FORWARD, alBlock);
+					LazyAlignmentSequence alSeq = new LazyAlignmentSequence(
+							getSelectedChrom(), mafEntry.getNucStart(),
+							mafEntry.getAlignmentLength(), Strand.FORWARD,
+							alBlock);
 					alBlock.add(alSeq);
 					for (int spec : species) {
-						int specIdx=(int)Math.abs(spec);
-						Strand s=Strand.FORWARD;
-						if(spec<0)
-							s=Strand.REVERSE;
-						String name = idx.getSpeciesName(getSelectedChrom(), specIdx);
-						alSeq = new LazyAlignmentSequence(name, mafEntry.getNucStart(), mafEntry.getAlignmentLength(),
-								s, alBlock);
+						int specIdx = (int) Math.abs(spec);
+						Strand s = Strand.FORWARD;
+						if (spec < 0)
+							s = Strand.REVERSE;
+						String name = idx.getSpeciesName(getSelectedChrom(),
+								specIdx);
+						alSeq = new LazyAlignmentSequence(name,
+								mafEntry.getNucStart(),
+								mafEntry.getAlignmentLength(), s, alBlock);
 						alBlock.add(alSeq);
 					}
-					blockCache.put(mafEntry,alBlock);
+					blockCache.put(mafEntry, alBlock);
 				}
 				return blockCache.get(mafEntry);
 

@@ -76,7 +76,7 @@ public class IndexedMAFDataSource extends DataSource {
 			}
 
 		try {
-			IndexedMAF maf = new IndexedMAF(content, iis);
+			IndexedMAF maf = new IndexedMAF(content, iis, getLog());
 			// System.out.println("Reading MAF: ");
 
 			for (String name : maf.getNames()) {
@@ -95,7 +95,7 @@ public class IndexedMAFDataSource extends DataSource {
 				} else {
 					e = set.getOrCreateEntry(name);
 				}
-				IndexedMAF idxMaf = new IndexedMAF(name, maf);
+				IndexedMAF idxMaf = new IndexedMAF(name, maf, getLog());
 				// System.out.println("Adding MAF:
 				// "+content+"\t"+idxMaf+"\t"+idxMaf.getClass());
 				e.add(Type.get(data.toString()), idxMaf);

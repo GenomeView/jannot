@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
 
 import net.sf.jannot.Strand;
 import net.sf.jannot.picard.LineBlockCompressedInputStream;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.utils.SequenceTools;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -28,11 +30,15 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 
 	private ArrayList<AbstractAlignmentSequence> list = new ArrayList<AbstractAlignmentSequence>();
 
-	public LazyAlignmentBlock(long offsetStart, LineBlockCompressedInputStream zr,int start,int end) {
-		super(start,end);
+	private final Reporter log;
+
+	public LazyAlignmentBlock(long offsetStart,
+			LineBlockCompressedInputStream zr, int start, int end,
+			Reporter log) {
+		super(start, end);
 		this.offsetStart = offsetStart;
 		this.zr = zr;
-		
+		this.log = log;
 	}
 
 	public void add(AbstractAlignmentSequence as) {
@@ -57,13 +63,12 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 
 	private boolean lazyLoading = false;
 
-	
 	/**
 	 * Load the actual alignment block from the zipped maf file and fill in the
 	 * gaps in the alignment sequences
 	 */
 	public synchronized void lazyLoad() {
-		if (list.size()==0||lazyLoading)
+		if (list.size() == 0 || lazyLoading)
 			return;
 		lazyLoading = true;
 
@@ -87,8 +92,9 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 					String type = cols[0];
 					if (type.equals("s")) {
 						String id = cols[1];
-						LazyAlignmentSequence alSeq = (LazyAlignmentSequence) idMap.get(id);
-						
+						LazyAlignmentSequence alSeq = (LazyAlignmentSequence) idMap
+								.get(id);
+
 						if (alSeq != null) {
 //							System.err.println("Loading sequence for: " + id);
 							MemorySequence seq = new MemorySequence(cols[6]);
@@ -99,15 +105,17 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 								alSeq.start = startNuc;
 								alSeq.setSeq(seq);// = seq;
 							} else {
-								alSeq.start = totalLength - startNuc - alSeq.noNucleotides;
-								alSeq.setSeq(SequenceTools.reverseComplement(seq));//
+								alSeq.start = totalLength - startNuc
+										- alSeq.noNucleotides;
+								alSeq.setSeq(
+										SequenceTools.reverseComplement(seq));//
 
 								// ;
 							}
-						
+
 //							list.add(alSeq);
 						} else {
-							System.err.println("LAS is not in map! " + id);
+							log.log(Level.WARNING, "LAS is not in map: " + id);
 						}
 					}
 				}
@@ -121,12 +129,8 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 //			 System.err.println("Initing with: " + as);
 //			 System.err.println("\tseq=" + as.seq());
 //			super.initPosition(as);
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (NumberFormatException | IOException e) {
+			log.log(Level.WARNING, "lazy load failed", e);
 		}
 
 	}
