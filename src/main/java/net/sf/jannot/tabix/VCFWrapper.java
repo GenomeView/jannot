@@ -6,8 +6,6 @@ package net.sf.jannot.tabix;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import net.sf.jannot.Feature;
-import net.sf.jannot.tabix.codec.BEDCodec;
 import net.sf.jannot.variation.VCFCodec;
 import net.sf.jannot.variation.Variation;
 
@@ -22,23 +20,13 @@ public class VCFWrapper extends TabixWrapper<Variation> {
 		super(key, data, idx);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get(int, int)
-	 */
 	@Override
-	public Iterable<Variation> get(int start, int end) {
+	public Iterable<Variation> get(int start, int end) throws IOException {
 		try {
 			return new VCFCodec(this, data.query(key, start, end));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("Can't create VCFCodec", e);
 		}
-		return null;
 	}
 
 }

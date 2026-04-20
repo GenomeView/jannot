@@ -3,6 +3,8 @@
  */
 package net.sf.jannot.tabix;
 
+import java.io.IOException;
+
 import net.sf.jannot.Data;
 import net.sf.jannot.DensityEstimate;
 import net.sf.jannot.Location;
@@ -40,7 +42,7 @@ public abstract class TabixWrapper<T> implements Data<T>, DensityEstimate {
 	}
 
 	@Override
-	public Iterable<T> get() {
+	public Iterable<T> get() throws IOException {
 		return get(1, getMaximumCoordinate());
 
 	}

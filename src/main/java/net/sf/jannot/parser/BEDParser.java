@@ -3,6 +3,7 @@
  */
 package net.sf.jannot.parser;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -68,7 +69,7 @@ public class BEDParser extends Parser {
 	}
 
 	@Override
-	public void write(OutputStream os, Entry entry) {
+	public void write(OutputStream os, Entry entry) throws IOException {
 
 		PrintWriter out = new PrintWriter(os);
 

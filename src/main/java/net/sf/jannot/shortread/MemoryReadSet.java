@@ -3,16 +3,17 @@
  */
 package net.sf.jannot.shortread;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import be.abeel.util.FrequencyMap;
+import htsjdk.samtools.SAMRecord;
 import net.sf.jannot.Data;
 import net.sf.jannot.Location;
-import htsjdk.samtools.SAMRecord;
-import be.abeel.util.FrequencyMap;
 
 /**
  * 
@@ -20,11 +21,11 @@ import be.abeel.util.FrequencyMap;
  * 
  */
 public class MemoryReadSet extends ReadGroup {
-	
-	public String label(){
+
+	public String label() {
 		return "Memory readset";
 	}
-	
+
 	private SortedSet<SAMRecord> set = new TreeSet<SAMRecord>();
 	private int maxPos = 0;
 
@@ -41,8 +42,8 @@ public class MemoryReadSet extends ReadGroup {
 		set.add(g);
 		if (g.getAlignmentEnd() > maxPos)
 			maxPos = g.getAlignmentEnd();
-		if ((g.getAlignmentEnd()-g.getAlignmentStart()+1) > maxLength)
-			maxLength = (g.getAlignmentEnd()-g.getAlignmentStart()+1);
+		if ((g.getAlignmentEnd() - g.getAlignmentStart() + 1) > maxLength)
+			maxLength = (g.getAlignmentEnd() - g.getAlignmentStart() + 1);
 		/* Keep track of paired reads */
 //		if (g instanceof ShortReadTools) {
 //			ShortReadTools esr = (ShortReadTools) g;
@@ -74,16 +75,13 @@ public class MemoryReadSet extends ReadGroup {
 		// updatePileup(g);
 	}
 
-	// @Override
 	public void add(SAMRecord g) {
 		addQuiet(g);
 		// setChanged();
 		// notifyObservers();
 	}
 
-	// @Override
-	public void addAll(Data<SAMRecord> t) {
-
+	public void addAll(Data<SAMRecord> t) throws IOException {
 		for (SAMRecord s : t.get()) {
 			add(s);
 		}
@@ -124,7 +122,8 @@ public class MemoryReadSet extends ReadGroup {
 	// @Override
 	private Iterable<SAMRecord> get(Location l) {
 		try {
-			return set;//.subSet(ShortRead.getQuery(l.start() - maxLength), ShortRead.getQuery(l.end() + maxLength));
+			return set;// .subSet(ShortRead.getQuery(l.start() - maxLength),
+						// ShortRead.getQuery(l.end() + maxLength));
 		} catch (ConcurrentModificationException e) {
 			return new ArrayList<SAMRecord>();
 		}
@@ -192,26 +191,32 @@ public class MemoryReadSet extends ReadGroup {
 		return set;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.jannot.shortread.ReadGroup#getSecondRead(net.sf.samtools.SAMRecord)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.jannot.shortread.ReadGroup#getSecondRead(net.sf.samtools.
+	 * SAMRecord)
 	 */
 	@Override
 	public SAMRecord getSecondRead(SAMRecord one) {
-		
-		//XXX This is broken
-		//FIXME  This is broken
+
+		// XXX This is broken
+		// FIXME This is broken
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see net.sf.jannot.shortread.ReadGroup#getSecondRead(net.sf.samtools.SAMRecord)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.jannot.shortread.ReadGroup#getSecondRead(net.sf.samtools.
+	 * SAMRecord)
 	 */
 	@Override
 	public SAMRecord getFirstRead(SAMRecord one) {
-		
-		//XXX This is broken
-		//FIXME  This is broken
+
+		// XXX This is broken
+		// FIXME This is broken
 		// TODO Auto-generated method stub
 		return null;
 	}

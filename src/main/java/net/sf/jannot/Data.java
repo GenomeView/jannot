@@ -3,6 +3,8 @@
  */
 package net.sf.jannot;
 
+import java.io.IOException;
+
 /**
  * Data related to genome. Thought of as a 'list with elements of type K.
  * Typically part of an {@link Entry}. Data has a start and end point, a label,
@@ -22,13 +24,13 @@ public interface Data<K> {
 	 *              one-based coordinate.
 	 * @return the selected data.
 	 */
-	public Iterable<K> get(int start, int end);
+	public Iterable<K> get(int start, int end) throws IOException;
 
 	/**
 	 * 
 	 * @return {@link Iterable} over all data
 	 */
-	public Iterable<K> get();
+	public Iterable<K> get() throws IOException;
 
 	/**
 	 * @return true iff this data can be saved?

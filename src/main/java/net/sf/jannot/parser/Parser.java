@@ -3,6 +3,7 @@
  */
 package net.sf.jannot.parser;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -76,11 +77,12 @@ public abstract class Parser {
 	 * @param source the source to filter on, or null when no filtering is
 	 *               required.
 	 */
-	public void write(OutputStream os, Entry entry) {
+	public void write(OutputStream os, Entry entry) throws IOException {
 		write(os, entry, Type.values());
 	}
 
-	public void write(OutputStream os, Entry entry, DataKey[] dk) {
+	public void write(OutputStream os, Entry entry, DataKey[] dk)
+			throws IOException {
 		// Do nothing by default, parser can choose to implement the write
 		// method.
 

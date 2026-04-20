@@ -518,6 +518,15 @@ public class IndexedFeatureFile extends DataSource {
 		}
 	}
 
+	/**
+	 * 
+	 * @param tid the tile id or something?
+	 * @param beg beginindex
+	 * @param end endindex
+	 * @return list of {@link TabixLine}s (from beg to end ?)
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	private ArrayList<TabixLine> readRange(int tid, int beg, int end)
 			throws IOException, URISyntaxException {
 		int startTile = (beg + 1) / tileSize;
@@ -707,7 +716,16 @@ public class IndexedFeatureFile extends DataSource {
 	private int lastEnd = -1;
 	private ArrayList<TabixLine> lastList = null;
 
-	// @Override
+	/**
+	 * 
+	 * @param sequence a name of a sequence that should appear in idx.names
+	 * @param start
+	 * @param end
+	 * @return iterable (actually a list) over the sequence items from start to
+	 *         end
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	public synchronized Iterable<TabixLine> query(String sequence, int start,
 			int end) throws IOException, URISyntaxException {
 		if (!idx.names.contains(sequence))
@@ -716,7 +734,7 @@ public class IndexedFeatureFile extends DataSource {
 			return lastList;
 
 		int tid = idx.names.indexOf(sequence);
-		ArrayList<TabixLine> entryList = this.readRange(tid, start, end);
+		ArrayList<TabixLine> entryList = readRange(tid, start, end);
 		lastSeq = sequence;
 		lastStart = start;
 		lastEnd = end;
