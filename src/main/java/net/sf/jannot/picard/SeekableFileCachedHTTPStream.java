@@ -12,8 +12,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import be.abeel.net.URIFactory;
 import htsjdk.samtools.seekablestream.SeekableHTTPStream;
@@ -88,8 +86,8 @@ public class SeekableFileCachedHTTPStream
 
 class Cache {
 
-	private Logger log = Logger
-			.getLogger(SeekableFileCachedHTTPStream.class.getCanonicalName());
+//	private Logger log = Logger
+//			.getLogger(SeekableFileCachedHTTPStream.class.getCanonicalName());
 
 	private static final int BLOCKSIZE = 256 * 1024;
 	/* Each file contains n number of blocks */
@@ -147,8 +145,8 @@ class Cache {
 			retrievedBlocks.set((int) block);
 
 		} catch (Exception e) {
-			log.log(Level.SEVERE, "Exception during retrieval rafs.len="
-					+ rafs.length + ", url=" + urlstream.getSource(), e);
+			throw new IOException("retrieval of rafs failed. len=" + rafs.length
+					+ ", url=" + urlstream.getSource(), e);
 
 		}
 	}
