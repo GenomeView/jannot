@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.SortedSet;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
@@ -155,12 +156,8 @@ public class EMBLParser extends Parser {
 				fa.add(f);
 				// entry.annotation.add(f);
 			} catch (Exception e) {
-				e.printStackTrace();
-				System.err.println("Parser error! " + e);
-				System.err.println("Location=" + location);
-				System.err.println("Qualifiers=" + qualifiers);
-				// System.err.println("Source=" + source);
-
+				getLog().log(Level.WARNING, "EMBL parser err: location="
+						+ location + ", qualifiers=" + qualifiers, e);
 			}
 
 		}
@@ -224,7 +221,8 @@ public class EMBLParser extends Parser {
 			// TODO implement construct stuff
 			// System.out.println("Ignoring construct line: " + line);
 		} else {
-			System.err.println("Unrecognized line: " + line);
+			getLog().log(Level.WARNING,
+					"EMBL parser Unrecognized line: " + line);
 		}
 	}
 
@@ -245,27 +243,24 @@ public class EMBLParser extends Parser {
 		// Entry out = new Entry(source);
 		String[] arr = idLine.substring(5).split(";");
 		if (arr.length != 7) {
-			System.err.println(
-					"The ID line is not conform the specifications. We can extract the ID, but other fields will be ignored.");
-			System.err.println("\t" + idLine);
 			String emergencyID = arr[0].split("\\s+")[0].trim();
-			System.err.println("Extracted ID:" + emergencyID);
+			getLog().log(Level.WARNING,
+					"The ID line is not conform the specifications. "
+							+ "We can extract the ID, but other fields will be ignored."
+							+ idLine + " Extracted ID:" + emergencyID);
 			return set.getOrCreateEntry(emergencyID);
-		} else {
-			Entry out = set.getOrCreateEntry(arr[0].trim());
-			out.description.put("seqversion", arr[1].substring(3).trim());
-			// if (!arr[2].trim().equals("linear"))
-			// throw new
-			// UnsupportedException("Only linear sequences are supported! Found
-			// "
-			// + arr[2]);
-			out.description.put("moleculeType", arr[3].trim());
-			out.description.put("dataClass", arr[4].trim());
-			out.description.put("taxDivision", arr[5].trim());
-			return out;
-
 		}
-
+		Entry out = set.getOrCreateEntry(arr[0].trim());
+		out.description.put("seqversion", arr[1].substring(3).trim());
+		// if (!arr[2].trim().equals("linear"))
+		// throw new
+		// UnsupportedException("Only linear sequences are supported! Found
+		// "
+		// + arr[2]);
+		out.description.put("moleculeType", arr[3].trim());
+		out.description.put("dataClass", arr[4].trim());
+		out.description.put("taxDivision", arr[5].trim());
+		return out;
 	}
 
 	private static final String spacer = "   ";
@@ -403,10 +398,9 @@ public class EMBLParser extends Parser {
 				line.append(" ");
 
 			String qual = f.qualifier(key);
-			if (qual == null)
-				System.err
-						.println("EMBLParse: " + f + "\t" + key + "\t" + qual);
 			if (qual == null) {
+				getLog().log(Level.WARNING,
+						"EMBLParse: qual=null " + f + ", " + key);
 				line.append("/" + key);
 				out.append("\n" + line);
 			} else {
