@@ -15,18 +15,19 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.parser.ParserFactory;
 import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
+import tudelft.utilities.logging.Reporter;
 
 public class CachedURLSource extends URLSource {
 
-	public CachedURLSource(URL url) throws IOException {
-		super(url, null);
+	public CachedURLSource(URL url, Reporter log) throws IOException {
+		super(url, log);
 
 	}
 
 	@Override
 	public EntrySet read(EntrySet set) {
 		if (!SourceCache.contains(url)) {
-			SSL.certify(url);
+			new SSL(getLog()).certify(url);
 			try {
 				super.setParser(
 						ParserFactory.create(url.openStream(), url, getLog()));

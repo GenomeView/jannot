@@ -49,7 +49,7 @@ public class URLSource extends AbstractStreamDataSource {
 	 */
 	public URLSource(URL url, Reporter log) throws IOException {
 		this(url, null, log);
-		SSL.certify(url);
+		new SSL(log).certify(url);
 		init(log);
 
 	}

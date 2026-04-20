@@ -66,7 +66,7 @@ public class DataSourceFactory {
 		log.log(Level.INFO, "Data: " + data);
 		log.log(Level.INFO, "Index: " + index);
 		if (data.isURL()) {
-			SSL.certify(data.url());
+			new SSL(log).certify(data.url());
 		}
 
 		if (data.isTDF()) {
@@ -84,7 +84,7 @@ public class DataSourceFactory {
 					return new URLSource(data.url(), log);
 				} else {
 					log.log(Level.INFO, "Loading as CachedURLSource");
-					return new CachedURLSource(data.url());
+					return new CachedURLSource(data.url(), log);
 				}
 			} else {
 				log.log(Level.INFO, "Loading as FileSource");
