@@ -27,7 +27,7 @@ public abstract class AbstractWiggle implements Graph, Query {
 	public float[] get(int start, int end, int resolutionIndex)
 			throws IOException {
 		if (buffer5 == null)
-			throw new RuntimeException("Wiggle needs to be initialized!");
+			throw new IOException("Wiggle needs to be initialized");
 		if (lastStart == start && lastEnd == end && lastRes == resolutionIndex)
 			return last;
 		if (resolutionIndex < 5) {

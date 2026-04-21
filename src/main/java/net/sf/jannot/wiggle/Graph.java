@@ -25,6 +25,7 @@ public interface Graph extends Data<Float> {
 	 * @param start           zero based coordinate of the start
 	 * @param end             zero based coordinate of the end, non-inclusive
 	 * @param resolutionIndex index of the desired resolution
+	 * @throws IOException if the value at given pos can't be read
 	 */
 	public float[] get(int start, int end, int resolutionIndex)
 			throws IOException;
@@ -33,12 +34,11 @@ public interface Graph extends Data<Float> {
 
 	public float max();
 
-	// public String getName();
-
 	/**
 	 * @param pos one based coordinate
-	 * @return
+	 * @return value at pos
+	 * @throws IOException if the value at given pos can't be read
 	 */
-	public float value(int pos);
+	public float value(int pos) throws IOException;
 
 }

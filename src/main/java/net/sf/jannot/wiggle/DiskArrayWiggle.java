@@ -33,9 +33,9 @@ public class DiskArrayWiggle extends AbstractWiggle implements Iterable<Float> {
 
 	public DiskArrayWiggle(int size) throws IOException {
 		this.size = size;
-		System.out.println("Mapping: " + size * 4);
+		// System.out.println("Mapping: " + size * 4);
 		blob = new BinaryBlob(size * 4);
-		System.out.println("Mapping successfull!");
+		// System.out.println("Mapping successfull!");
 
 	}
 
@@ -73,37 +73,16 @@ public class DiskArrayWiggle extends AbstractWiggle implements Iterable<Float> {
 		return size;// / 4;
 	}
 
-	/**
-	 * Get a single value, one based coordinate
-	 * 
-	 * @see net.sf.jannot.wiggle.Graph#value(int)
-	 */
 	@Override
-	public float value(int pos) {
-		try {
-			return blob.getFloat(4 * (pos - 1));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} // buffer[pos - 1];
-		return -1;
+	public float value(int pos) throws IOException {
+		return blob.getFloat(4 * (pos - 1));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get()
-	 */
 	@Override
 	public Iterable<Float> get() {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#canSave()
-	 */
 	@Override
 	public boolean canSave() {
 		return false;
@@ -131,24 +110,18 @@ public class DiskArrayWiggle extends AbstractWiggle implements Iterable<Float> {
 			return currentIdx <= daw.size();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.Iterator#next()
-		 */
 		@Override
 		public Float next() {
-			return daw.value(currentIdx++);
+			try {
+				return daw.value(currentIdx++);
+			} catch (IOException e) {
+				return 0f; // shouldn't happen
+			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.Iterator#remove()
-		 */
 		@Override
 		public void remove() {
-			throw new RuntimeException("Does not work");
+			throw new RuntimeException("Not implemented");
 
 		}
 
