@@ -119,14 +119,9 @@ public class URLSource extends AbstractStreamDataSource {
 	private long cachedSize = -2;
 
 	@Override
-	public long size() {
+	public long size() throws IOException {
 		if (cachedSize == -2)
-			try {
-				cachedSize = url.openConnection().getContentLength();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			cachedSize = url.openConnection().getContentLength();
 		return cachedSize;
 	}
 
