@@ -17,8 +17,6 @@
 package net.sf.jannot.parser;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +28,6 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
@@ -49,8 +46,7 @@ public class TestVCFParser {
 			TestVCFParser.class.toString());
 
 	@Test
-	public void testTinySize()
-			throws URISyntaxException, IOException, ReadFailedException {
+	public void testTinySize() throws Exception {
 
 		File f = DataManager.file("tiny.vcf");
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
@@ -78,8 +74,7 @@ public class TestVCFParser {
 	}
 
 	@Test
-	public void testRegularSize()
-			throws URISyntaxException, IOException, ReadFailedException {
+	public void testRegularSize() throws Exception {
 
 		File f = DataManager.file("regular.vcf");
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);

@@ -17,15 +17,12 @@
 package net.sf.jannot.parser;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Type;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
@@ -43,8 +40,7 @@ public class TestGFFParser {
 			TestGFFParser.class.toString());
 
 	@Test
-	public void testParserMini()
-			throws URISyntaxException, IOException, ReadFailedException {
+	public void testParserMini() throws Exception {
 		File f = DataManager.file("doubleScore.gff3");
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 		EntrySet es = ds.read();

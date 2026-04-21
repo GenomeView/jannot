@@ -16,14 +16,10 @@
  */
 package net.sf.jannot.parser;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,7 +34,6 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Type;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
@@ -56,146 +51,105 @@ public class TestBEDParser {
 			TestBEDParser.class.toString());
 
 	@Test
-	public void testParserMini() {
+	public void testParserMini() throws Exception {
 		File f = DataManager.file("minibed.bed");
-		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-			EntrySet es = ds.read();
-			// System.out.println(es.firstEntry());
-			Assert.assertEquals("chr7", es.firstEntry().getID());
-			int count = 0;
-			for (Entry e : es)
-				count++;
-			Assert.assertEquals(1, count);
-			Data d = es.firstEntry().get(Type.get("ItemRGBDemo"));
-			for (DataKey dk : es.firstEntry()) {
-				System.out.println("Datakey=" + dk);
-			}
-			Assert.assertNotNull(d);
-
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (ReadFailedException e) {
-
-			e.printStackTrace();
-			Assert.fail();
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
+		EntrySet es = ds.read();
+		// System.out.println(es.firstEntry());
+		Assert.assertEquals("chr7", es.firstEntry().getID());
+		int count = 0;
+		for (Entry e : es)
+			count++;
+		Assert.assertEquals(1, count);
+		Data d = es.firstEntry().get(Type.get("ItemRGBDemo"));
+		for (DataKey dk : es.firstEntry()) {
+			System.out.println("Datakey=" + dk);
 		}
+		Assert.assertNotNull(d);
+
 	}
 
 	@Test
-	public void testParserBare() {
+	public void testParserBare() throws Exception {
 		File f = DataManager.file("barebed.bed");
-		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-			EntrySet es = ds.read();
-			// System.out.println(es.firstEntry());
-			Assert.assertEquals("chr7", es.firstEntry().getID());
-			int count = 0;
-			for (Entry e : es)
-				count++;
-			Assert.assertEquals(1, count);
-			Data d = es.firstEntry().get(Type.get("barebed.bed"));
-			for (DataKey dk : es.firstEntry()) {
-				System.out.println("Datakey=" + dk);
-			}
-			Assert.assertNotNull(d);
-
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (ReadFailedException e) {
-
-			e.printStackTrace();
-			Assert.fail();
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
+		EntrySet es = ds.read();
+		// System.out.println(es.firstEntry());
+		Assert.assertEquals("chr7", es.firstEntry().getID());
+		int count = 0;
+		for (Entry e : es)
+			count++;
+		Assert.assertEquals(1, count);
+		Data d = es.firstEntry().get(Type.get("barebed.bed"));
+		for (DataKey dk : es.firstEntry()) {
+			System.out.println("Datakey=" + dk);
 		}
+		Assert.assertNotNull(d);
+
 	}
 
 	@Test
-	public void testSave() {
+	public void testSave() throws Exception {
 		File f = DataManager.file("barebed.bed");
-		try {
-			DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-			EntrySet es = ds.read();
-			BEDParser output = new BEDParser("save.bed", log);
-			FileOutputStream fos = new FileOutputStream("save.bed");
-			for (Entry e : es) {
-				output.write(fos, e);
-			}
-			fos.close();
-			LineIterator it = new LineIterator(new File("save.bed"));
-			Assert.assertEquals("track name=\"barebed.bed\"", it.next());
-			LineIterator expected = new LineIterator(f);
-			for (String line : it) {
-				Assert.assertEquals(expected.next(),
-						line.replaceAll("0\\.0", "0"));
-			}
-			it.close();
-			expected.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
+		EntrySet es = ds.read();
+		BEDParser output = new BEDParser("save.bed", log);
+		FileOutputStream fos = new FileOutputStream("save.bed");
+		for (Entry e : es) {
+			output.write(fos, e);
 		}
+		fos.close();
+		LineIterator it = new LineIterator(new File("save.bed"));
+		Assert.assertEquals("track name=\"barebed.bed\"", it.next());
+		LineIterator expected = new LineIterator(f);
+		for (String line : it) {
+			Assert.assertEquals(expected.next(), line.replaceAll("0\\.0", "0"));
+		}
+		it.close();
+		expected.close();
 	}
 
 	@Test
-	public void test_loadEntries() {
+	public void test_loadEntries() throws Exception {
 		log.log(Level.INFO, "BEGIN test_loadEntries");
-		try {
-			File fileData = DataManager.file("ItemRGBDemo.txt");
-			InputStream is = new FileInputStream(fileData);
+		File fileData = DataManager.file("ItemRGBDemo.txt");
+		InputStream is = new FileInputStream(fileData);
 
-			EntrySet entries = new EntrySet();
-			BEDParser parser = new BEDParser(fileData.getName(), log);
-			log.log(Level.INFO, "	> fileData: " + fileData + "( "
-					+ fileData.length() + " KB)");
-			try {
-				// We parse the sample file
-				entries = parser.parse(is, null);
-				log.log(Level.INFO,
-						"		> Number of entries: " + entries.size());
-				// assertTrue(entries.size() > 0);
-				// We build an ArrayList to access randonmly to a entry
-				List<Entry> list = new ArrayList<Entry>();
-				for (Entry entry : entries) {
-					list.add(entry);
-				}
-				int selectedIndex = Math.max(0,
-						(int) Math.round(Math.random() * list.size()) - 1);
-				Entry selectedEntry = list.get(selectedIndex);
-
-				Iterator<DataKey> it = selectedEntry.iterator();
-				List<DataKey> list2 = new ArrayList<DataKey>();
-				while (it.hasNext()) {
-					list2.add(it.next());
-				}
-				int keyIndex = Math.max(0,
-						(int) Math.round(Math.random() * list2.size()) - 1);
-
-				/* retrieve some data from some entry */
-				long t3 = System.currentTimeMillis();
-				DataKey dataKey = list2.get(keyIndex);
-				Data<?> data = selectedEntry.get(dataKey);
-				System.out.println("DD: " + data);
-
-				long t4 = System.currentTimeMillis();
-				log.log(Level.INFO, "		> Time consumed fetching data: "
-						+ Math.abs(t4 - t3));
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				assertTrue(false);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
+		EntrySet entries = new EntrySet();
+		BEDParser parser = new BEDParser(fileData.getName(), log);
+		log.log(Level.INFO, "	> fileData: " + fileData + "( "
+				+ fileData.length() + " KB)");
+		// We parse the sample file
+		entries = parser.parse(is, null);
+		log.log(Level.INFO, "		> Number of entries: " + entries.size());
+		// assertTrue(entries.size() > 0);
+		// We build an ArrayList to access randonmly to a entry
+		List<Entry> list = new ArrayList<Entry>();
+		for (Entry entry : entries) {
+			list.add(entry);
 		}
+		int selectedIndex = Math.max(0,
+				(int) Math.round(Math.random() * list.size()) - 1);
+		Entry selectedEntry = list.get(selectedIndex);
+
+		Iterator<DataKey> it = selectedEntry.iterator();
+		List<DataKey> list2 = new ArrayList<DataKey>();
+		while (it.hasNext()) {
+			list2.add(it.next());
+		}
+		int keyIndex = Math.max(0,
+				(int) Math.round(Math.random() * list2.size()) - 1);
+
+		/* retrieve some data from some entry */
+		long t3 = System.currentTimeMillis();
+		DataKey dataKey = list2.get(keyIndex);
+		Data<?> data = selectedEntry.get(dataKey);
+		System.out.println("DD: " + data);
+
+		long t4 = System.currentTimeMillis();
+		log.log(Level.INFO,
+				"		> Time consumed fetching data: " + Math.abs(t4 - t3));
+
 		log.log(Level.INFO, "END test_loadEntries");
 	}
 

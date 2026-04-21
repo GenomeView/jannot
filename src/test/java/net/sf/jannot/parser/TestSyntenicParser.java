@@ -20,15 +20,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import org.junit.Test;
 
 import net.sf.jannot.Data;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.SyntenicData;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
@@ -42,8 +39,7 @@ public class TestSyntenicParser {
 			TestSyntenicParser.class.toString());
 
 	@Test
-	public void testParserMini()
-			throws URISyntaxException, IOException, ReadFailedException {
+	public void testParserMini() throws Exception {
 		File f = DataManager.file(SYN_FILE);
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 		EntrySet es = ds.read();

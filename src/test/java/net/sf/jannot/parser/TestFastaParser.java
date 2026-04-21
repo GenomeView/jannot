@@ -50,15 +50,13 @@ public class TestFastaParser {
 	}
 
 	@Test
-	public void testMiniFasta()
-			throws URISyntaxException, IOException, ReadFailedException {
+	public void testMiniFasta() throws Exception {
 		File f = DataManager.file("mini.fasta");
 		testFile(f);
 	}
 
 	@Test
-	public void testWrite()
-			throws URISyntaxException, IOException, ReadFailedException {
+	public void testWrite() throws Exception {
 		File f = DataManager.file("mini.fasta");
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 		EntrySet es = ds.read();
@@ -76,8 +74,7 @@ public class TestFastaParser {
 	}
 
 	@Test
-	public void testMFasta()
-			throws URISyntaxException, IOException, ReadFailedException {
+	public void testMFasta() throws Exception {
 
 		DataSource ds = DataSourceFactory.create(
 				new Locator(DataManager.file("10313-CDS.fasta"), log), log);

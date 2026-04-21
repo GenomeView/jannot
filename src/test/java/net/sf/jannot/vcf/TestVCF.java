@@ -1,7 +1,5 @@
 package net.sf.jannot.vcf;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +12,6 @@ import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
@@ -46,8 +43,7 @@ public class TestVCF {
 	}
 
 	@Test
-	public void test_loadEntries()
-			throws URISyntaxException, IOException, ReadFailedException {
+	public void test_loadEntries() throws Exception {
 		ReportToLogger log = new ReportToLogger(getClass().getSimpleName());
 
 		int i = 0;

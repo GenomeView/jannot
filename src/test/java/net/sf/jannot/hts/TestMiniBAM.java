@@ -24,31 +24,26 @@ public class TestMiniBAM {
 			TestMiniBAM.class.toString());
 
 	@Test
-	public void testShortRead() {
+	public void testShortRead() throws Exception {
 
 		Locator fData = new Locator(DataManager.file("tworead.bam"), log);
 		Locator fIndex = new Locator(DataManager.file("tworead.bam.bai"), log);
 
-		try {
-			DataSource ds = DataSourceFactory.create(fData, fIndex, log);
-			Assert.assertNotNull(ds);
-			EntrySet entries = ds.read();
-			Entry e = entries.getEntry("chr4");
-			int dkCount = 0;
-			int readCount = 0;
-			for (DataKey dk : e) {
-				dkCount++;
-				Data d = e.get(dk);
-				for (Object o : d.get(73151000, 73152000)) {
-					readCount++;
-					System.out.println(o);
-				}
+		DataSource ds = DataSourceFactory.create(fData, fIndex, log);
+		Assert.assertNotNull(ds);
+		EntrySet entries = ds.read();
+		Entry e = entries.getEntry("chr4");
+		int dkCount = 0;
+		int readCount = 0;
+		for (DataKey dk : e) {
+			dkCount++;
+			Data d = e.get(dk);
+			for (Object o : d.get(73151000, 73152000)) {
+				readCount++;
+				System.out.println(o);
 			}
-			Assert.assertEquals(1, dkCount);
-			Assert.assertEquals(2, readCount);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
 		}
+		Assert.assertEquals(1, dkCount);
+		Assert.assertEquals(2, readCount);
 	}
 }

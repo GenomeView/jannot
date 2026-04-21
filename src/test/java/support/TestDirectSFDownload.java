@@ -32,7 +32,7 @@ public class TestDirectSFDownload {
 	// this test makes no sense, all files are now always in src/test/resources
 	@Ignore
 	@Test
-	public void testDownload() {
+	public void testDownload() throws Exception {
 		String id = "minibed.bed";
 		DataManager.file(id);
 		Assert.assertTrue(new File(".sf-testing-cache").exists());
@@ -45,7 +45,7 @@ public class TestDirectSFDownload {
 	// this test makes no sense, all files are now always in src/test/resources
 	@Ignore
 	@Test
-	public void testLargeDownload() {
+	public void testLargeDownload() throws Exception {
 		String id = "CEU.trio.2010_03.genotypes.vcf.gz";
 		DataManager.file(id);
 		Assert.assertTrue(new File(".sf-testing-cache").exists());

@@ -22,7 +22,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
 
 /**
  * 
@@ -31,29 +30,25 @@ import org.junit.Assert;
  */
 public class DataManager {
 
-	public static File file(String identifier) {
-		try {
-			// File folder = new File(".sf-testing-cache");
-			File folder = new File("src/test/resources");
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
-			File file = new File(folder, identifier);
-			if (!file.exists() || file.length() == 0) {
-				retrieveSF(identifier, file);
-			}
-			return file;
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-			return null;
+	public static File file(String identifier) throws Exception {
+		// File folder = new File(".sf-testing-cache");
+		File folder = new File("src/test/resources");
+		if (!folder.exists()) {
+			folder.mkdirs();
 		}
+		File file = new File(folder, identifier);
+		if (!file.exists() || file.length() == 0) {
+			retrieveSF(identifier, file);
+		}
+		return file;
 
 	}
 
-	private static void retrieveSF(String identifier, File out) throws Exception {
-		URL url = new URL("https://sourceforge.net/projects/genomeview/files/unit%20test%20files/" + identifier
-				+ "/download?use_mirror=autoselect");
+	private static void retrieveSF(String identifier, File out)
+			throws Exception {
+		URL url = new URL(
+				"https://sourceforge.net/projects/genomeview/files/unit%20test%20files/"
+						+ identifier + "/download?use_mirror=autoselect");
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		int response = conn.getResponseCode();
 		if (response == 302) {
