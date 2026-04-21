@@ -32,10 +32,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.broad.igv.tdf.TDFWriter.IndexEntry;
 import org.broad.igv.track.WindowFunction;
 import org.broad.igv.util.CompressionUtils;
 
@@ -50,21 +47,26 @@ import org.broad.igv.util.CompressionUtils;
  */
 public class TDFWriter {
 
-	static private Logger log = Logger.getLogger(TDFWriter.class.getCanonicalName());
-	static private int version = 3;
-	private OutputStream fos = null;
+	// static private Logger log =
+	// Logger.getLogger(TDFWriter.class.getCanonicalName());
+	private final static int version = 3;
+	private final static byte[] magicNumber = new byte[] { 'T', 'D', 'F', '3' };
+
+	private final OutputStream fos;
+	private final File file;
+	private final Map<String, TDFGroup> groupCache = new LinkedHashMap<String, TDFGroup>();
+	private final Map<String, TDFDataset> datasetCache = new LinkedHashMap<String, TDFDataset>();
+	private final Map<String, IndexEntry> datasetIndex = new LinkedHashMap<String, IndexEntry>();
+	private final Map<String, IndexEntry> groupIndex = new LinkedHashMap<String, IndexEntry>();
+	private long indexPositionPosition;
+	private final boolean compressed;
+
 	private long bytesWritten = 0;
 
-	private File file;
-	private Map<String, TDFGroup> groupCache = new LinkedHashMap<String, TDFGroup>();
-	private Map<String, TDFDataset> datasetCache = new LinkedHashMap<String, TDFDataset>();
-	private Map<String, IndexEntry> datasetIndex = new LinkedHashMap<String, IndexEntry>();
-	private Map<String, IndexEntry> groupIndex = new LinkedHashMap<String, IndexEntry>();
-	private long indexPositionPosition;
-	private boolean compressed;
-
-	public TDFWriter(File f, String genomeId, String trackType, String trackLine, String[] trackNames,
-			Collection<WindowFunction> windowFunctions, boolean compressed) {
+	public TDFWriter(File f, String genomeId, String trackType,
+			String trackLine, String[] trackNames,
+			Collection<WindowFunction> windowFunctions, boolean compressed)
+			throws IOException {
 
 		if (f.getName().endsWith(".tdf")) {
 			this.file = f;
@@ -75,51 +77,25 @@ public class TDFWriter {
 
 		try {
 			fos = new BufferedOutputStream(new FileOutputStream(file));
-			writeHeader(genomeId, trackType, trackLine, trackNames, windowFunctions);
+			writeHeader(genomeId, trackType, trackLine, trackNames,
+					windowFunctions);
 
 			TDFGroup rootGroup = new TDFGroup("/");
 			groupCache.put(rootGroup.getName(), rootGroup);
 
 		} catch (IOException ex) {
 			// log.error("Error creating file: " + file.getAbsolutePath(), ex);
-			throw new RuntimeException("Error creating file" + file.getAbsolutePath());
+			throw new IOException(
+					"Error creating file" + file.getAbsolutePath(), ex);
 		}
 
 	}
 
-	// public TDFWriter(File f, String genomeId,
-	//
-	// String trackLine, String[] trackNames, Collection<WindowFunction>
-	// windowFunctions, boolean compressed) {
-	//
-	// if (f.getName().endsWith(".tdf")) {
-	// this.file = f;
-	// } else {
-	// this.file = new File(f.getAbsolutePath() + ".tdf");
-	// }
-	// this.compressed = compressed;
-	//
-	// try {
-	// fos = new BufferedOutputStream(new FileOutputStream(file));
-	// writeHeader(genomeId, trackLine, trackNames, windowFunctions);
-	//
-	// TDFGroup rootGroup = new TDFGroup("/");
-	// groupCache.put(rootGroup.getName(), rootGroup);
-	//
-	// } catch (IOException ex) {
-	// log.log(Level.SEVERE,"Error creating file: " + file.getAbsolutePath(),
-	// ex);
-	// throw new RuntimeException("Error creating file" +
-	// file.getAbsolutePath());
-	// }
-	//
-	// }
-
-	private void writeHeader(String genomeId, String trackType, String trackLine, String[] trackNames,
+	private void writeHeader(String genomeId, String trackType,
+			String trackLine, String[] trackNames,
 			Collection<WindowFunction> windowFunctions) throws IOException {
 
 		// Magic number -- 4 bytes
-		byte[] magicNumber = new byte[] { 'T', 'D', 'F', '3' };
 
 		BufferedByteWriter buffer = new BufferedByteWriter(24);
 		buffer.put(magicNumber);
@@ -189,27 +165,24 @@ public class TDFWriter {
 			writeIndexPosition(indexPosition, nbytes);
 
 		} catch (IOException ex) {
-			log.log(Level.SEVERE, "Error closing file");
+			// log.log(Level.SEVERE, "Error closing file");
 		}
 	}
 
-	private void writeIndexPosition(long indexPosition, int nbytes) {
-		try {
-			RandomAccessFile raf = new RandomAccessFile(file, "rw");
-			raf.getChannel().position(indexPositionPosition);
+	private void writeIndexPosition(long indexPosition, int nbytes)
+			throws IOException {
+		RandomAccessFile raf = new RandomAccessFile(file, "rw");
+		raf.getChannel().position(indexPositionPosition);
 
-			System.out.println("Index position position: "+indexPositionPosition);
-			System.out.println("Index position: "+indexPosition);
-			System.out.println("nBytes: "+nbytes);
-			// Write as little endian
-			BufferedByteWriter buffer = new BufferedByteWriter();
-			buffer.putLong(indexPosition);
-			buffer.putInt(nbytes);
-			raf.write(buffer.getBytes());
-			raf.close();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
+		System.out.println("Index position position: " + indexPositionPosition);
+		System.out.println("Index position: " + indexPosition);
+		System.out.println("nBytes: " + nbytes);
+		// Write as little endian
+		BufferedByteWriter buffer = new BufferedByteWriter();
+		buffer.putLong(indexPosition);
+		buffer.putInt(nbytes);
+		raf.write(buffer.getBytes());
+		raf.close();
 	}
 
 	public TDFGroup getGroup(String name) {
@@ -232,7 +205,8 @@ public class TDFWriter {
 		return group;
 	}
 
-	public TDFDataset createDataset(String name, TDFDataset.DataType dataType, int tileWidth, int nTiles) {
+	public TDFDataset createDataset(String name, TDFDataset.DataType dataType,
+			int tileWidth, int nTiles) {
 
 		if (datasetCache.containsKey(name)) {
 			throw new RuntimeException("Dataset: " + name + " already exists");
@@ -247,11 +221,12 @@ public class TDFWriter {
 	// arrays
 	// Tile layout
 
-	public void writeTile(String dsId, int tileNumber, TDFTile tile) throws IOException {
+	public void writeTile(String dsId, int tileNumber, TDFTile tile)
+			throws IOException {
 
 		TDFDataset dataset = datasetCache.get(dsId);
 		if (dataset == null) {
-			throw new java.lang.NoSuchFieldError("Dataset: " + dsId + " doese not exist.  "
+			throw new IOException("Dataset: " + dsId + " does not exist.  "
 					+ "Call createDataset first");
 		}
 		long pos = bytesWritten;
@@ -279,11 +254,11 @@ public class TDFWriter {
 			dataset.tileSizes[tileNumber] = nBytes;
 		} else {
 			// The occasional tile number == tile array size is expected, but
-			// tile
-			// numbers larger than that are not
+			// tile numbers larger than that are not
 			if (tileNumber > dataset.tilePositions.length) {
-				System.out.println("Unexpected tile number: " + tileNumber + " (max of " + dataset.tilePositions.length
-						+ " expected).");
+				throw new IOException(
+						"Unexpected tile number: " + tileNumber + " (max of "
+								+ dataset.tilePositions.length + " expected).");
 			}
 
 		}
@@ -312,7 +287,8 @@ public class TDFWriter {
 			write(buffer.getBytes());
 
 			int nBytes = (int) (bytesWritten - position);
-			datasetIndex.put(dataset.getName(), new IndexEntry(position, nBytes));
+			datasetIndex.put(dataset.getName(),
+					new IndexEntry(position, nBytes));
 
 		}
 	}

@@ -35,9 +35,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import htsjdk.samtools.SAMSequenceDictionary;
-import htsjdk.samtools.SAMSequenceRecord;
-
 import org.broad.igv.tdf.TDFBedTile;
 import org.broad.igv.tdf.TDFDataset;
 import org.broad.igv.tdf.TDFFixedTile;
@@ -49,6 +46,9 @@ import org.broad.igv.tools.Accumulator;
 import org.broad.igv.track.WindowFunction;
 import org.broad.igv.util.collections.FloatArrayList;
 import org.broad.igv.util.collections.IntArrayList;
+
+import htsjdk.samtools.SAMSequenceDictionary;
+import htsjdk.samtools.SAMSequenceRecord;
 
 /**
  * 
@@ -84,9 +84,11 @@ class Preprocessor {
 	private Map<String, String> attributes = new HashMap<String, String>();
 	private PrintStream out = System.out;
 
-	private List<WindowFunction> allDataFunctions = Arrays.asList(WindowFunction.mean, WindowFunction.median,
-			WindowFunction.min, WindowFunction.max, WindowFunction.percentile2, WindowFunction.percentile10,
-			WindowFunction.percentile90, WindowFunction.percentile98);
+	private List<WindowFunction> allDataFunctions = Arrays.asList(
+			WindowFunction.mean, WindowFunction.median, WindowFunction.min,
+			WindowFunction.max, WindowFunction.percentile2,
+			WindowFunction.percentile10, WindowFunction.percentile90,
+			WindowFunction.percentile98);
 	private String genomeID;
 
 	Preprocessor(String genomeID, File outputFile, SAMSequenceDictionary genome,
@@ -96,7 +98,7 @@ class Preprocessor {
 		this.outputFile = outputFile;
 		this.genome = genome;
 		this.windowFunctions = windowFunctions;
-		//this.sizeEstimate = sizeEstimate;
+		// this.sizeEstimate = sizeEstimate;
 		// this.genome = genome;
 		allDataStats = new Accumulator(allDataFunctions);
 
@@ -110,11 +112,15 @@ class Preprocessor {
 	/**
 	 * Called to set inital parameters. It is required that this be called prior
 	 * to writing the file
+	 * 
+	 * @throws IOException
 	 */
-	private void setTrackParameters(String trackType, String trackLine, String[] trackNames) {
+	private void setTrackParameters(String trackType, String trackLine,
+			String[] trackNames) throws IOException {
 
 		if (outputFile != null && writer == null) {
-			writer = new TDFWriter(outputFile, genomeID, trackType, trackLine, trackNames, windowFunctions, compressed);
+			writer = new TDFWriter(outputFile, genomeID, trackType, trackLine,
+					trackNames, windowFunctions, compressed);
 			nTracks = trackNames.length;
 
 			// Convert genome coordinates from bp to kbp
@@ -171,8 +177,9 @@ class Preprocessor {
 
 		if (currentChr != null && chr.equals(currentChr)) {
 			if (start < (lastStartPosition - maxExtFactor)) {
-				String msg = "Error: Data is not sorted @ " + chr + " " + start + "  (last position = "
-						+ lastStartPosition + "   max ext factor = " + maxExtFactor + ")";
+				String msg = "Error: Data is not sorted @ " + chr + " " + start
+						+ "  (last position = " + lastStartPosition
+						+ "   max ext factor = " + maxExtFactor + ")";
 				out.println(msg);
 				throw new RuntimeException(msg);
 			}
@@ -189,8 +196,9 @@ class Preprocessor {
 		int chrLength = genome.getSequence(chr).getSequenceLength(); // genome.getChromosome(chr).getLength();
 
 		if (start > chrLength) {
-			log.info("Ignoring data from non-existent locus.  Probe = " + name + "  Locus = " + chr + ":" + start + "-"
-					+ end + ". " + chr + " length = " + chrLength);
+			log.info("Ignoring data from non-existent locus.  Probe = " + name
+					+ "  Locus = " + chr + ":" + start + "-" + end + ". " + chr
+					+ " length = " + chrLength);
 			return;
 		}
 
@@ -238,8 +246,8 @@ class Preprocessor {
 	private void newChromosome(String chr) {
 
 		if (visitedChromosomes.contains(chr)) {
-			String msg = "Error: Data is not ordered by start position. Chromosome " + chr
-					+ " appears in multiple blocks";
+			String msg = "Error: Data is not ordered by start position. Chromosome "
+					+ chr + " appears in multiple blocks";
 			out.println(msg);
 			throw new RuntimeException(msg);
 
@@ -248,7 +256,8 @@ class Preprocessor {
 
 		SAMSequenceRecord c = genome.getSequence(chr);
 		if (c == null) {
-			out.println("Chromosome: " + chr + " not found in .genome file.  Skipping.");
+			out.println("Chromosome: " + chr
+					+ " not found in .genome file.  Skipping.");
 			skippedChromosomes.add(chr);
 		} else {
 
@@ -301,7 +310,8 @@ class Preprocessor {
 		writer.getRootGroup().setAttribute("chromosomes", chrString.toString());
 
 		for (Map.Entry<String, String> entry : attributes.entrySet()) {
-			writer.getRootGroup().setAttribute(entry.getKey(), entry.getValue());
+			writer.getRootGroup().setAttribute(entry.getKey(),
+					entry.getValue());
 		}
 
 		if (zoomLevels != null) {
@@ -313,7 +323,9 @@ class Preprocessor {
 
 		if (rawData == null) {
 			// TODO -- delete .tdf file?
-			out.println("No features were found that matched chromosomes in genome: " + genome);
+			out.println(
+					"No features were found that matched chromosomes in genome: "
+							+ genome);
 
 		} else {
 			rawData.close();
@@ -323,7 +335,8 @@ class Preprocessor {
 			TDFGroup group = writer.getGroup("/");
 			group.setAttribute(TDFGroup.USE_PERCENTILE_AUTOSCALING, "true");
 			for (WindowFunction wf : allDataFunctions) {
-				group.setAttribute(wf.getDisplayName(), String.valueOf(allDataStats.getValue(wf)));
+				group.setAttribute(wf.getDisplayName(),
+						String.valueOf(allDataStats.getValue(wf)));
 			}
 			writer.closeFile();
 		}
@@ -429,12 +442,14 @@ class Preprocessor {
 				if (startArray.size() > 0) {
 					int[] s = startArray.toArray();
 					int[] e = endArray.toArray();
-					float[][] d = new float[dataArray.length][dataArray[0].size()];
+					float[][] d = new float[dataArray.length][dataArray[0]
+							.size()];
 					for (int i = 0; i < dataArray.length; i++) {
 						d[i] = dataArray[i].toArray();
 					}
 
-					String[] n = nameList == null ? null : nameList.toArray(new String[] {});
+					String[] n = nameList == null ? null
+							: nameList.toArray(new String[] {});
 					TDFBedTile tile = new TDFBedTile(tileStart, s, e, d, n);
 					writer.writeTile(dsName, tileNumber, tile);
 					startArray.clear();
@@ -454,9 +469,9 @@ class Preprocessor {
 	 */
 	private class Raw {
 
-		//private String chr;
+		// private String chr;
 		private String dsName;
-		//private TDFDataset dataset;
+		// private TDFDataset dataset;
 		private int tileWidth;
 		private Map<Integer, RawTile> activeTiles = new HashMap<Integer, RawTile>();
 
@@ -465,7 +480,8 @@ class Preprocessor {
 			this.tileWidth = tileWidth;
 			int nTiles = (int) (chrLength / tileWidth) + 1;
 			dsName = "/" + chr + "/raw";
-			writer.createDataset(dsName, TDFDataset.DataType.FLOAT, tileWidth, nTiles);
+			writer.createDataset(dsName, TDFDataset.DataType.FLOAT, tileWidth,
+					nTiles);
 
 		}
 
@@ -498,7 +514,8 @@ class Preprocessor {
 			for (int t = startTileNumber; t <= endTileNumber; t++) {
 				RawTile tile = activeTiles.get(t);
 				if (tile == null) {
-					tile = new RawTile(dsName, t, t * tileWidth, (t + 1) * tileWidth);
+					tile = new RawTile(dsName, t, t * tileWidth,
+							(t + 1) * tileWidth);
 					activeTiles.put(t, tile);
 				}
 				tile.addData(start, end, data, name);
@@ -543,7 +560,8 @@ class Preprocessor {
 			// Create datasets -- one for each window function
 			for (WindowFunction wf : windowFunctions) {
 				String dsName = "/" + chr + "/z" + level + "/" + wf.toString();
-				datasets.put(wf, writer.createDataset(dsName, TDFDataset.DataType.FLOAT, tileWidth, nTiles));
+				datasets.put(wf, writer.createDataset(dsName,
+						TDFDataset.DataType.FLOAT, tileWidth, nTiles));
 			}
 		}
 
@@ -599,7 +617,8 @@ class Preprocessor {
 		Accumulator[][] accumulators;
 		Map<WindowFunction, TDFDataset> datasets;
 
-		Tile(Map<WindowFunction, TDFDataset> datasets, int zoomLevel, int tileNumber, int nBins, int tileWidth) {
+		Tile(Map<WindowFunction, TDFDataset> datasets, int zoomLevel,
+				int tileNumber, int nBins, int tileWidth) {
 			this.totalCount = 0;
 			this.datasets = datasets;
 			// this.zoomLevel = zoomLevel;
@@ -616,14 +635,14 @@ class Preprocessor {
 		 * 
 		 * @param start
 		 * @param end
-		 * @param data
-		 *            array of values at this position, 1 value per track
+		 * @param data  array of values at this position, 1 value per track
 		 */
 		void addData(int start, int end, float[] data) {
 			totalCount++;
 
 			int startBin = Math.max(0, (int) ((start - tileStart) / binWidth));
-			int endBin = Math.min(nBins - 1, (int) ((end - tileStart) / binWidth));
+			int endBin = Math.min(nBins - 1,
+					(int) ((end - tileStart) / binWidth));
 
 			int tmp = (int) ((start - tileStart - maxExtFactor) / binWidth);
 
@@ -645,8 +664,8 @@ class Preprocessor {
 		}
 
 		/**
-         *
-         */
+		 *
+		 */
 		void close() {
 
 			// Count non-empty bins. All tracks should be the same
@@ -679,29 +698,34 @@ class Preprocessor {
 							if (acc != null) {
 								data[t][n] = acc.getValue(wf);
 								if (t == nTracks - 1) {
-									starts[n] = (int) (tileStart + (i * binWidth));
+									starts[n] = (int) (tileStart
+											+ (i * binWidth));
 									n++;
 								}
 							}
 						}
 					}
-					tile = new TDFVaryTile((int) tileStart, binWidth, starts, data);
+					tile = new TDFVaryTile((int) tileStart, binWidth, starts,
+							data);
 
 				} else {
 					float[][] data = new float[nTracks][nBins];
 					for (int t = 0; t < nTracks; t++) {
 						for (int i = 0; i < nBins; i++) {
-							data[t][i] = accumulators[t][i] == null ? Float.NaN : accumulators[t][i].getValue(wf);
+							data[t][i] = accumulators[t][i] == null ? Float.NaN
+									: accumulators[t][i].getValue(wf);
 						}
 					}
-					tile = new TDFFixedTile(tileStart, tileStart, binWidth, data);
+					tile = new TDFFixedTile(tileStart, tileStart, binWidth,
+							data);
 				}
 
 				String dsName = datasets.get(wf).getName();
 				try {
 					writer.writeTile(dsName, tileNumber, tile);
 				} catch (IOException iOException) {
-					log.log(Level.SEVERE, "Error writing tile: " + dsName + " [" + tileNumber + "]", iOException);
+					log.log(Level.SEVERE, "Error writing tile: " + dsName + " ["
+							+ tileNumber + "]", iOException);
 					// TODO -- replace with PreprocessorException
 					throw new RuntimeException(iOException);
 				}
@@ -719,18 +743,20 @@ class Preprocessor {
 	void count(String iFile, int maxZoomValue)
 			throws IOException, URISyntaxException {
 		setNZoom(maxZoomValue);
-		setTrackParameters("COVERAGE", null, new String[] { "forward","reverse" });
+		setTrackParameters("COVERAGE", null,
+				new String[] { "forward", "reverse" });
 		this.setSkipZeroes(true);
-		CoverageCounter aParser = new CoverageCounter(iFile, this, 1, 0, null, genome	);
+		CoverageCounter aParser = new CoverageCounter(iFile, this, 1, 0, null,
+				genome);
 //		setSizeEstimate((int) (getLength(genome.getSequences())));
 		aParser.parse();
 	}
 
 //	private HashMap<String,Sting>attributes=new HashMap<String, String>();
-	
+
 	public void setAttribute(String key, String value) {
-		attributes.put(key,value);
-		
+		attributes.put(key, value);
+
 	}
 
 //	private void preprocess(File iFile, String probeFile, int maxZoomValue) throws IOException {

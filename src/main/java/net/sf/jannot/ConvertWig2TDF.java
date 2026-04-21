@@ -119,9 +119,11 @@ public class ConvertWig2TDF {
 	/**
 	 * Called to set inital parameters. It is required that this be called prior
 	 * to writing the file
+	 * 
+	 * @throws IOException
 	 */
 	private void setTrackParameters(String trackType, String trackLine,
-			String[] trackNames) {
+			String[] trackNames) throws IOException {
 
 		if (outputFile != null && writer == null) {
 			writer = new TDFWriter(outputFile, trackName, trackType, trackLine,
