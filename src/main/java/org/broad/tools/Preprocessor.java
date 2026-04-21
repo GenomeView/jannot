@@ -20,7 +20,6 @@ package org.broad.tools;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,7 +81,6 @@ class Preprocessor {
 	private List<String> chromosomes = new ArrayList<String>();
 	private Set<String> visitedChromosomes = new HashSet<String>();
 	private Map<String, String> attributes = new HashMap<String, String>();
-	private PrintStream out = System.out;
 
 	private List<WindowFunction> allDataFunctions = Arrays.asList(
 			WindowFunction.mean, WindowFunction.median, WindowFunction.min,
@@ -98,13 +96,8 @@ class Preprocessor {
 		this.outputFile = outputFile;
 		this.genome = genome;
 		this.windowFunctions = windowFunctions;
-		// this.sizeEstimate = sizeEstimate;
-		// this.genome = genome;
 		allDataStats = new Accumulator(allDataFunctions);
 
-		// if (statusMonitor == null) {
-		// statusMonitor = new CommandLineStatusMonitor();
-		// }
 	}
 
 	final public static String CHR_ALL = "All";
@@ -123,24 +116,12 @@ class Preprocessor {
 					trackNames, windowFunctions, compressed);
 			nTracks = trackNames.length;
 
-			// Convert genome coordinates from bp to kbp
-//			int genomeLength = (int) (getLength(genome.getSequences()) / 1000);
-//			genomeZoom = new Zoom(CHR_ALL, 0, genomeLength);
-
 			TDFGroup rootGroup = writer.getRootGroup();
 			rootGroup.setAttribute("genome", genomeID);
 			rootGroup.setAttribute("maxZoom", String.valueOf(nZoom));
 
 		}
 	}
-
-//	private long getLength(List<SAMSequenceRecord> genome2) {
-//		long size = 0;
-//		for (SAMSequenceRecord e : genome2) {
-//			size += e.getSequenceLength();
-//		}
-//		return size;
-//	}
 
 	/**
 	 * Add an array of data for the given interval. The array contains a value
@@ -166,11 +147,6 @@ class Preprocessor {
 			}
 		}
 
-		// // Check for stop signal
-		// if (statusMonitor != null && statusMonitor.isInterrupted()) {
-		// throw new PreprocessingException("Preprocessing Halted.");
-		// }
-
 		if (skippedChromosomes.contains(chr)) {
 			return;
 		}
@@ -180,7 +156,6 @@ class Preprocessor {
 				String msg = "Error: Data is not sorted @ " + chr + " " + start
 						+ "  (last position = " + lastStartPosition
 						+ "   max ext factor = " + maxExtFactor + ")";
-				out.println(msg);
 				throw new RuntimeException(msg);
 			}
 		} else {
@@ -248,7 +223,6 @@ class Preprocessor {
 		if (visitedChromosomes.contains(chr)) {
 			String msg = "Error: Data is not ordered by start position. Chromosome "
 					+ chr + " appears in multiple blocks";
-			out.println(msg);
 			throw new RuntimeException(msg);
 
 		}
@@ -256,15 +230,15 @@ class Preprocessor {
 
 		SAMSequenceRecord c = genome.getSequence(chr);
 		if (c == null) {
-			out.println("Chromosome: " + chr
-					+ " not found in .genome file.  Skipping.");
+//			out.println("Chromosome: " + chr
+//					+ " not found in .genome file.  Skipping.");
 			skippedChromosomes.add(chr);
 		} else {
 
 			chromosomes.add(chr);
 
-			out.println();
-			out.println("Processing chromosome " + chr);
+//			out.println();
+//			out.println("Processing chromosome " + chr);
 			if (zoomLevels != null) {
 				for (Zoom zl : zoomLevels) {
 					zl.close();
@@ -323,9 +297,9 @@ class Preprocessor {
 
 		if (rawData == null) {
 			// TODO -- delete .tdf file?
-			out.println(
-					"No features were found that matched chromosomes in genome: "
-							+ genome);
+//			out.println(
+//					"No features were found that matched chromosomes in genome: "
+//							+ genome);
 
 		} else {
 			rawData.close();
