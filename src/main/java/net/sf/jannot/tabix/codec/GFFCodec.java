@@ -5,6 +5,7 @@ package net.sf.jannot.tabix.codec;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -12,6 +13,7 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.tabix.FeatureWrapper;
 import net.sf.jannot.tabix.TabixLine;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -25,8 +27,9 @@ public class GFFCodec extends Codec<Feature> {
 	 * @param wrapper
 	 * @param in
 	 */
-	public GFFCodec(FeatureWrapper wrapper, Iterable<TabixLine> in) {
-		super(in, 1024);
+	public GFFCodec(FeatureWrapper wrapper, Iterable<TabixLine> in,
+			Reporter log) {
+		super(in, 1024, log);
 		this.wrapper = wrapper;
 	}
 
@@ -43,19 +46,7 @@ public class GFFCodec extends Codec<Feature> {
 		else {
 
 			try {
-				// if (arr.length < 9) {
-				// arr = GFF3Parser.padGff(arr);
-				// }
 				Location l = new Location(line.getInt(3), line.getInt(4));
-				// String parent = GFF3Parser.extractParent(line.get(8));
-
-				// /* Add to existing feature */
-				// if (parent != null && parentMap.containsKey(parent) &&
-				// arr[2].equals("CDS")) {
-				//
-				// parentMap.get(parent).addLocation(l);
-				//
-				// } else {/* Add as a new feature */
 				SortedSet<Location> tmp = new TreeSet<Location>();
 				tmp.add(l);
 				f = new Feature(tmp);
@@ -73,7 +64,6 @@ public class GFFCodec extends Codec<Feature> {
 					f.setStrand(Strand.UNKNOWN);
 					break;
 				}
-				// f.addQualifier(new Qualifier("seqid", arr[0]));
 				f.addQualifier("source", line.get(1));
 				f.setType(Type.get(line.get(2)));
 				String five = line.get(5);
@@ -93,22 +83,10 @@ public class GFFCodec extends Codec<Feature> {
 							f.addQualifier("note", pair[0]);
 					}
 				}
-//				wrapper.update(f);
-				// if (parent != null && f.type() == Type.get("CDS"))
-				// parentMap.put(parent, f);
-				// String id = f.singleQualifierValue("id");
-				// assert(id!=null);
-				// idMap.put(id, f);
-				// set.getOrCreateEntry(arr[0]).annotation.add(f);
-				// FeatureAnnotation fa =
-				// set.getOrCreateEntry(arr[0]).getAnnotation(f.type());
-				// fa.add(f);
 				return f;
-				// }
 
 			} catch (Exception e) {
-				e.printStackTrace();
-				System.err.println("Could not parse line: " + line);
+				getLog().log(Level.WARNING, "can't parse line" + line, e);
 				return null;
 			}
 		}

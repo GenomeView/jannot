@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import be.abeel.util.LRUCache;
 import net.sf.jannot.tabix.TabixLine;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -14,12 +15,18 @@ import net.sf.jannot.tabix.TabixLine;
  */
 public abstract class Codec<T> implements Iterable<T> {
 
-	private Iterable<TabixLine> in;
-	protected LRUCache<TabixLine, T> lru;
+	private final Iterable<TabixLine> in;
+	protected final LRUCache<TabixLine, T> lru;
+	private final Reporter log;
 
-	public Codec(Iterable<TabixLine> in, int lruSize) {
+	public Codec(Iterable<TabixLine> in, int lruSize, Reporter log) {
 		this.in = in;
 		this.lru = new LRUCache<TabixLine, T>(lruSize);
+		this.log = log;
+	}
+
+	public Reporter getLog() {
+		return log;
 	}
 
 	/**

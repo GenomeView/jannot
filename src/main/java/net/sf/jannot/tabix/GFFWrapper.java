@@ -20,7 +20,8 @@ public class GFFWrapper extends FeatureWrapper {
 	@Override
 	public Iterable<Feature> get(int start, int end) throws IOException {
 		try {
-			return new GFFCodec(this, data.query(key, start, end));
+			return new GFFCodec(this, data.query(key, start, end),
+					data.getLog());
 
 		} catch (URISyntaxException e) {
 			throw new IOException("Failed to get GFFCodec", e);

@@ -17,15 +17,10 @@ public class PileupWrapper extends TabixWrapper<DoublePile>
 		super(key, data, idx);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get(int, int)
-	 */
 	@Override
 	public Iterable<DoublePile> get(int start, int end) throws IOException {
 		try {
-			return new PileupCodec(data.query(key, start, end));
+			return new PileupCodec(data.query(key, start, end), data.getLog());
 		} catch (URISyntaxException e) {
 			throw new IOException("can't get PileupCodec", e);
 		}

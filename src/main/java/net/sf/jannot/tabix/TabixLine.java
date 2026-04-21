@@ -80,9 +80,6 @@ public class TabixLine {
 	/**
 	 * This parses {@link #line} and fills the content of this TabixLine with
 	 * the parse results
-	 * 
-	 * @param idx
-	 * @param split
 	 */
 	private void parse() {
 		if (line.length() == 0) {

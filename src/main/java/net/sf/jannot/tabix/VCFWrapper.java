@@ -23,7 +23,8 @@ public class VCFWrapper extends TabixWrapper<Variation> {
 	@Override
 	public Iterable<Variation> get(int start, int end) throws IOException {
 		try {
-			return new VCFCodec(this, data.query(key, start, end));
+			return new VCFCodec(this, data.query(key, start, end),
+					data.getLog());
 		} catch (URISyntaxException e) {
 			throw new IOException("Can't create VCFCodec", e);
 		}

@@ -20,7 +20,7 @@ public class SWigWrapper extends TabixWrapper<Pile>
 	@Override
 	public Iterable<Pile> get(int start, int end) throws IOException {
 		try {
-			return new SWigCodec(data.query(key, start, end));
+			return new SWigCodec(data.query(key, start, end), data.getLog());
 		} catch (URISyntaxException e) {
 			throw new IOException("Can't get SWigCodec", e);
 		}

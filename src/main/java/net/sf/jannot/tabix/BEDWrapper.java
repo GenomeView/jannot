@@ -23,7 +23,8 @@ public class BEDWrapper extends FeatureWrapper {
 	@Override
 	public Iterable<Feature> get(int start, int end) throws IOException {
 		try {
-			return new BEDCodec(this, data.query(key, start, end));
+			return new BEDCodec(this, data.query(key, start, end),
+					data.getLog());
 		} catch (URISyntaxException e) {
 			throw new IOException("Failed to get BEDCodec", e);
 		}

@@ -3,17 +3,10 @@
  */
 package net.sf.jannot.variation;
 
-import java.util.HashMap;
-
-import net.sf.jannot.Feature;
-import net.sf.jannot.Location;
-import net.sf.jannot.Type;
-import net.sf.jannot.parser.BEDTools;
-import net.sf.jannot.tabix.FeatureWrapper;
 import net.sf.jannot.tabix.TabixLine;
 import net.sf.jannot.tabix.VCFWrapper;
 import net.sf.jannot.tabix.codec.Codec;
-
+import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -21,18 +14,16 @@ import net.sf.jannot.tabix.codec.Codec;
  */
 public class VCFCodec extends Codec<Variation> {
 
-	
 	private VCFWrapper wrapper;
 
 	/**
 	 * @param in
 	 */
-	public VCFCodec(VCFWrapper vcfWrapper,Iterable<TabixLine> in) {
-		super(in,1024);
-		this.wrapper=vcfWrapper;
+	public VCFCodec(VCFWrapper vcfWrapper, Iterable<TabixLine> in,
+			Reporter log) {
+		super(in, 1024, log);
+		this.wrapper = vcfWrapper;
 	}
-	
-	
 
 	/*
 	 * (non-Javadoc)
@@ -47,8 +38,7 @@ public class VCFCodec extends Codec<Variation> {
 //		f.addQualifier("ref", line.get(3));
 //		if(line.get(4).charAt(0)!='.')
 //			f.addQualifier("alt", line.get(4));
-		
-		
+
 //		wrapper.update(f);
 		return f;
 	}

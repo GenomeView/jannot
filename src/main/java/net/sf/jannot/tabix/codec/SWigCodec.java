@@ -6,6 +6,7 @@ package net.sf.jannot.tabix.codec;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.pileup.PileTools;
 import net.sf.jannot.tabix.TabixLine;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -16,8 +17,8 @@ public class SWigCodec extends Codec<Pile> {
 	/**
 	 * @param in
 	 */
-	public SWigCodec(Iterable<TabixLine> in) {
-		super(in, 15000);
+	public SWigCodec(Iterable<TabixLine> in, Reporter log) {
+		super(in, 15000, log);
 	}
 
 	@Override

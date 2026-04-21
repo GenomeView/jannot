@@ -6,19 +6,19 @@ package net.sf.jannot.tabix.codec;
 import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.ReadDetailPile;
 import net.sf.jannot.tabix.TabixLine;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
  * 
  */
 public class PileupCodec extends Codec<DoublePile> {
-	
 
 	/**
 	 * @param in
 	 */
-	public PileupCodec(Iterable<TabixLine> in) {
-		super(in,15000);
+	public PileupCodec(Iterable<TabixLine> in, Reporter log) {
+		super(in, 15000, log);
 	}
 
 	/*
