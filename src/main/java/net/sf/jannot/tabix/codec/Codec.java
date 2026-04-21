@@ -5,8 +5,8 @@ package net.sf.jannot.tabix.codec;
 
 import java.util.Iterator;
 
-import net.sf.jannot.tabix.TabixLine;
 import be.abeel.util.LRUCache;
+import net.sf.jannot.tabix.TabixLine;
 
 /**
  * @author Thomas Abeel
@@ -16,16 +16,14 @@ public abstract class Codec<T> implements Iterable<T> {
 
 	private Iterable<TabixLine> in;
 	protected LRUCache<TabixLine, T> lru;
-	
-	public Codec(Iterable<TabixLine> in,int lruSize) {
+
+	public Codec(Iterable<TabixLine> in, int lruSize) {
 		this.in = in;
-		this.lru=new LRUCache<TabixLine, T>(lruSize);
+		this.lru = new LRUCache<TabixLine, T>(lruSize);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Iterable#iterator()
+	/**
+	 * @return an iterator over WHAT?
 	 */
 	@Override
 	public Iterator<T> iterator() {
@@ -34,7 +32,7 @@ public abstract class Codec<T> implements Iterable<T> {
 
 	/**
 	 * @param next
-	 * @return
+	 * @return the next <T> parsed from a {@link TabixLine}
 	 */
 	public abstract T parse(TabixLine next);
 
@@ -49,31 +47,16 @@ public abstract class Codec<T> implements Iterable<T> {
 			this.it = in.iterator();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.Iterator#hasNext()
-		 */
 		@Override
 		public boolean hasNext() {
 			return it.hasNext();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.Iterator#next()
-		 */
 		@Override
 		public T next() {
 			return parse(it.next());
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.Iterator#remove()
-		 */
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();

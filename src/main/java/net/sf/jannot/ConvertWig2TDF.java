@@ -382,7 +382,7 @@ public class ConvertWig2TDF {
 					}
 				}
 			} catch (IOException ex) {
-				ex.printStackTrace();
+				log.log(Level.WARNING, "falied to close tile", ex);
 			}
 		}
 	}

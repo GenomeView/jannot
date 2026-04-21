@@ -20,23 +20,13 @@ public class BEDWrapper extends FeatureWrapper {
 		super(key, data, idx);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get(int, int)
-	 */
 	@Override
-	public Iterable<Feature> get(int start, int end) {
+	public Iterable<Feature> get(int start, int end) throws IOException {
 		try {
 			return new BEDCodec(this, data.query(key, start, end));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("Failed to get BEDCodec", e);
 		}
-		return null;
 	}
 
 }

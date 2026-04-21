@@ -491,11 +491,11 @@ public class IndexedFeatureFile extends DataSource {
 			// SAMRecord record = iter.next();
 			// System.out.println("Processing: " + record.line());
 			// Range of tile indices that this alignment contributes to.
-			int aStart = record.beg;// record.getAlignmentStart();
-			int aEnd = record.end;// getAlignmentEnd();// record.getEnd();
+			int aStart = record.getBegin();// record.getAlignmentStart();
+			int aEnd = record.getEnd();// getAlignmentEnd();// record.getEnd();
 			int idx0 = Math.max(0, (aStart - start) / tileSize);
 			int idx1 = Math.min(tiles.size() - 1,
-					(record.end - start) / tileSize);
+					(record.getEnd() - start) / tileSize);
 
 			// Loop over tiles this read overlaps
 			for (int i = idx0; i <= idx1; i++) {
@@ -602,7 +602,7 @@ public class IndexedFeatureFile extends DataSource {
 				TabixLine intv = this.readParsedLine(in, tid, beg, end);// Line(in);
 				if (intv == null)
 					break;
-				if (intv.end > end)
+				if (intv.getEnd() > end)
 					break;
 				// System.out.println("Raw line: " + intv.line());
 				// System.out.println("\t" + intv.line().length());
@@ -614,15 +614,15 @@ public class IndexedFeatureFile extends DataSource {
 				// seeking beyond the requested end yet
 				// and the found entry overlaps with our request: we found a GFF
 				// entry.
-				if (intv.meta)
+				if (intv.isMeta())
 					continue;
 				else
 				// if (line.charAt(0) != idx.meta) {
 				// try {
 				// //ParsedLine intv = get_intv(line);
 				// // log.info("$"+intv.beg+" "+intv.end+"$-"+line);
-				if (intv.tid == tid && intv.beg < end) {
-					if (is_overlap(beg, end, intv.beg, intv.end)) {
+				if (intv.getTid() == tid && intv.getBegin() < end) {
+					if (is_overlap(beg, end, intv.getBegin(), intv.getEnd())) {
 						output.add(intv);
 					}
 				}
@@ -647,21 +647,16 @@ public class IndexedFeatureFile extends DataSource {
 	 * @param end
 	 * @param beg
 	 * @param tid
-	 * @return
-	 * @throws IOException
+	 * @return TabixLine, or null if no more input available.
+	 * @throws IOException if reading fails completely
 	 */
 	private TabixLine readParsedLine(LineBlockCompressedInputStream in, int tid,
 			int beg, int end) throws IOException {
 
-		TabixLine p = new TabixLine();
-
 		String line = in.readLine();
 		if (line == null)
 			return null;
-		p.setLine(line);
-		p.parse(idx, '\t');
-
-		return p;
+		return new TabixLine(line, idx, '\t');
 	}
 
 	// /**

@@ -54,49 +54,6 @@ public class URLSource extends AbstractStreamDataSource {
 
 	}
 
-//	@Override
-//	public void saveOwn(EntrySet entries) throws SaveFailedException {
-//		try {
-//			System.out.println(url.getProtocol() + "://" + url.getHost() + url.getPath());
-//			url = new URL(url.getProtocol() + "://" + url.getHost() + url.getPath());
-//			File tmp = File.createTempFile("GenomeView", "save");
-//			tmp.deleteOnExit();
-//			OutputStream os = new FileOutputStream(tmp);
-//			for (Entry e : entries) {
-//				super.getParser().write(os, e, this);
-//			}
-//			os.close();
-//			LineIterator it = new LineIterator(tmp);
-//			System.out.println("-------");
-//			System.out.println("Uploaded file:");
-//			for (String line : it)
-//				System.out.println(line);
-//			System.out.println("---EOF---");
-//			it.close();
-//
-//			String reply = ClientHttpUpload.upload(tmp, url);
-//			System.out.println("SERVER REPLY: " + reply);
-//			// TODO add more checks on the reply.
-//			if (reply.equals("")) {
-//
-//				throw new SaveFailedException("Empty reply from server");
-//
-//			}
-//			if (reply.toLowerCase().contains("error")) {
-//				JOptionPane.showMessageDialog(null, reply);
-//				throw new SaveFailedException("Error reply from server");
-//
-//			}
-//			JOptionPane.showMessageDialog(null, reply);
-//
-//		} catch (IOException e) {
-//
-//			e.printStackTrace();
-//			throw new SaveFailedException("IOException");
-//		}
-//
-//	}
-
 	public URL getURL() {
 		return url;
 	}
@@ -106,11 +63,6 @@ public class URLSource extends AbstractStreamDataSource {
 		return url.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.source.DataSource#isIndexed()
-	 */
 	@Override
 	public boolean isIndexed() {
 		return false;
@@ -124,11 +76,5 @@ public class URLSource extends AbstractStreamDataSource {
 			cachedSize = url.openConnection().getContentLength();
 		return cachedSize;
 	}
-
-//	@Override
-//	public boolean isDestructiveSave() {
-//
-//		return false;
-//	}
 
 }

@@ -23,12 +23,13 @@ public interface Data<K> {
 	 * @param end   the end coordinate, this one will not be included. This is a
 	 *              one-based coordinate.
 	 * @return the selected data.
+	 * @throws IOException if there is a serious problem
 	 */
 	public Iterable<K> get(int start, int end) throws IOException;
 
 	/**
-	 * 
 	 * @return {@link Iterable} over all data
+	 * @throws IOException if there is a serious problem
 	 */
 	public Iterable<K> get() throws IOException;
 

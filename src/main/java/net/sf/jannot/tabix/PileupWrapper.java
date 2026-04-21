@@ -10,7 +10,8 @@ import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.PileNormalization;
 import net.sf.jannot.tabix.codec.PileupCodec;
 
-public class PileupWrapper extends TabixWrapper<DoublePile> implements PileNormalization {
+public class PileupWrapper extends TabixWrapper<DoublePile>
+		implements PileNormalization {
 
 	PileupWrapper(String key, IndexedFeatureFile data, TabIndex idx) {
 		super(key, data, idx);
@@ -22,17 +23,12 @@ public class PileupWrapper extends TabixWrapper<DoublePile> implements PileNorma
 	 * @see net.sf.jannot.Data#get(int, int)
 	 */
 	@Override
-	public Iterable<DoublePile> get(int start, int end) {
+	public Iterable<DoublePile> get(int start, int end) throws IOException {
 		try {
 			return new PileupCodec(data.query(key, start, end));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("can't get PileupCodec", e);
 		}
-		return null;
 	}
 
 	@Override

@@ -7,42 +7,24 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import net.sf.jannot.Feature;
-import net.sf.jannot.FeatureAnnotation;
-import net.sf.jannot.Location;
 import net.sf.jannot.tabix.codec.GFFCodec;
+
 /**
  */
-public class GFFWrapper extends FeatureWrapper  {
+public class GFFWrapper extends FeatureWrapper {
 
 	public GFFWrapper(String key, IndexedFeatureFile data, TabIndex idx) {
 		super(key, data, idx);
 	}
 
-
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get(int, int)
-	 */
 	@Override
-	public Iterable<Feature> get(int start, int end) {
+	public Iterable<Feature> get(int start, int end) throws IOException {
 		try {
-			return new GFFCodec(this,data.query(key, start, end));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return new GFFCodec(this, data.query(key, start, end));
+
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("Failed to get GFFCodec", e);
 		}
-		return null;
 	}
-
-
-
-	
-
-
 
 }
