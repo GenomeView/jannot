@@ -26,6 +26,7 @@ import net.sf.jannot.Type;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.nameservice.NameService;
 import support.DataManager;
 import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;
@@ -36,11 +37,13 @@ import tudelft.utilities.logging.Reporter;
  * 
  */
 public class TestGTFParser {
-	private static Reporter log = new ReportToLogger(
-			TestGTFParser.class.toString());
 
 	@Test
 	public void testParserMini() throws Exception {
+
+		Reporter log = new ReportToLogger(TestGTFParser.class.toString());
+		NameService.init(log);
+
 		File f = DataManager.file("doubleScore.gtf");
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 		EntrySet es = ds.read();

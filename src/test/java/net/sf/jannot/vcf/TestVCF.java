@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,12 +11,15 @@ import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import net.sf.jannot.variation.Variation;
+import net.sf.nameservice.NameService;
 import support.DataManager;
 import tudelft.utilities.logging.ReportToLogger;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * IMPORTANT!!!: This test requires the data in test/resource to be prepared.
@@ -31,15 +33,10 @@ import tudelft.utilities.logging.ReportToLogger;
  */
 public class TestVCF {
 
-	// private String[] files =DataManager.vcfFiles();
-
 	@Before
-	public void init() {
-	}
-
-	@After
-	public void destroy() {
-
+	public void init() throws ReadFailedException {
+		Reporter log = new ReportToLogger((getClass().getSimpleName()));
+		NameService.init(log);
 	}
 
 	@Test

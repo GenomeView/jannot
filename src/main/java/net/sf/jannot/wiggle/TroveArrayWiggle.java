@@ -55,21 +55,11 @@ public class TroveArrayWiggle extends AbstractWiggle
 			min = value;
 		// try {
 		blob.put(position, value);
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 	}
 
 	public void init() {
 		super.init(this);
 	}
-
-	//
-	// @Override
-	// public String getName() {
-	// return name;
-	// }
 
 	/**
 	 * @return copy of data from start (inclusive) to end (exclusive)
@@ -85,14 +75,7 @@ public class TroveArrayWiggle extends AbstractWiggle
 		if (start < 0)
 			start = 0;
 		for (int i = start; i < end; i++)
-			// try {
 			out[i - start] = blob.get(i);
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// blob.getFloat(out, start, len);
-		// System.arraycopy(fb.capacity(), start, out, 0, len);
 		return out;
 	}
 
@@ -118,13 +101,7 @@ public class TroveArrayWiggle extends AbstractWiggle
 	 */
 	@Override
 	public float value(int pos) {
-//		try {
 		return blob.get(pos - 1);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}// buffer[pos - 1];
-//		return -1;
 	}
 
 	@Override
@@ -132,11 +109,6 @@ public class TroveArrayWiggle extends AbstractWiggle
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#canSave()
-	 */
 	@Override
 	public boolean canSave() {
 		return false;
@@ -154,31 +126,16 @@ public class TroveArrayWiggle extends AbstractWiggle
 			this.daw = blob;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.Iterator#hasNext()
-		 */
 		@Override
 		public boolean hasNext() {
 			return currentIdx <= daw.size();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.Iterator#next()
-		 */
 		@Override
 		public Float next() {
 			return daw.value(currentIdx++);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.Iterator#remove()
-		 */
 		@Override
 		public void remove() {
 			throw new RuntimeException("Does not work");

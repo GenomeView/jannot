@@ -66,7 +66,7 @@ public class EntrySet implements Iterable<Entry> {
 	 * @return an Entry that has the key as id.
 	 */
 	public synchronized Entry getOrCreateEntry(String key) {
-		key = NameService.getPrimaryName(key);
+		key = NameService.instance().getPrimaryName(key);
 		if (mapGet(key) == null) {
 			Entry e = new Entry(key);
 			map.put(key, e);
@@ -81,7 +81,7 @@ public class EntrySet implements Iterable<Entry> {
 	}
 
 	public synchronized Entry getEntry(String string) {
-		return mapGet(NameService.getPrimaryName(string));
+		return mapGet(NameService.instance().getPrimaryName(string));
 
 	}
 

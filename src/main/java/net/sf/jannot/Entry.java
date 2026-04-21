@@ -64,7 +64,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	 *           NameService. Must not be null
 	 */
 	public Entry(String id) {
-		id = NameService.getPrimaryName(id);
+		id = NameService.instance().getPrimaryName(id);
 		if (id == null)
 			throw new RuntimeException("id is null");
 		this.id = id;
