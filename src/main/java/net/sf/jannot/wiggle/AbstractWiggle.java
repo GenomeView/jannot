@@ -3,6 +3,8 @@
  */
 package net.sf.jannot.wiggle;
 
+import java.io.IOException;
+
 import net.sf.jannot.utils.ArrayIterable;
 
 /**
@@ -11,20 +13,22 @@ import net.sf.jannot.utils.ArrayIterable;
  *
  */
 public abstract class AbstractWiggle implements Graph, Query {
-	
-	public String label(){
+
+	public String label() {
 		return "wiggle";
 	}
-	
+
 	private FloatCache buffer5 = null;
 
-	private int lastStart=-1,lastEnd=-1,lastRes=-1;
-	private float[]last=null;
+	private int lastStart = -1, lastEnd = -1, lastRes = -1;
+	private float[] last = null;
+
 	@Override
-	public float[] get(int start, int end, int resolutionIndex) {
-		if(buffer5==null)
+	public float[] get(int start, int end, int resolutionIndex)
+			throws IOException {
+		if (buffer5 == null)
 			throw new RuntimeException("Wiggle needs to be initialized!");
-		if(lastStart==start&&lastEnd==end&&lastRes==resolutionIndex)
+		if (lastStart == start && lastEnd == end && lastRes == resolutionIndex)
 			return last;
 		if (resolutionIndex < 5) {
 			last = getRawRange(start, end);
@@ -57,9 +61,6 @@ public abstract class AbstractWiggle implements Graph, Query {
 		return out;
 	}
 
-//	@Override
-//	public abstract String getName();
-
 	@Override
 	public abstract float max();
 
@@ -67,27 +68,20 @@ public abstract class AbstractWiggle implements Graph, Query {
 	public abstract float min();
 
 	@Override
-	public abstract float[] getRawRange(int start, int end);
+	public abstract float[] getRawRange(int start, int end) throws IOException;
 
 	@Override
 	public abstract long size();
 
 	public void init(Query source) {
-		buffer5=new FloatCache(source);
-		
-	}
-	
-	
+		buffer5 = new FloatCache(source);
 
-	/* (non-Javadoc)
-	 * @see net.sf.jannot.Data#get(int, int)
-	 */
+	}
+
 	@Override
-	public Iterable<Float> get(int start, int end) {
-		float[]out=getRawRange(start, end);
+	public Iterable<Float> get(int start, int end) throws IOException {
+		float[] out = getRawRange(start, end);
 		return new ArrayIterable<Float>(out);
 	}
-	
-	
-	
+
 }

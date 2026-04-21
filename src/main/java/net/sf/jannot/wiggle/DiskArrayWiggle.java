@@ -32,45 +32,19 @@ public class DiskArrayWiggle extends AbstractWiggle implements Iterable<Float> {
 	private int size;
 
 	public DiskArrayWiggle(int size) throws IOException {
-		this.size=size;
+		this.size = size;
 		System.out.println("Mapping: " + size * 4);
 		blob = new BinaryBlob(size * 4);
 		System.out.println("Mapping successfull!");
 
 	}
 
-	/**
-	 * Zero based coordinate
-	 * 
-	 * @param position
-	 * @param value
-	 */
-	public void set(int position, float value) {
-
-		if (value > max)
-			max = value;
-		if (value < min)
-			min = value;
-		try {
-			blob.putFloat(position * 4, value);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	public void init() {
 		super.init(this);
 	}
 
-	//
-	// @Override
-	// public String getName() {
-	// return name;
-	// }
-
 	@Override
-	public float[] getRawRange(int start, int end) {
+	public float[] getRawRange(int start, int end) throws IOException {
 		if (start >= size)
 			return new float[0];
 		float[] out = new float[end - start];
@@ -79,15 +53,8 @@ public class DiskArrayWiggle extends AbstractWiggle implements Iterable<Float> {
 			len = size - start;
 		if (start < 0)
 			start = 0;
-		for(int i=start;i<end;i++)
-			try {
-				out[i-start]=blob.getFloat(i*4);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-//		blob.getFloat(out, start, len);
-		// System.arraycopy(fb.capacity(), start, out, 0, len);
+		for (int i = start; i < end; i++)
+			out[i - start] = blob.getFloat(i * 4);
 		return out;
 	}
 
@@ -118,7 +85,7 @@ public class DiskArrayWiggle extends AbstractWiggle implements Iterable<Float> {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}// buffer[pos - 1];
+		} // buffer[pos - 1];
 		return -1;
 	}
 

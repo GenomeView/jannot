@@ -3,6 +3,8 @@
  */
 package net.sf.jannot.wiggle;
 
+import java.io.IOException;
+
 import net.sf.jannot.Data;
 
 /**
@@ -24,7 +26,8 @@ public interface Graph extends Data<Float> {
 	 * @param end             zero based coordinate of the end, non-inclusive
 	 * @param resolutionIndex index of the desired resolution
 	 */
-	public float[] get(int start, int end, int resolutionIndex);
+	public float[] get(int start, int end, int resolutionIndex)
+			throws IOException;
 
 	public float min();
 
