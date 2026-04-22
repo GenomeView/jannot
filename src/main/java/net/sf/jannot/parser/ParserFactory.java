@@ -53,7 +53,7 @@ public abstract class ParserFactory {
 	}
 
 	/**
-	 * public method for {@link #findParser(InputStream, Object)}
+	 * public entry for {@link #findParser(InputStream, Object, Reporter)}
 	 * 
 	 * @param is     the inputstream of the data to parse
 	 * @param source the filename or so representing the original source. Some

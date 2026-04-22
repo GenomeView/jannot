@@ -29,6 +29,7 @@ import net.sf.jannot.SyntenicData;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.nameservice.NameService;
 import support.DataManager;
 import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;
@@ -40,6 +41,7 @@ public class TestSyntenicParser {
 
 	@Test
 	public void testParserMini() throws Exception {
+		NameService.init(log);
 		File f = DataManager.file(SYN_FILE);
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
 		EntrySet es = ds.read();

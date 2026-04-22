@@ -66,8 +66,8 @@ class CoverageCounter {
 
 	private SAMSequenceDictionary genome;
 
-	CoverageCounter(String alignmentFile, Preprocessor consumer, int windowSize, int extFactor, File wigFile,
-			SAMSequenceDictionary genome2) {
+	CoverageCounter(String alignmentFile, Preprocessor consumer, int windowSize,
+			int extFactor, File wigFile, SAMSequenceDictionary genome2) {
 		/* This should be a BAM file */
 		this.alignmentFile = alignmentFile;
 		this.consumer = consumer;
@@ -81,15 +81,18 @@ class CoverageCounter {
 
 	private boolean passFilter(SAMRecord alignment) {
 
-		return !alignment.getReadUnmappedFlag() && !alignment.getDuplicateReadFlag()
+		return !alignment.getReadUnmappedFlag()
+				&& !alignment.getDuplicateReadFlag()
 				&& alignment.getMappingQuality() >= minMappingQuality;
 	}
 
 	void parse() throws IOException, URISyntaxException {
 
-		int tolerance = (int) (windowSize * (Math.floor(extFactor / windowSize) + 2));
+		int tolerance = (int) (windowSize
+				* (Math.floor(extFactor / windowSize) + 2));
 
-		SamReader sfr = SamReaderFactory.makeDefault().open(new File(alignmentFile));
+		SamReader sfr = SamReaderFactory.makeDefault()
+				.open(new File(alignmentFile));
 
 		// DataSourceFactory.createFile(new File(alignmentFile +
 		// ".bai")).read(genome);
@@ -98,7 +101,8 @@ class CoverageCounter {
 		ReadCounter counter = null;
 
 		for (SAMSequenceRecord e : genome.getSequences()) {
-			SAMRecordIterator it = sfr.queryOverlapping(e.getSequenceName(), 1, e.getSequenceLength());
+			SAMRecordIterator it = sfr.queryOverlapping(e.getSequenceName(), 1,
+					e.getSequenceLength());
 			// for (DataKey dk : e) {
 			// Data<?> data = e.get(dk);
 			// if (data instanceof ReadGroup) {
@@ -113,7 +117,8 @@ class CoverageCounter {
 
 					if (alignmentChr.equals(lastChr)) {
 						if (counter != null) {
-							counter.closeBucketsBefore(alignment.getAlignmentStart() - tolerance);
+							counter.closeBucketsBefore(
+									alignment.getAlignmentStart() - tolerance);
 						}
 					} else {
 						if (counter != null) {
@@ -123,15 +128,18 @@ class CoverageCounter {
 						lastChr = alignmentChr;
 					}
 
-					AlignmentBlock[] blocks = alignment.getAlignmentBlocks().toArray(new AlignmentBlock[0]);
+					AlignmentBlock[] blocks = alignment.getAlignmentBlocks()
+							.toArray(new AlignmentBlock[0]);
 					if (blocks != null) {
 						for (AlignmentBlock block : blocks) {
 
 							int adjustedStart = block.getReferenceStart();// block.getStart();
 							// FIXME Is this the correct coordinate?
-							int adjustedEnd = block.getReferenceStart() + block.getLength();// block.getEnd();
+							int adjustedEnd = block.getReferenceStart()
+									+ block.getLength();// block.getEnd();
 							if (alignment.getReadNegativeStrandFlag()) {
-								adjustedStart = Math.max(0, adjustedStart - extFactor);
+								adjustedStart = Math.max(0,
+										adjustedStart - extFactor);
 							} else {
 								adjustedEnd += extFactor;
 							}
@@ -149,7 +157,8 @@ class CoverageCounter {
 						// FIXME is this correct?
 						int adjustedEnd = alignment.getAlignmentEnd();
 						if (alignment.getReadNegativeStrandFlag()) {
-							adjustedStart = Math.max(0, adjustedStart - extFactor);
+							adjustedStart = Math.max(0,
+									adjustedStart - extFactor);
 						} else {
 							adjustedEnd += extFactor;
 						}
@@ -205,7 +214,7 @@ class CoverageCounter {
 			counts.get(bucket).incrementNeg();
 		}
 
-		void closeBucketsBefore(int position) {
+		void closeBucketsBefore(int position) throws IOException {
 			List<Integer> bucketsToClose = new ArrayList<Integer>();
 
 			Integer bucket = position / windowSize;
@@ -221,15 +230,19 @@ class CoverageCounter {
 					if (genome != null) {
 						SAMSequenceRecord chromosome = genome.getSequence(chr);
 						if (chromosome != null) {
-							bucketEndPosition = Math.min(bucketEndPosition, chromosome.getSequenceLength());
+							bucketEndPosition = Math.min(bucketEndPosition,
+									chromosome.getSequenceLength());
 						}
 					}
 					int bucketSize = bucketEndPosition - bucketStartPosition;
 
-					buffer[0] = ((float) entry.getValue().getCount()) / bucketSize;
-					buffer[1] = ((float) entry.getValue().getNegCount()) / bucketSize;
+					buffer[0] = ((float) entry.getValue().getCount())
+							/ bucketSize;
+					buffer[1] = ((float) entry.getValue().getNegCount())
+							/ bucketSize;
 
-					consumer.addData(chr, bucketStartPosition, bucketEndPosition, buffer, null);
+					consumer.addData(chr, bucketStartPosition,
+							bucketEndPosition, buffer, null);
 
 					bucketsToClose.add(entry.getKey());
 				}

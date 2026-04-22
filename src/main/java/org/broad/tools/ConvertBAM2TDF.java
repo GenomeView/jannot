@@ -22,11 +22,14 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Level;
 
 import org.broad.igv.track.WindowFunction;
 
 import htsjdk.samtools.SamReaderFactory;
 import htsjdk.samtools.ValidationStringency;
+import tudelft.utilities.logging.ReportToLogger;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Program to create tdf files from bam files.
@@ -36,34 +39,43 @@ import htsjdk.samtools.ValidationStringency;
  */
 public class ConvertBAM2TDF {
 
-	public static void main(String[] args) throws Exception {
-		if (args.length == 0) {
-			printUsage();
-		}
+	private final Reporter log;
+
+	public ConvertBAM2TDF(String[] args, Reporter log) {
+		this.log = log;
 		for (String s : args) {
 			if (!new File(s + ".bai").exists()) {
-				System.err.println("WARNING: Could not find BAI file for " + s);
-				System.err.println(
-						"\ttdformat needs a BAI file for each BAM file.");
+				log.log(Level.WARNING, "Could not find BAI file for " + s
+						+ ". tdformat needs a BAI file for each BAM file.");
 			} else {
 				try {
 					createFile(s);
 				} catch (Exception e) {
-					System.err.println(
-							"ERROR: Failed to create TDF file for " + s);
+					log.log(Level.SEVERE, "Failed to create TDF file for " + s);
 				}
 			}
 		}
 	}
 
+	public static void main(String[] args) {
+		if (args.length == 0) {
+			printUsage();
+			return;
+		}
+
+		new ConvertBAM2TDF(args,
+				new ReportToLogger(ConvertBAM2TDF.class.getSimpleName()));
+	}
+
 	private static void printUsage() {
+
 		System.out.println(
 				"Usage: java -jar tdformat-<version>.jar <bam file 1> [<bam file 2> ...]");
 		System.out.println("\ttdformat needs a BAI file for each BAM file.");
 
 	}
 
-	private static void createFile(String ifile)
+	private void createFile(String ifile)
 			throws IOException, URISyntaxException {
 		Collection<WindowFunction> wfs = new ArrayList<WindowFunction>();
 		for (WindowFunction wf : WindowFunction.values())
@@ -71,7 +83,7 @@ public class ConvertBAM2TDF {
 		// FIXME we should not set the default validation stringency
 		SamReaderFactory
 				.setDefaultValidationStringency(ValidationStringency.SILENT);
-		TDFTools igvTools = new TDFTools();
+		TDFTools igvTools = new TDFTools(log);
 		igvTools.doCount(ifile, ifile + ".tdf", wfs);
 
 	}

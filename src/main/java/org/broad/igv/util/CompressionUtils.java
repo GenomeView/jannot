@@ -69,14 +69,10 @@ public class CompressionUtils {
 				decompressor.setInput(data, offset, rem);
 			}
 
-//            try {
 			int count = decompressor.inflate(outbuf, 0, outbuf.length);
 			rem = decompressor.getRemaining();
 			bos.write(outbuf, 0, count);
 
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
 		}
 
 		try {

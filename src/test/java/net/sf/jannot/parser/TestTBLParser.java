@@ -26,6 +26,7 @@ import net.sf.jannot.Type;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.nameservice.NameService;
 import support.DataManager;
 import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;
@@ -36,6 +37,7 @@ public class TestTBLParser {
 
 	@Test
 	public void testParserMini() throws Exception {
+		NameService.init(log);
 		File f = DataManager.file("sequin.tbl");
 		// following is copy of another test.
 		// It was expected to fail but apparently works. No idea what it does...

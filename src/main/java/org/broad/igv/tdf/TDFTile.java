@@ -52,11 +52,8 @@ public interface TDFTile {
 	public void writeTo(BufferedByteWriter fos) throws IOException;
 
 	/**
-	 * Returns the number of values that are available for each position in
-	 * this Tile.
-	 * 
-	 * @param i
-	 * @return
+	 * @return the number of values that are available for each position in this
+	 *         Tile.
 	 */
 	public int noValues();
 

@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.broad.igv.tdf.TDFBedTile;
 import org.broad.igv.tdf.TDFDataset;
@@ -48,6 +47,7 @@ import org.broad.igv.util.collections.IntArrayList;
 
 import htsjdk.samtools.SAMSequenceDictionary;
 import htsjdk.samtools.SAMSequenceRecord;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -56,7 +56,6 @@ import htsjdk.samtools.SAMSequenceRecord;
  */
 class Preprocessor {
 
-	private static Logger log = Logger.getLogger(Preprocessor.class.toString());
 	private boolean compressed = true;
 	private boolean skipZeroes = false;
 	private int nZoom = 7;
@@ -88,9 +87,12 @@ class Preprocessor {
 			WindowFunction.percentile10, WindowFunction.percentile90,
 			WindowFunction.percentile98);
 	private String genomeID;
+	private final Reporter log;
 
 	Preprocessor(String genomeID, File outputFile, SAMSequenceDictionary genome,
-			Collection<WindowFunction> windowFunctions, int sizeEstimate) {
+			Collection<WindowFunction> windowFunctions, int sizeEstimate,
+			Reporter log) {
+		this.log = log;
 		this.genomeID = genomeID;
 		// this.statusMonitor = monitor;
 		this.outputFile = outputFile;
@@ -127,8 +129,11 @@ class Preprocessor {
 	 * Add an array of data for the given interval. The array contains a value
 	 * for each sample/track in this dataset. The name is an optional probe or
 	 * feature name.
+	 * 
+	 * @throws IOException if problem occurs
 	 */
-	void addData(String chr, int start, int end, float[] data, String name) {
+	void addData(String chr, int start, int end, float[] data, String name)
+			throws IOException {
 
 		if (writer == null) {
 			return;
@@ -153,10 +158,10 @@ class Preprocessor {
 
 		if (currentChr != null && chr.equals(currentChr)) {
 			if (start < (lastStartPosition - maxExtFactor)) {
-				String msg = "Error: Data is not sorted @ " + chr + " " + start
-						+ "  (last position = " + lastStartPosition
-						+ "   max ext factor = " + maxExtFactor + ")";
-				throw new RuntimeException(msg);
+				throw new RuntimeException(
+						"Error: Data is not sorted @ " + chr + " " + start
+								+ "  (last position = " + lastStartPosition
+								+ "   max ext factor = " + maxExtFactor + ")");
 			}
 		} else {
 			newChromosome(chr);
@@ -171,9 +176,10 @@ class Preprocessor {
 		int chrLength = genome.getSequence(chr).getSequenceLength(); // genome.getChromosome(chr).getLength();
 
 		if (start > chrLength) {
-			log.info("Ignoring data from non-existent locus.  Probe = " + name
-					+ "  Locus = " + chr + ":" + start + "-" + end + ". " + chr
-					+ " length = " + chrLength);
+			log.log(Level.INFO,
+					"Ignoring data from non-existent locus.  Probe = " + name
+							+ "  Locus = " + chr + ":" + start + "-" + end
+							+ ". " + chr + " length = " + chrLength);
 			return;
 		}
 
@@ -202,28 +208,18 @@ class Preprocessor {
 
 	}
 
-//	private long getCumulativeOffset(SAMSequenceDictionary genome, String chr) {
-//		//TODO check this implementation, I don't use this ~~Thomas
-//		long pos=0;
-//		for(SAMSequenceRecord sr:genome.getSequences()){
-//			if(sr.getSequenceName().equals(chr))
-//				return pos;
-//			pos+=sr.getSequenceLength();
-//		}
-//		// Did not find the specified ID.
-//		return -1;
-//	}
-
 	/**
 	 * Start a new chromosome. Note that data is sorted by chromosome, then
 	 * start position.
+	 * 
+	 * @throws IOException if problem occurs
 	 */
-	private void newChromosome(String chr) {
+	private void newChromosome(String chr) throws IOException {
 
 		if (visitedChromosomes.contains(chr)) {
 			String msg = "Error: Data is not ordered by start position. Chromosome "
 					+ chr + " appears in multiple blocks";
-			throw new RuntimeException(msg);
+			throw new IOException(msg);
 
 		}
 		visitedChromosomes.add(chr);
@@ -261,14 +257,7 @@ class Preprocessor {
 
 	}
 
-	// /**
-	// * Called at end-of-file
-	// */
-	// private void parsingComplete() {
-	//
-	// }
-
-	void finish() {
+	void finish() throws IOException {
 		if (writer == null) {
 			return;
 		}
@@ -322,26 +311,6 @@ class Preprocessor {
 		// }
 	}
 
-//	private void setType(String type) {
-//		// this.type = type;
-//	}
-//
-//	private void setSortTolerance(int tolerance) {
-//		maxExtFactor = tolerance;
-//	}
-//
-//	private void setAttribute(String key, String value) {
-//		attributes.put(key, value);
-//	}
-
-//	/**
-//	 * @param sizeEstimate
-//	 *            the sizeEstimate to set
-//	 */
-//	private void setSizeEstimate(int sizeEstimate) {
-//		this.sizeEstimate = sizeEstimate;
-//	}
-
 	private void setSkipZeroes(boolean skipZeroes) {
 		this.skipZeroes = skipZeroes;
 	}
@@ -353,10 +322,6 @@ class Preprocessor {
 	private void setNZoom(int nZoom) {
 		this.nZoom = nZoom;
 	}
-//
-//	private int getSizeEstimate() {
-//		return sizeEstimate;
-//	}
 
 	/**
 	 * Class representing a tile of raw (as opposed to summarized) data.
@@ -387,12 +352,12 @@ class Preprocessor {
 		void addData(int start, int end, float[] data, String name) {
 
 			if (start > tileEnd) {
-				log.info("Warning: start position > tile end");
+				log.log(Level.WARNING, "start position > tile end");
 
 			}
 
 			if (end < tileStart) {
-				log.info("Warning: end position > tile end");
+				log.log(Level.WARNING, "end position > tile end");
 			}
 
 			if (name != null && nameList == null) {
@@ -433,7 +398,7 @@ class Preprocessor {
 					}
 				}
 			} catch (IOException ex) {
-				ex.printStackTrace();
+				log.log(Level.WARNING, "TDFBedTile close failed", ex);
 			}
 		}
 	}
@@ -495,15 +460,6 @@ class Preprocessor {
 				tile.addData(start, end, data, name);
 			}
 
-			// Update progress -- assume uniform distribution
-			// if (statusMonitor != null) {
-			// int p = (int) ((100.0 * nPtsProcessed) / (1.5 *
-			// getSizeEstimate()));
-			// if (p > percentComplete) {
-			// percentComplete = p;
-			// statusMonitor.setPercentComplete(percentComplete);
-			// }
-			// }
 			nPtsProcessed++;
 		}
 
@@ -539,7 +495,8 @@ class Preprocessor {
 			}
 		}
 
-		private void addData(int start, int end, float[] data) {
+		private void addData(int start, int end, float[] data)
+				throws IOException {
 
 			int startTile = start / tileWidth;
 			int endTile = end / tileWidth;
@@ -567,9 +524,12 @@ class Preprocessor {
 			}
 		}
 
-		// Close all active tiles
-
-		private void close() {
+		/**
+		 * Close all active tiles
+		 * 
+		 * @throws IOException
+		 */
+		private void close() throws IOException {
 			for (Tile t : activeTiles.values()) {
 				t.close();
 			}
@@ -638,9 +598,10 @@ class Preprocessor {
 		}
 
 		/**
+		 * @throws IOException
 		 *
 		 */
-		void close() {
+		void close() throws IOException {
 
 			// Count non-empty bins. All tracks should be the same
 			nonEmptyBins = 0;
@@ -698,10 +659,8 @@ class Preprocessor {
 				try {
 					writer.writeTile(dsName, tileNumber, tile);
 				} catch (IOException iOException) {
-					log.log(Level.SEVERE, "Error writing tile: " + dsName + " ["
+					throw new IOException("Error writing tile: " + dsName + " ["
 							+ tileNumber + "]", iOException);
-					// TODO -- replace with PreprocessorException
-					throw new RuntimeException(iOException);
 				}
 			}
 		}

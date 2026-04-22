@@ -22,13 +22,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.logging.Level;
+
+import org.broad.igv.track.WindowFunction;
 
 import htsjdk.samtools.SAMSequenceDictionary;
 import htsjdk.samtools.SAMSequenceRecord;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.SamReaderFactory;
-
-import org.broad.igv.track.WindowFunction;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Class to create TDF files from BAM files.
@@ -38,57 +40,48 @@ import org.broad.igv.track.WindowFunction;
  */
 public class TDFTools {
 
-		
-	
+	private final Reporter log;
+
+	public TDFTools(Reporter log) {
+		this.log = log;
+	}
 
 	/**
 	 * Compute coverage or density of an alignment or feature file.
 	 * 
-	 * @param ifile
-	 *           BAM Alignment
-	 * @param ofile
-	 *            Output file
+	 * @param ifile           BAM Alignment
+	 * @param ofile           Output file
 	 * @param windowFunctions
-	 * @param windowSizeValue
-	 * @param extFactorValue
-	 * @param strandOption
 	 * @throws IOException
-	 * @throws URISyntaxException 
-	 * @throws ReadFailedException 
+	 * @throws URISyntaxException
 	 */
-	public void doCount(String ifile, String ofile, 
+	public void doCount(String ifile, String ofile,
 			Collection<WindowFunction> windowFunctions)
 			throws IOException, URISyntaxException {
-		System.out.println("Computing coverage.  File = " + ifile);
-		SamReader sfr= SamReaderFactory.makeDefault().open(new File(ifile));
-		SAMSequenceDictionary dict=sfr.getFileHeader().getSequenceDictionary();
-		long max=0;
-		for(SAMSequenceRecord ssr:dict.getSequences()){
-			if(ssr.getSequenceLength()>max)
-				max=ssr.getSequenceLength();
+		log.log(Level.INFO, "Computing coverage.  File = " + ifile);
+		SamReader sfr = SamReaderFactory.makeDefault().open(new File(ifile));
+		SAMSequenceDictionary dict = sfr.getFileHeader()
+				.getSequenceDictionary();
+		long max = 0;
+		for (SAMSequenceRecord ssr : dict.getSequences()) {
+			if (ssr.getSequenceLength() > max)
+				max = ssr.getSequenceLength();
 		}
-		
-		
-		
-		int zoom=0;
-		while(max/2>50000){
-			max/=2;
+
+		int zoom = 0;
+		while (max / 2 > 50000) {
+			max /= 2;
 			zoom++;
 		}
-		System.out.println("Zoom levels needed: "+zoom);
+		log.log(Level.INFO, "Zoom levels needed: " + zoom);
 
+		int maxZoomValue = zoom;
 
-		int maxZoomValue=zoom;
-		
-		Preprocessor p = new Preprocessor(new File(ifile).getName(), new File(ofile), dict,windowFunctions, 1);
+		Preprocessor p = new Preprocessor(new File(ifile).getName(),
+				new File(ofile), dict, windowFunctions, 1, log);
 		p.count(ifile, maxZoomValue);
 		p.finish();
 
-		System.out.flush();
 	}
-
-	
-
-	
 
 }
