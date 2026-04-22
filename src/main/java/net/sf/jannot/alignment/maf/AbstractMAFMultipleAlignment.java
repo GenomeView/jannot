@@ -14,16 +14,13 @@ import net.sf.jannot.Data;
  * @author Thomas Abeel
  * 
  */
-public abstract class AbstractMAFMultipleAlignment implements Data<AbstractAlignmentBlock> {
+public abstract class AbstractMAFMultipleAlignment
+		implements Data<AbstractAlignmentBlock> {
 
 	public String label() {
 		return "Multiple alignment";
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6205720325158215670L;
 	private Set<String> species = new HashSet<String>();
 
 	/**
@@ -49,6 +46,10 @@ public abstract class AbstractMAFMultipleAlignment implements Data<AbstractAlign
 		return false;
 	}
 
+	/**
+	 * 
+	 * @return number of alidnment blocks in the iteratable {@link #get()}
+	 */
 	public abstract int noAlignmentBlocks();
 
 }
