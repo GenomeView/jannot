@@ -34,12 +34,13 @@ public class TestFastaParser {
 			throws URISyntaxException, IOException, ReadFailedException {
 
 		DataSource ds = DataSourceFactory.create(new Locator(file, log), log);
-		EntrySet es = ds.read();
+		EntrySet es = ds.read(new EntrySet(log));
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("TestFasta", es.firstEntry().getID());
 		int count = 0;
-		for (Entry e : es)
+		for (Entry e : es) {
 			count++;
+		}
 		Assert.assertEquals(1, count);
 
 		Sequence d = es.firstEntry().sequence();
@@ -59,14 +60,15 @@ public class TestFastaParser {
 	public void testWrite() throws Exception {
 		File f = DataManager.file("mini.fasta");
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read();
+		EntrySet es = ds.read(new EntrySet(log));
 
 		File out = File.createTempFile("unittesting.", ".fasta");
 		out.deleteOnExit();
 
 		FileOutputStream fos = new FileOutputStream(out);
-		for (Entry e : es)
+		for (Entry e : es) {
 			new FastaParser(log).write(fos, e);
+		}
 		fos.close();
 
 		testFile(out);
@@ -78,7 +80,7 @@ public class TestFastaParser {
 
 		DataSource ds = DataSourceFactory.create(
 				new Locator(DataManager.file("10313-CDS.fasta"), log), log);
-		EntrySet es = ds.read();
+		EntrySet es = ds.read(new EntrySet(log));
 
 		assertEquals(11386 / 2, es.size());
 		// EntrySet sorts the names alphabetically... Makes not much sense in

@@ -58,7 +58,7 @@ public class TestVCFParser {
 
 		File f = DataManager.file("tiny.vcf");
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read();
+		EntrySet es = ds.read(new EntrySet(log));
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("20", es.firstEntry().getID());
 		int count = 0;
@@ -87,7 +87,7 @@ public class TestVCFParser {
 
 		File f = DataManager.file("regular.vcf");
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read();
+		EntrySet es = ds.read(new EntrySet(log));
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("gi|395136682|gb|CP003248.1|",
 				es.firstEntry().getID());

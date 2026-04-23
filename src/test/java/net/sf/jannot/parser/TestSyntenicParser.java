@@ -44,7 +44,7 @@ public class TestSyntenicParser {
 		NameService.init(log);
 		File f = DataManager.file(SYN_FILE);
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read();
+		EntrySet es = ds.read(new EntrySet(log));
 
 		Data<?> data = es.getOrCreateEntry("anthracis")
 				.get(SyntenicParser.SYNTENIC_KEY);

@@ -46,7 +46,7 @@ public class TestGTFParser {
 
 		File f = DataManager.file("doubleScore.gtf");
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read();
+		EntrySet es = ds.read(new EntrySet(log));
 		double score = es.firstEntry().getMemoryAnnotation(Type.get("gene"))
 				.get(0).getScore();
 		Assert.assertEquals(0, score, 0.0001);

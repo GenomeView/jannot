@@ -43,7 +43,7 @@ public class TestFirstNucleotide {
 
 		IndexedFastaDataSource ifd = new IndexedFastaDataSource(l, i, log);
 		System.out.println("Reading entries");
-		EntrySet es = ifd.read();
+		EntrySet es = ifd.read(new EntrySet(log));
 
 		System.out.println("Query");
 		for (Character c : es.getEntry("chr1").sequence().get(1, 1000)) {

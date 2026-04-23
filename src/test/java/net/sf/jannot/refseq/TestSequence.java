@@ -35,7 +35,8 @@ public class TestSequence {
 				"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta.fai",
 				log);
 
-		EntrySet es = new IndexedFastaDataSource(l, i, log).read();
+		EntrySet es = new IndexedFastaDataSource(l, i, log)
+				.read(new EntrySet(log));
 		Sequence seq = es.firstEntry().sequence();
 		String tmp = "";
 		for (Character c : seq.get(1, 4)) {

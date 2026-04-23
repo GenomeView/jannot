@@ -25,8 +25,9 @@ public abstract class DataSource implements Comparable<DataSource> {
 	 * @param log the logger to use. Must not be null
 	 */
 	protected DataSource(Locator l, Reporter log) {
-		if (log == null)
+		if (log == null) {
 			throw new NullPointerException("log must be not null");
+		}
 		this.locator = l;
 		this.log = log;
 	}
@@ -37,21 +38,12 @@ public abstract class DataSource implements Comparable<DataSource> {
 	}
 
 	/**
-	 * copy this into a new empty {@link EntrySet}.
-	 * 
-	 * @return the new {@link EntrySet}. This can not throw because
-	 */
-	public EntrySet read() {
-		return read(null);
-	}
-
-	/**
 	 * 
 	 * @param add the {@link EntrySet} to add data to that was read. If null,
 	 *            use a new empty EntrySet.
-	 * @return the entryset containing the data. This can not throw because it's
-	 *         generally used inside separate threads. If there is a problem,
-	 *         log it and return whatever entryset is now available.
+	 * @return the (non-null) entryset to add the data to. This can not throw
+	 *         because it's generally used inside separate threads. If there is
+	 *         a problem, log it and return whatever entryset is now available.
 	 * 
 	 */
 	public abstract EntrySet read(EntrySet add);

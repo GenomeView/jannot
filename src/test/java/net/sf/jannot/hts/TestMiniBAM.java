@@ -31,7 +31,7 @@ public class TestMiniBAM {
 
 		DataSource ds = DataSourceFactory.create(fData, fIndex, log);
 		Assert.assertNotNull(ds);
-		EntrySet entries = ds.read();
+		EntrySet entries = ds.read(new EntrySet(log));
 		Entry e = entries.getEntry("chr4");
 		int dkCount = 0;
 		int readCount = 0;

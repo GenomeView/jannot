@@ -42,7 +42,7 @@ public class TestTBLParser {
 		// following is copy of another test.
 		// It was expected to fail but apparently works. No idea what it does...
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read();
+		EntrySet es = ds.read(new EntrySet(log));
 		double score = es.firstEntry().getMemoryAnnotation(Type.get("gene"))
 				.get(0).getScore();
 		Assert.assertEquals(0, score, 0.0001);
