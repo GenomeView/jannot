@@ -45,9 +45,6 @@ public class GTFParser extends Parser {
 	 */
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null) {
-			set = new EntrySet(getLog());
-		}
 
 		/* Keeps track of which features have the same ID */
 		Map<String, Feature> parentMap = new HashMap<String, Feature>();

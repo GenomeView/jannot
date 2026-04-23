@@ -36,6 +36,9 @@ public abstract class AbstractStreamDataSource extends DataSource {
 
 	@Override
 	public EntrySet read(EntrySet set) {
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		return parser.parse(ios, set);
 	}
 

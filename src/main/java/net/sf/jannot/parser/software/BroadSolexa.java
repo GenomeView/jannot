@@ -34,18 +34,11 @@ public class BroadSolexa extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null) {
-			set = new EntrySet(getLog());
-		}
 		LineIterator it = new LineIterator(is);
-
-//		long time = System.currentTimeMillis();
 
 		/* This parser assumes that header and sequences lines alternate */
 		int mapStart = -1;
-//		boolean forward = false;
 		Entry entry = null;
-//		set.setMute(true);
 
 		for (String line : it) {
 

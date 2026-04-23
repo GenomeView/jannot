@@ -58,11 +58,6 @@ public class SyntenicParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		// List<Entry>list=new ArrayList<Entry>();
-		if (set == null) {
-			set = new EntrySet(getLog());
-			// Map<String,Entry>mapping=new HashMap<String, Entry>();
-		}
 
 		LineIterator it = new LineIterator(is);
 		it.setSkipBlanks(true);

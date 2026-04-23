@@ -41,9 +41,6 @@ public class BEDParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null) {
-			set = new EntrySet(getLog());
-		}
 		Type type = null;
 		LineIterator it = new LineIterator(is);
 		it.setSkipBlanks(true);

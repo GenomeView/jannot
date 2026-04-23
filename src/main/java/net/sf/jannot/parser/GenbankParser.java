@@ -36,9 +36,6 @@ public class GenbankParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null) {
-			set = new EntrySet(getLog());
-		}
 		Entry e = null;
 		LineIterator it = new LineIterator(is);
 		String locus = null;

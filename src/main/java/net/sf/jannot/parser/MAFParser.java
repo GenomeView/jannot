@@ -34,9 +34,6 @@ public class MAFParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null) {
-			set = new EntrySet(getLog());
-		}
 		LineIterator it = new LineIterator(is);
 		it.setCommentIdentifier("#");
 		it.setSkipBlanks(true);

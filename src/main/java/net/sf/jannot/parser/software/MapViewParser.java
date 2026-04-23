@@ -25,31 +25,19 @@ public class MapViewParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null) {
-			set = new EntrySet(getLog());
-		}
 		LineIterator it = new LineIterator(is);
 
-		// long time = System.currentTimeMillis();
-
-//		set.setMute(true);
 		int count = 0;
 		for (String line : it) {
 			String[] arr = line.split("\t");
 			Entry entry = set.getOrCreateEntry(arr[1]);
 
-//			if(e.shortReads.getReadGroup(source)==null){
-//				e.shortReads.add(source, new MemoryReadSet());
-//			}
 			if (!entry.contains(dataKey)) {
 				entry.add(dataKey, new MemoryReadSet(getLog()));
 			}
 			if (!arr[14].matches(".*[nN].*")) {
 				MemoryReadSet mrs = (MemoryReadSet) entry.get(dataKey);
-				// mrs.add(new BasicShortRead(arr[14].toCharArray(),
-				// Integer.parseInt(arr[2]), arr[3].charAt(0) == '+'));
 			} else {
-				// System.out.println("discarding: "+arr[0]);
 				count++;
 			}
 

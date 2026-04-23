@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import be.abeel.io.LineIterator;
@@ -34,9 +35,11 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Type;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.nameservice.NameService;
 import support.DataManager;
 import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;
@@ -49,6 +52,11 @@ import tudelft.utilities.logging.Reporter;
 public class TestBEDParser {
 	private static Reporter log = new ReportToLogger(
 			TestBEDParser.class.toString());
+
+	@Before
+	public void before() throws ReadFailedException {
+		NameService.init(log);
+	}
 
 	@Test
 	public void testParserMini() throws Exception {
@@ -122,7 +130,7 @@ public class TestBEDParser {
 		log.log(Level.INFO, "	> fileData: " + fileData + "( "
 				+ fileData.length() + " KB)");
 		// We parse the sample file
-		entries = parser.parse(is, null);
+		entries = parser.parse(is, entries);
 		log.log(Level.INFO, "		> Number of entries: " + entries.size());
 		// assertTrue(entries.size() > 0);
 		// We build an ArrayList to access randonmly to a entry

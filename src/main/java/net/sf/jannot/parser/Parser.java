@@ -62,8 +62,7 @@ public abstract class Parser {
 	 * 
 	 * 
 	 * @param is  inputStream
-	 * @param set an EntrySet to add the parse results to. If null, a new
-	 *            {@link EntrySet} is created
+	 * @param set an EntrySet to add the parse results to. Must be not null.
 	 * @return either the set to which the parsed data was added.
 	 */
 	public abstract EntrySet parse(InputStream is, EntrySet set);

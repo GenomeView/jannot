@@ -28,12 +28,6 @@ public class BlastM8Parser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null) {
-			set = new EntrySet(getLog());
-		}
-//        Entry[] out = new Entry[1];
-//        // try {
-//        out[0] = new Entry(source);
 		LineIterator it = new LineIterator(is);
 		it.setSkipComments(true);
 		Type t = Type.get("NCBI Blast hit");

@@ -32,9 +32,6 @@ public class GeneMarkParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null) {
-			set = new EntrySet(getLog());
-		}
 		Type t = Type.get("CDS_pred");
 		MemoryFeatureAnnotation fa = set.iterator().next()
 				.getMemoryAnnotation(t);

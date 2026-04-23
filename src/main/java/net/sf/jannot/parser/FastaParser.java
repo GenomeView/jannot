@@ -48,9 +48,6 @@ public class FastaParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null) {
-			set = new EntrySet(getLog());
-		}
 		final LineIterator it = new LineIterator(is);
 		StringBuffer current = null; // accumulates all lines after last '>'
 		final ArrayList<StringBuffer> seq = new ArrayList<StringBuffer>();

@@ -30,9 +30,6 @@ public class WiggleParser extends Parser {
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
 		try {
-			if (set == null) {
-				set = new EntrySet(getLog());
-			}
 			LineIterator it = new LineIterator(is);
 			it.setSkipComments(true);
 			it.setCommentIdentifier("#");

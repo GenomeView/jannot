@@ -27,9 +27,6 @@ public class BedGraphParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null) {
-			set = new EntrySet(getLog());
-		}
 		LineIterator it = new LineIterator(is);
 		it.setSkipComments(true);
 		it.setCommentIdentifier("#");

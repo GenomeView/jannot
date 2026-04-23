@@ -1,9 +1,10 @@
 package net.sf.jannot;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import junit.framework.Assert;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.nameservice.NameService;
 import tudelft.utilities.logging.ReportToLogger;
@@ -27,17 +28,17 @@ public class TestEntrySet {
 		EntrySet es = new EntrySet(log);
 		Entry x = es.getOrCreateEntry("chr1");
 		Entry y = es.getOrCreateEntry("2");
-		Assert.assertNotNull(x);
-		Assert.assertNotNull(y);
+		assertNotNull(x);
+		assertNotNull(y);
 		System.out.println(es.getEntry("1"));
-		Assert.assertNotNull(es.getEntry("1"));
-		Assert.assertNotNull(es.getEntry("CHR1"));
-		Assert.assertNotNull(es.getEntry("chr1"));
+		assertNotNull(es.getEntry("1"));
+		assertNotNull(es.getEntry("CHR1"));
+		assertNotNull(es.getEntry("chr1"));
 
 		System.out.println(es.getEntry("chr2"));
-		Assert.assertNotNull(es.getEntry("chr2"));
-		Assert.assertNotNull(es.getEntry("Chr2"));
-		Assert.assertNotNull(es.getEntry("chR2"));
+		assertNotNull(es.getEntry("chr2"));
+		assertNotNull(es.getEntry("Chr2"));
+		assertNotNull(es.getEntry("chR2"));
 
 	}
 }

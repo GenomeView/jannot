@@ -31,9 +31,6 @@ public class ALNParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null) {
-			set = new EntrySet(getLog());
-		}
 		List<Entry> list = new ArrayList<Entry>();
 		boolean header = true;
 		LineIterator it = new LineIterator(is);
