@@ -41,15 +41,17 @@ public class TransTermHPParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		LineIterator it = new LineIterator(is);
 		String id = null;
 		Type t = Type.get("TransTermHP");
 		for (String line : it) {
 			line = line.trim();
-			if (line.startsWith("SEQUENCE"))
+			if (line.startsWith("SEQUENCE")) {
 				id = line.substring(9);
+			}
 			if (line.startsWith("TERM")) {
 				String[] arr = line.split("[ \t\n\f\r]+");
 				Feature f = new Feature(new Location(Integer.parseInt(arr[2]),

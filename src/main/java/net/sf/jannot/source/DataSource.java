@@ -16,7 +16,7 @@ import tudelft.utilities.logging.Reporter;
  */
 public abstract class DataSource implements Comparable<DataSource> {
 
-	protected Locator locator = null;
+	protected final Locator locator;
 	private final Reporter log;
 
 	/**

@@ -58,8 +58,9 @@ public class TestBEDParser {
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("chr7", es.firstEntry().getID());
 		int count = 0;
-		for (Entry e : es)
+		for (Entry e : es) {
 			count++;
+		}
 		Assert.assertEquals(1, count);
 		Data d = es.firstEntry().get(Type.get("ItemRGBDemo"));
 		for (DataKey dk : es.firstEntry()) {
@@ -77,8 +78,9 @@ public class TestBEDParser {
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("chr7", es.firstEntry().getID());
 		int count = 0;
-		for (Entry e : es)
+		for (Entry e : es) {
 			count++;
+		}
 		Assert.assertEquals(1, count);
 		Data d = es.firstEntry().get(Type.get("barebed.bed"));
 		for (DataKey dk : es.firstEntry()) {
@@ -115,7 +117,7 @@ public class TestBEDParser {
 		File fileData = DataManager.file("ItemRGBDemo.txt");
 		InputStream is = new FileInputStream(fileData);
 
-		EntrySet entries = new EntrySet();
+		EntrySet entries = new EntrySet(log);
 		BEDParser parser = new BEDParser(fileData.getName(), log);
 		log.log(Level.INFO, "	> fileData: " + fileData + "( "
 				+ fileData.length() + " KB)");

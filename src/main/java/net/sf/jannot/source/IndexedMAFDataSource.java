@@ -44,36 +44,40 @@ public class IndexedMAFDataSource extends DataSource {
 			throws MalformedURLException, IOException, ReadFailedException,
 			URISyntaxException {
 		super(data, log);
-		if (data.isURL())
+		if (data.isURL()) {
 			content = new SeekableFileCachedHTTPStream(data.url());
-		else
+		} else {
 			content = new SeekableFileStream(data.file());
+		}
 		this.index = index;
 		this.data = data;
 	}
 
 	@Override
 	public EntrySet read(EntrySet set) {
-		if (content == null)
+		if (content == null) {
 			throw new RuntimeException("Boenk!");
-		if (set == null)
-			set = new EntrySet();
-		// SAMFileReader inputSam = getReader();
+		}
+		if (set == null) {
+			set = new EntrySet(getLog());
+			// SAMFileReader inputSam = getReader();
+		}
 
 		InputStream iis = null;
-		if (index.isURL())
+		if (index.isURL()) {
 			try {
 				iis = index.url().openStream();
 			} catch (IOException | URISyntaxException e1) {
 				getLog().log(Level.WARNING, "failed to open " + index, e1);
 				// and just continue as in original code (why?)
 			}
-		else
+		} else {
 			try {
 				iis = new FileInputStream(index.file());
 			} catch (FileNotFoundException e1) {
 				getLog().log(Level.WARNING, "file not found " + index, e1);
 			}
+		}
 
 		try {
 			IndexedMAF maf = new IndexedMAF(content, iis, getLog());

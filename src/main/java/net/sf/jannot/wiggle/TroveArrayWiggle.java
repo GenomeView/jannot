@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import gnu.trove.map.hash.TIntFloatHashMap;
 import net.sf.jannot.Data;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -23,18 +24,15 @@ import net.sf.jannot.Data;
 public class TroveArrayWiggle extends AbstractWiggle
 		implements Iterable<Float> {
 
-	// private float[] buffer;
-	// private String name;
 	private float min = Float.POSITIVE_INFINITY;
 	private float max = Float.NEGATIVE_INFINITY;
-	// private FloatBuffer fb = null;
-	// private int size;
 
 	// the data in blob is mutable
 	private final TIntFloatHashMap blob = new TIntFloatHashMap();
 	private final int size;
 
-	public TroveArrayWiggle(int size) throws IOException {
+	public TroveArrayWiggle(int size, Reporter log) throws IOException {
+		super(log);
 		this.size = size;
 		System.out.println("Mapping: " + size * 4);
 		System.out.println("Mapping successfull!");

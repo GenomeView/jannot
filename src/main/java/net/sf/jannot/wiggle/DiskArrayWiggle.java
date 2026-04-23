@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import net.sf.jannot.picard.BinaryBlob;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -21,21 +22,15 @@ import net.sf.jannot.picard.BinaryBlob;
  */
 public class DiskArrayWiggle extends AbstractWiggle implements Iterable<Float> {
 
-	// private float[] buffer;
-	// private String name;
 	private float min = Float.POSITIVE_INFINITY;
 	private float max = Float.NEGATIVE_INFINITY;
-	// private FloatBuffer fb = null;
-	// private int size;
-
 	private BinaryBlob blob = null;
 	private int size;
 
-	public DiskArrayWiggle(int size) throws IOException {
+	public DiskArrayWiggle(int size, Reporter log) throws IOException {
+		super(log);
 		this.size = size;
-		// System.out.println("Mapping: " + size * 4);
 		blob = new BinaryBlob(size * 4);
-		// System.out.println("Mapping successfull!");
 
 	}
 

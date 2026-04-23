@@ -30,8 +30,9 @@ public class WiggleParser extends Parser {
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
 		try {
-			if (set == null)
-				set = new EntrySet();
+			if (set == null) {
+				set = new EntrySet(getLog());
+			}
 			LineIterator it = new LineIterator(is);
 			it.setSkipComments(true);
 			it.setCommentIdentifier("#");
@@ -55,8 +56,9 @@ public class WiggleParser extends Parser {
 					e = set.getEntry(chr);
 
 				} else if (line.startsWith("variableStep")) {
-					if (e == null)
+					if (e == null) {
 						e = set.iterator().next();
+					}
 					add(e, name, daw);
 
 					String[] arr = line.split("[ \t]+");
@@ -70,14 +72,16 @@ public class WiggleParser extends Parser {
 						}
 						if (kv[0].equals("chrom")) {
 							e = set.getOrCreateEntry(kv[1].trim());
-							daw = new TroveArrayWiggle(e.getMaximumLength());
+							daw = new TroveArrayWiggle(e.getMaximumLength(),
+									getLog());
 
 						}
 
 					}
 				} else if (line.startsWith("fixedStep")) {
-					if (e == null)
+					if (e == null) {
 						e = set.iterator().next();
+					}
 					add(e, name, daw);
 
 					String[] arr = line.split("[ \t]+");
@@ -86,15 +90,19 @@ public class WiggleParser extends Parser {
 					stepOffset = 1;
 					for (String s : arr) {
 						String[] kv = s.split("=");
-						if (kv[0].equals("span"))
+						if (kv[0].equals("span")) {
 							span = Integer.parseInt(kv[1]);
-						if (kv[0].equals("step"))
+						}
+						if (kv[0].equals("step")) {
 							step = Integer.parseInt(kv[1]);
-						if (kv[0].equals("start"))
+						}
+						if (kv[0].equals("start")) {
 							start = Integer.parseInt(kv[1]);
+						}
 						if (kv[0].equals("chrom")) {
 							e = set.getOrCreateEntry(kv[1].trim());
-							daw = new TroveArrayWiggle(e.getMaximumLength());
+							daw = new TroveArrayWiggle(e.getMaximumLength(),
+									getLog());
 						}
 					}
 				} else if (variable) {

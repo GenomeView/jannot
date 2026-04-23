@@ -5,11 +5,24 @@ package net.sf.jannot;
 
 import java.util.ArrayList;
 
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Data that is stored in memory in a list of a particular type
  */
-public abstract class MemoryListData<T> extends ArrayList<T> implements Data<T>  {
+@SuppressWarnings("serial")
+public abstract class MemoryListData<T> extends ArrayList<T>
+		implements Data<T> {
+
+	private final Reporter log;
+
+	public MemoryListData(Reporter log) {
+		this.log = log;
+	}
+
+	public Reporter getLog() {
+		return log;
+	}
 
 	public void addAll(MemoryListData<T> t) {
 		Iterable<T> list = t.get();
@@ -21,61 +34,20 @@ public abstract class MemoryListData<T> extends ArrayList<T> implements Data<T> 
 			this.add(t);
 	}
 
-
-
-	
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get(int, int)
-	 */
 	@Override
 	public Iterable<T> get(int start, int end) {
-		return new LocatedListIterable(this, new Location(start,end));
-		
-				
+		return new LocatedListIterable(this, new Location(start, end));
+
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get()
-	 */
 	@Override
 	public Iterable<T> get() {
 		return new ListIterable<T>(this);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.jannot.Data#canSave()
-	 */
 	@Override
 	public boolean canSave() {
 		return false;
 	}
-
-//	/**
-//	 * @return
-//	 */
-//	public int size() {
-//		return list.size();
-//	}
-//
-//	/**
-//	 * @param row
-//	 * @return
-//	 */
-//	public T get(int row) {
-//		return list.get(row);
-//	}
-//
-//	/**
-//	 * @param first
-//	 * @return
-//	 */
-//	public int indexOf(T o) {
-//		return list.indexOf(o);
-//	}
 
 }

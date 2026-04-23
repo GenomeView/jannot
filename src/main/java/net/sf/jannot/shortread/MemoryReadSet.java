@@ -14,6 +14,7 @@ import be.abeel.util.FrequencyMap;
 import htsjdk.samtools.SAMRecord;
 import net.sf.jannot.Data;
 import net.sf.jannot.Location;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -21,6 +22,10 @@ import net.sf.jannot.Location;
  * 
  */
 public class MemoryReadSet extends ReadGroup {
+
+	public MemoryReadSet(Reporter log) {
+		super(log);
+	}
 
 	public String label() {
 		return "Memory readset";

@@ -3,54 +3,42 @@
  */
 package net.sf.jannot.refseq;
 
+import tudelft.utilities.logging.Reporter;
+
 /**
  * @author Thomas Abeel
  * 
  */
 public class SubSequence extends Sequence {
 
-	private int end;
-	private int start;
-	private Sequence seq;
+	private final int end;
+	private final int start;
+	private final Sequence seq;
 
 	/**
 	 * @param start
 	 * @param end
 	 */
-	public SubSequence(Sequence s, int start, int end) {
+	public SubSequence(Sequence s, int start, int end, Reporter log) {
+		super(log);
 		this.seq = s;
 		this.start = start;
 		this.end = end;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.refseq.Sequence#get(int, int)
-	 */
 	@Override
 	public Iterable<Character> get(int start, int end) {
 		return seq.get(start + this.start, end);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.refseq.Sequence#get()
-	 */
 	@Override
 	public Iterable<Character> get() {
 		return seq.get(this.start, this.end);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.refseq.Sequence#size()
-	 */
 	@Override
 	public int size() {
-		return end-start;
+		return end - start;
 	}
 
 }

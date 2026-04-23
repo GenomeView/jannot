@@ -4,6 +4,7 @@
 package net.sf.jannot.wiggle;
 
 import net.sf.jannot.utils.ArrayIterable;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -13,12 +14,11 @@ import net.sf.jannot.utils.ArrayIterable;
 public class FloatArrayWiggle extends AbstractWiggle {
 
 	private float[] buffer;
-	// private String name;
 	private float min = Float.POSITIVE_INFINITY;
 	private float max = Float.NEGATIVE_INFINITY;
 
-	public FloatArrayWiggle(float[] arr) {
-		// this.name = name;
+	public FloatArrayWiggle(float[] arr, Reporter log) {
+		super(log);
 		this.buffer = arr;
 		for (float f : arr) {
 			if (f > max)
@@ -29,12 +29,6 @@ public class FloatArrayWiggle extends AbstractWiggle {
 		super.init(this);
 
 	}
-
-	//
-	// @Override
-	// public String getName() {
-	// return name;
-	// }
 
 	@Override
 	public float[] getRawRange(int start, int end) {
@@ -75,11 +69,6 @@ public class FloatArrayWiggle extends AbstractWiggle {
 		return buffer[pos - 1];
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get()
-	 */
 	@Override
 	public Iterable<Float> get() {
 
@@ -87,9 +76,6 @@ public class FloatArrayWiggle extends AbstractWiggle {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.jannot.Data#canSave()
-	 */
 	@Override
 	public boolean canSave() {
 		return false;

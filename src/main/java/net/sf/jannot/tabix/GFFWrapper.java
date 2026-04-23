@@ -8,13 +8,15 @@ import java.net.URISyntaxException;
 
 import net.sf.jannot.Feature;
 import net.sf.jannot.tabix.codec.GFFCodec;
+import tudelft.utilities.logging.Reporter;
 
 /**
  */
 public class GFFWrapper extends FeatureWrapper {
 
-	public GFFWrapper(String key, IndexedFeatureFile data, TabIndex idx) {
-		super(key, data, idx);
+	public GFFWrapper(String key, IndexedFeatureFile data, TabIndex idx,
+			Reporter log) {
+		super(key, data, idx, log);
 	}
 
 	@Override

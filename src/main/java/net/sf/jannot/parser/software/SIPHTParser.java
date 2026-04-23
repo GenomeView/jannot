@@ -34,16 +34,18 @@ public class SIPHTParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		LineIterator it = new LineIterator(is);
 		it.setSkipBlanks(true);
 		String id = null;
 		Type t = Type.get("SIPHT");
 		int count = 0;
 		while (it.hasNext() && count < 1) {
-			if (it.next().startsWith("~"))
+			if (it.next().startsWith("~")) {
 				count++;
+			}
 		}
 		ArrayList<String> header = new ArrayList<String>();
 		for (String line : it) {
@@ -66,10 +68,11 @@ public class SIPHTParser extends Parser {
 				int end = Integer.parseInt(arr[9]);
 				Feature f = new Feature(new Location(start, end));
 				f.setType(t);
-				if (arr[10].equals("<<<"))
+				if (arr[10].equals("<<<")) {
 					f.setStrand(Strand.REVERSE);
-				else
+				} else {
 					f.setStrand(Strand.FORWARD);
+				}
 				for (int i = 0; i < arr.length; i++) {
 					if (!header.get(i).equals("|")) {
 						f.addQualifier(header.get(i), arr[i]);

@@ -25,8 +25,9 @@ public class MapViewParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		LineIterator it = new LineIterator(is);
 
 		// long time = System.currentTimeMillis();
@@ -41,7 +42,7 @@ public class MapViewParser extends Parser {
 //				e.shortReads.add(source, new MemoryReadSet());
 //			}
 			if (!entry.contains(dataKey)) {
-				entry.add(dataKey, new MemoryReadSet());
+				entry.add(dataKey, new MemoryReadSet(getLog()));
 			}
 			if (!arr[14].matches(".*[nN].*")) {
 				MemoryReadSet mrs = (MemoryReadSet) entry.get(dataKey);
@@ -53,10 +54,11 @@ public class MapViewParser extends Parser {
 			}
 
 		}
-		if (count > 0)
+		if (count > 0) {
 			getLog().log(Level.WARNING, "Discarded: " + count
 					+ " short reads because of ambiguity");
 //		set.setMute(false);
+		}
 
 		return set;
 	}

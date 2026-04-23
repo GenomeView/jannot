@@ -48,8 +48,9 @@ public class VCFParser extends Parser {
 	 */
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 
 		LineIterator it = new LineIterator(is, true, true);
 
@@ -66,8 +67,9 @@ public class VCFParser extends Parser {
 			 * Only parse lines that pass the filters
 			 */
 			String filter = arr[6];
-			if (!(filter.equalsIgnoreCase("PASS") || filter.equals(".")))
+			if (!(filter.equalsIgnoreCase("PASS") || filter.equals("."))) {
 				continue;
+			}
 
 			int pos = Integer.parseInt(arr[1]);
 
@@ -80,8 +82,9 @@ public class VCFParser extends Parser {
 			for (final String alt : multiAlt.split(",")) {
 
 				double score = 0;
-				if (arr[5].charAt(0) != '.')
+				if (arr[5].charAt(0) != '.') {
 					score = Double.parseDouble(arr[5]);
+				}
 
 				int refLength = ref.length();
 
@@ -96,8 +99,9 @@ public class VCFParser extends Parser {
 				/*
 				 * Only include differences, don't load matches
 				 */
-				if (variation == Variation.Match)
+				if (variation == Variation.Match) {
 					continue;
+				}
 				int end = pos + refLength - 1;
 				int start = pos;
 				// if(variation==Variation.SingleSubstitution||variation==Variation.SingleInsertion||variation==Variation.LongInsertion)
@@ -173,30 +177,32 @@ public class VCFParser extends Parser {
 	private Variation getVariation(final String ref, String alt)
 			throws IllegalArgumentException {
 		if (ref.length() == alt.length()) {
-			if (alt.equals(".") || ref.equals(alt))
+			if (alt.equals(".") || ref.equals(alt)) {
 				return Variation.Match;
-			else {
-				if (ref.length() == 1)
+			} else {
+				if (ref.length() == 1) {
 					return Variation.SingleSubstitution;
-				else
+				} else {
 					return Variation.LongSubstitution;
+				}
 			}
 		} else {
 			// assume(ref.length() > 0 && alt.length() > 0)
 			if (ref.length() == 1 || alt.length() == 1) {
 				int diff = ref.length() - alt.length();
 				// if (ref.length() > alt.length())
-				if (diff > 1)
+				if (diff > 1) {
 					return Variation.LongDeletion;
-				else if (diff > 0)
+				} else if (diff > 0) {
 					return Variation.SingleDeletion;
-				else if (diff < -1)
+				} else if (diff < -1) {
 					return Variation.LongInsertion;
-				else if (diff < 0)
+				} else if (diff < 0) {
 					return Variation.SingleInsertion;
-				else
+				} else {
 					throw new IllegalArgumentException(
 							"illegal value for diff");
+				}
 			} else {
 				return Variation.LongSubstitution;
 			}

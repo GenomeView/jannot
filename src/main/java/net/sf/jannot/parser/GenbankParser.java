@@ -36,8 +36,9 @@ public class GenbankParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		Entry e = null;
 		LineIterator it = new LineIterator(is);
 		String locus = null;
@@ -107,10 +108,12 @@ public class GenbankParser extends Parser {
 				}
 				e = set.getOrCreateEntry(arr[1]);
 //				
-				if (locus != null)
+				if (locus != null) {
 					e.description.put("LOCUS", locus);
-				if (definition != null)
+				}
+				if (definition != null) {
 					e.description.put("DEFINITION", definition);
+				}
 
 			}
 
@@ -124,8 +127,9 @@ public class GenbankParser extends Parser {
 			throws ArrayIndexOutOfBoundsException, NumberFormatException {
 
 		if (line.startsWith("                     ")) {
-			if (line.trim().startsWith("/"))
+			if (line.trim().startsWith("/")) {
 				qualifierBuffer.append("\n");
+			}
 			qualifierBuffer.append(line.trim());
 		} else {
 			if (lastFeature != null) {
@@ -155,10 +159,9 @@ public class GenbankParser extends Parser {
 
 				String[] qarr = arr[i].split("=");
 				lastFeature.addQualifier(qarr[0].substring(1), qarr[1]);
-			}
-
-			else
+			} else {
 				lastFeature.addQualifier(arr[i].substring(1), null);
+			}
 
 		}
 		qualifierBuffer = new StringBuffer();

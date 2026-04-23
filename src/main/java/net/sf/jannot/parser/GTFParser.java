@@ -45,8 +45,9 @@ public class GTFParser extends Parser {
 	 */
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 
 		/* Keeps track of which features have the same ID */
 		Map<String, Feature> parentMap = new HashMap<String, Feature>();
@@ -92,8 +93,9 @@ public class GTFParser extends Parser {
 					f.addQualifier("source", arr[1]);
 					f.setType(Type.get(arr[2]));
 					if (!(arr[5].length() == 1 && arr[5].charAt(0) == '.')
-							&& arr[5].length() != 0)
+							&& arr[5].length() != 0) {
 						f.setScore(Double.parseDouble(arr[5]));
+					}
 					for (java.util.Map.Entry<String, String> me : quals
 							.entrySet()) {
 						f.addQualifier(me.getKey(), me.getValue());
@@ -109,8 +111,9 @@ public class GTFParser extends Parser {
 					// } else
 					// f.addQualifier(new Qualifier("note", pair[0]));
 					// }
-					if (parent != null)
+					if (parent != null) {
 						parentMap.put(parent, f);
+					}
 					// String id = f.singleQualifierValue("id");
 					// assert(id!=null);
 					// idMap.put(id, f);
@@ -141,17 +144,19 @@ public class GTFParser extends Parser {
 			if (s.length() > 0) {
 				int i = s.indexOf(' ');
 				String key = "note";
-				if (i >= 0)
+				if (i >= 0) {
 					key = s.substring(0, i);
+				}
 				key = key.trim();
 
 				String value = s.substring(i + 1, s.length());
 				value = value.trim().replaceAll("\"", "");
 
-				if (quals.containsKey(key))
+				if (quals.containsKey(key)) {
 					quals.put(key, quals.get(key) + "," + value);
-				else
+				} else {
 					quals.put(key, value);
+				}
 			}
 		}
 
@@ -174,8 +179,9 @@ public class GTFParser extends Parser {
 		String out = quals.get("transcript_id");
 //		if (out == null)
 //			out = quals.get("gene_id");
-		if (out != null)
+		if (out != null) {
 			out = chromosome + "$$" + type + "$$" + out;
+		}
 		return out;
 
 	}
@@ -200,8 +206,9 @@ public class GTFParser extends Parser {
 			if (entry.get(dk) instanceof FeatureAnnotation) {
 				FeatureAnnotation fa = (FeatureAnnotation) entry.get(dk);
 				for (Feature f : fa.get()) {
-					for (int i = 0; i < f.location().length; i++)
+					for (int i = 0; i < f.location().length; i++) {
 						out.println(line(entry, f, entry.getID(), i));
+					}
 				}
 			}
 		}
@@ -226,10 +233,11 @@ public class GTFParser extends Parser {
 			}
 
 		}
-		if (qualifiers.length() > 0)
+		if (qualifiers.length() > 0) {
 			out.append(qualifiers.substring(1));
-		else
+		} else {
 			out.append("no qualifiers");
+		}
 		return out.toString();
 	}
 

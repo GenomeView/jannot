@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 
 import net.sf.jannot.variation.VCFCodec;
 import net.sf.jannot.variation.Variation;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -16,8 +17,9 @@ import net.sf.jannot.variation.Variation;
  */
 public class VCFWrapper extends TabixWrapper<Variation> {
 
-	VCFWrapper(String key, IndexedFeatureFile data, TabIndex idx) {
-		super(key, data, idx);
+	VCFWrapper(String key, IndexedFeatureFile data, TabIndex idx,
+			Reporter log) {
+		super(key, data, idx, log);
 	}
 
 	@Override

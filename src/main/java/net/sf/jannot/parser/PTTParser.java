@@ -30,8 +30,9 @@ public class PTTParser extends Parser {
 	 */
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		LineIterator it = new LineIterator(is);
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);

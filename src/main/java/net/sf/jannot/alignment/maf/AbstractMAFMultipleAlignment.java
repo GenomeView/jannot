@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.sf.jannot.Data;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -16,6 +17,16 @@ import net.sf.jannot.Data;
  */
 public abstract class AbstractMAFMultipleAlignment
 		implements Data<AbstractAlignmentBlock> {
+
+	private final Reporter log;
+
+	public AbstractMAFMultipleAlignment(Reporter log) {
+		this.log = log;
+	}
+
+	public Reporter getLog() {
+		return log;
+	}
 
 	public String label() {
 		return "Multiple alignment";

@@ -41,8 +41,9 @@ public class EMBLParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 
 		LineIterator it = new LineIterator(is);
 		it.setSkipBlanks(true);
@@ -70,9 +71,9 @@ public class EMBLParser extends Parser {
 				seqMode = true;
 				// do nothing, this line is ignored
 			} else {
-				if (!seqMode)
+				if (!seqMode) {
 					processLine(line, entry);
-				else {
+				} else {
 					String cline = condense(line);
 					// assert(cline.length()==60);
 					seqBuffer.append(cline);
@@ -94,8 +95,10 @@ public class EMBLParser extends Parser {
 	}
 
 	private void storeSequence(Entry entry, StringBuffer seqBuffer) {
-		if (entry != null && seqBuffer.length() > 0)
-			entry.setSequence(new MemorySequence(seqBuffer.toString()));
+		if (entry != null && seqBuffer.length() > 0) {
+			entry.setSequence(
+					new MemorySequence(seqBuffer.toString(), getLog()));
+		}
 		seqBuffer.setLength(0);
 
 	}
@@ -128,15 +131,17 @@ public class EMBLParser extends Parser {
 			for (int i = 0; i < featureBuffer.size(); i++) {
 				String lc = featureBuffer.get(i).substring(21).trim();
 				boolean slash = lc.startsWith("/");
-				if (slash)
+				if (slash) {
 					buildingLocation = false;
-				if (buildingLocation)
+				}
+				if (buildingLocation) {
 					location.append(lc);
-				else {
-					if (slash)
+				} else {
+					if (slash) {
 						qualifiers.add(new StringBuffer(lc));
-					else
+					} else {
 						qualifiers.lastElement().append("\n" + lc);
+					}
 				}
 
 			}
@@ -287,8 +292,9 @@ public class EMBLParser extends Parser {
 		out.print("AC" + spacer + primaryAcc + "; ");
 		if (e.description.get("acc") != null) {
 			for (String acc : e.description.get("acc").split("\n")) {
-				if (!acc.equals(primaryAcc))
+				if (!acc.equals(primaryAcc)) {
 					out.print(acc + "; ");
+				}
 			}
 		}
 		out.println();
@@ -334,7 +340,7 @@ public class EMBLParser extends Parser {
 		// }
 		for (DataKey data : dks) {
 			if (e.get(data) instanceof FeatureAnnotation) {
-				MemoryFeatureAnnotation fa = e.getMemoryAnnotation((Type) data);
+				MemoryFeatureAnnotation fa = e.getMemoryAnnotation(data);
 				for (Feature f : fa.get()) {
 					out.println(line(f));
 				}
@@ -347,31 +353,36 @@ public class EMBLParser extends Parser {
 			out.println("SQ   Sequence " + e.sequence().size()
 					+ " BP ; 0 A; 0 C; 0 G; 0 T; 0 other;");
 			char[] line = new char[80];
-			for (int i = 0; i < 80; i++)
+			for (int i = 0; i < 80; i++) {
 				line[i] = ' ';
+			}
 			int pos = 0;
 			// for (int i = 1; i <= e.sequence().size(); i++) {
 			int idx = 1;
 			for (char c : e.sequence().get()) {
 				line[pos++] = c;// e.sequence().getNucleotide(i);
 
-				if (idx % 10 == 0)
+				if (idx % 10 == 0) {
 					line[pos++] = ' ';
+				}
 				if (idx % 60 == 0) {
 					char[] number = new String("" + idx).toCharArray();
-					for (int j = 0; j < number.length; j++)
+					for (int j = 0; j < number.length; j++) {
 						line[line.length - 1 - j] = number[number.length - 1
 								- j];
+					}
 					pos = 0;
 					out.println(line);
 				}
 				idx++;
 			}
-			for (int i = pos; i < 80; i++)
+			for (int i = pos; i < 80; i++) {
 				line[i] = ' ';
+			}
 			char[] number = new String("" + e.sequence().size()).toCharArray();
-			for (int j = 0; j < number.length; j++)
+			for (int j = 0; j < number.length; j++) {
 				line[line.length - 1 - j] = number[number.length - 1 - j];
+			}
 			out.println(line);
 			// }
 		}
@@ -387,15 +398,17 @@ public class EMBLParser extends Parser {
 		String fType = f.type().toString().substring(0,
 				Math.min(15, f.type().toString().length()));
 		StringBuffer line = new StringBuffer("FT" + spacer + fType);
-		while (line.length() < 21)
+		while (line.length() < 21) {
 			line.append(" ");
+		}
 		line.append(unparse(f.strand(), f.location()));
 		StringBuffer out = new StringBuffer();
 		out.append(line);
 		for (String key : f.getQualifiersKeys()) {
 			line = new StringBuffer("FT");
-			while (line.length() < 21)
+			while (line.length() < 21) {
 				line.append(" ");
+			}
 
 			String qual = f.qualifier(key);
 			if (qual == null) {
@@ -429,16 +442,19 @@ public class EMBLParser extends Parser {
 		if (location.length > 1) {
 			loc.append("join(");
 			for (Location l : location) {
-				if (location[0].equals(l))
+				if (location[0].equals(l)) {
 					loc.append(l);
-				else
+				} else {
 					loc.append(",\n" + ftstart + l);
+				}
 			}
 			loc.append(")");
-		} else
+		} else {
 			loc.append(location[0]);
-		if (s == Strand.REVERSE)
+		}
+		if (s == Strand.REVERSE) {
 			loc.append(")");
+		}
 		return loc.toString();
 	}
 

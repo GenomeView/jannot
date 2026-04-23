@@ -5,22 +5,25 @@ package net.sf.jannot.alignment.mfa;
 
 import be.abeel.util.CountMap;
 import net.sf.jannot.MemoryListData;
+import tudelft.utilities.logging.Reporter;
 
 public class AlignmentAnnotation extends MemoryListData<Alignment> {
 
-	public String label() {
-		return "Multiple alignment";
-	}
-
-	private static final long serialVersionUID = -5188981624665479856L;
-//	private MemoryListData<Alignment> dataList = new MemoryListData<Alignment>();
 	private byte[][] conservation;
+
+	public AlignmentAnnotation(Reporter log) {
+		super(log);
+	}
 
 	public void addAll(Iterable<Alignment> align) {
 		for (Alignment a : align) {
 			super.add(a);
 		}
 		calculateConservation();
+	}
+
+	public String label() {
+		return "Multiple alignment";
 	}
 
 	/**
@@ -49,12 +52,6 @@ public class AlignmentAnnotation extends MemoryListData<Alignment> {
 	public int numAlignments() {
 		return super.size();
 	}
-
-//	public Alignment getAlignment(int i) {
-//		if (dataList.size() == 0)// This alignment is not loaded
-//			return null;
-//		return dataList.get(i);
-//	}
 
 	public int getNucleotideCount(char nt, int position) {
 		if (conservation == null)

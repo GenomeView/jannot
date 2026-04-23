@@ -40,14 +40,16 @@ public class TBLParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		LineIterator it = new LineIterator(is);
 		Entry current = null;
 		Feature currentF = null;
 		for (String line : it) {
-			if (line.strip().isEmpty())
+			if (line.strip().isEmpty()) {
 				continue;// skip empty lines
+			}
 			if (line.startsWith(">")) {
 				current = set.getOrCreateEntry(line.split(">Feature ")[1]);
 			} else {
@@ -66,10 +68,11 @@ public class TBLParser extends Parser {
 						int s = Integer.parseInt(arr[0]);
 						int t = Integer.parseInt(arr[1]);
 						currentF = new Feature(new Location(s, t));
-						if (s > t)
+						if (s > t) {
 							currentF.setStrand(Strand.REVERSE);
-						else
+						} else {
 							currentF.setStrand(Strand.FORWARD);
+						}
 						currentF.setType(Type.get(arr[2]));
 						// current.annotation.add(currentF);
 						MemoryFeatureAnnotation fa = current

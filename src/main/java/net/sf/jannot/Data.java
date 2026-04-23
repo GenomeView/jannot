@@ -5,6 +5,8 @@ package net.sf.jannot;
 
 import java.io.IOException;
 
+import tudelft.utilities.logging.Reporter;
+
 /**
  * Data related to genome. Thought of as a 'list with elements of type K.
  * Typically part of an {@link Entry}. Data has a start and end point, a label,
@@ -50,5 +52,7 @@ public interface Data<K> {
 	 * @return a label for this data
 	 */
 	public String label();
+
+	public Reporter getLog();
 
 }

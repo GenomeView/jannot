@@ -5,7 +5,7 @@
 package net.sf.jannot.alignment;
 
 import net.sf.jannot.refseq.MemorySequence;
-import net.sf.jannot.refseq.Sequence;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Sequence that can be used as reference for multiple alignments.
@@ -13,35 +13,23 @@ import net.sf.jannot.refseq.Sequence;
  * @author tabeel
  * 
  */
-public class ReferenceSequence extends MemorySequence{
+public class ReferenceSequence extends MemorySequence {
 	private int refGapCount;
 	private int[] mapping = null;
 
-	public ReferenceSequence(StringBuffer sequence) {
-		super(sequence);
+	public ReferenceSequence(StringBuffer sequence, Reporter log) {
+		super(sequence, log);
 		calculateMapping();
 	}
-	
+
 	public ReferenceSequence(MemorySequence sequence) {
 		super(sequence);
 		calculateMapping();
 	}
 
-	
-
-//	private int countGaps() {
-//		int gaps = 0;
-//		for (int i = 1; i <= this.size(); i++) {
-//			if (this.getNucleotide(i) == '-')
-//				gaps++;
-//
-//		}
-//		return gaps;
-//	}
-
 	private void calculateMapping() {
 		mapping = new int[this.size()];
-		refGapCount=0;
+		refGapCount = 0;
 		int index = 0;
 		int pos = 0;
 		for (int i = 0; i < this.size(); i++) {
@@ -49,7 +37,7 @@ public class ReferenceSequence extends MemorySequence{
 			pos++;
 			if (this.getNucleotide(i + 1) != '-') {
 				mapping[index++] = pos;
-			}else{
+			} else {
 				refGapCount++;
 			}
 
@@ -98,12 +86,13 @@ public class ReferenceSequence extends MemorySequence{
 	 * 
 	 */
 	public int ref2aln(int position) {
-		if(position>mapping.length){
-			return mapping[mapping.length-1];
+		if (position > mapping.length) {
+			return mapping[mapping.length - 1];
 //			throw new IllegalArgumentException((position-1)+"\t"+mapping.length);
 		}
 		if (mapping[position - 1] == 0)
-			System.err.println("ref2aln: " + (position - 1) + "\t" + mapping[position - 1]);
+			System.err.println("ref2aln: " + (position - 1) + "\t"
+					+ mapping[position - 1]);
 		return mapping[position - 1];
 	}
 

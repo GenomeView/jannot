@@ -3,34 +3,30 @@
  */
 package net.sf.jannot;
 
-/* Represents the annotation of a single type */
+import tudelft.utilities.logging.Reporter;
 
+/**
+ * 
+ * 
+ * Represents the annotation of a single type
+ * 
+ * All data that is kept in memory, these get added manually
+ */
+
+@SuppressWarnings("serial")
 public class MemoryFeatureAnnotation extends MemoryListData<Feature>
 		implements FeatureAnnotation {
 
-	/* All data that is kept in memory, these get added manually */
-	// private MemoryListData<Feature> memoryData = new
-	// MemoryListData<Feature>();
+	public MemoryFeatureAnnotation(Reporter log) {
+		super(log);
+	}
 
-//	private HashSet<String> qualifierKeys = new HashSet<String>();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get(int, int)
-	 */
 	@Override
 	public Iterable<Feature> get(int start, int end) {
 		return new LocatedListIterable<Feature>(this, new Location(start, end));
 
-		// return memoryData.get();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get()
-	 */
 	@Override
 	public Iterable<Feature> get() {
 		return super.get();
@@ -45,19 +41,18 @@ public class MemoryFeatureAnnotation extends MemoryListData<Feature>
 	 * @param f
 	 * @return
 	 */
+	@Override
 	public synchronized boolean add(Feature f) {
-		if (label == null)
+		if (label == null) {
 			label = f.type().toString();
+		}
 		super.add(f);
-//		qualifierKeys.addAll(f.getQualifiersKeys());
-		if (f.start() < minStart)
+		if (f.start() < minStart) {
 			minStart = f.start();
-		if (f.end() > maxEnd)
+		}
+		if (f.end() > maxEnd) {
 			maxEnd = f.end();
-//		if (f.getScore() > maxScore)
-//			maxScore = f.getScore();
-//		if (f.getScore() < minScore)
-//			minScore = f.getScore();
+		}
 		return true;
 	}
 
@@ -96,8 +91,9 @@ public class MemoryFeatureAnnotation extends MemoryListData<Feature>
 
 	@Override
 	public int getEstimateCount(Location l) {
-		if (cachedCount() < 200)
+		if (cachedCount() < 200) {
 			return 0;
+		}
 		double d = cachedCount() / (maxEnd - minStart);
 
 		int estMemory = (int) (l.length() * d);
@@ -111,66 +107,27 @@ public class MemoryFeatureAnnotation extends MemoryListData<Feature>
 		return (int) maxEnd;
 	}
 
-//	private double minScore = Double.POSITIVE_INFINITY;
-//	private double maxScore = Double.NEGATIVE_INFINITY;
-
-//	/*
-//	 * (non-Javadoc)
-//	 * 
-//	 * @see net.sf.jannot.FeatureAnnotation#getMaxScore()
-//	 */
-//	@Override
-//	public double getMaxScore() {
-//		return maxScore;
-//	}
-//
-//	/*
-//	 * (non-Javadoc)
-//	 * 
-//	 * @see net.sf.jannot.FeatureAnnotation#getMinScore()
-//	 */
-//	@Override
-//	public double getMinScore() {
-//		return minScore;
-//	}
-
 	@Override
 	public String toString() {
-		if (super.size() > 0)
+		if (super.size() > 0) {
 			return super.get(0).type().toString();
-		else
+		} else {
 			return null;
+		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.FeatureAnnotation#qualifierKeys()
-	 */
-//	@Override
-//	public Set<String> qualifierKeys() {
-//		return qualifierKeys;
-//	}
 
 	@Override
 	public boolean canSave() {
-		if (super.size() > 0)
-			return true;
-		else
-			return false;
+		return size() > 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#label()
-	 */
 	@Override
 	public String label() {
-		if (label == null)
+		if (label == null) {
 			return "no data";
-		else
+		} else {
 			return label;
+		}
 	}
 
 }

@@ -49,6 +49,7 @@ public class IndexedMAF extends AbstractMAFMultipleAlignment {
 	 */
 	public IndexedMAF(SeekableStream maf, InputStream index, Reporter log)
 			throws FileNotFoundException, IOException {
+		super(log);
 		this.compressedContent = maf;
 		this.idx = new MAFIndex(index);
 		this.log = log;
@@ -62,6 +63,7 @@ public class IndexedMAF extends AbstractMAFMultipleAlignment {
 	 * @param maf
 	 */
 	public IndexedMAF(String chr, IndexedMAF maf, Reporter log) {
+		super(log);
 		this.compressedContent = maf.compressedContent;
 		this.idx = maf.getIndex();
 		this.log = log;

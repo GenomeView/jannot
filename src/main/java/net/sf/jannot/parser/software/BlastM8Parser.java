@@ -28,8 +28,9 @@ public class BlastM8Parser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 //        Entry[] out = new Entry[1];
 //        // try {
 //        out[0] = new Entry(source);

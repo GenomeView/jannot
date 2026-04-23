@@ -9,12 +9,14 @@ import java.net.URISyntaxException;
 import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.PileNormalization;
 import net.sf.jannot.tabix.codec.PileupCodec;
+import tudelft.utilities.logging.Reporter;
 
 public class PileupWrapper extends TabixWrapper<DoublePile>
 		implements PileNormalization {
 
-	PileupWrapper(String key, IndexedFeatureFile data, TabIndex idx) {
-		super(key, data, idx);
+	PileupWrapper(String key, IndexedFeatureFile data, TabIndex idx,
+			Reporter log) {
+		super(key, data, idx, log);
 	}
 
 	@Override

@@ -25,17 +25,18 @@ import tudelft.utilities.logging.Reporter;
 public class MAFParser extends Parser {
 
 	/**
-	 * @param dataKey
+	 * @param dataKey the datakey for the data to parse
+	 * @param log     the {@link Reporter} to log issues to
 	 */
 	public MAFParser(DataKey dataKey, Reporter log) {
 		super(dataKey, log);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		LineIterator it = new LineIterator(is);
 		it.setCommentIdentifier("#");
 		it.setSkipBlanks(true);
@@ -59,21 +60,22 @@ public class MAFParser extends Parser {
 				String[] name = arr[1].split("\\.");
 
 				if (first) {
-					ma = new MAFMemoryMultipleAlignment();
+					ma = new MAFMemoryMultipleAlignment(getLog());
 					if (set.getEntry(name[name.length - 1]) != null) {
 						entry = set.getOrCreateEntry(name[name.length - 1]);
 					} else {
 						entry = set.getOrCreateEntry(arr[1]);
 					}
-					if (entry.get(dataKey) != null)
+					if (entry.get(dataKey) != null) {
 						ma = (MAFMemoryMultipleAlignment) entry.get(dataKey);
-					else
+					} else {
 						entry.add(dataKey, ma);
+					}
 
 				}
 
 				// }
-				MemorySequence seq = new MemorySequence(arr[6]);
+				MemorySequence seq = new MemorySequence(arr[6], getLog());
 				AbstractAlignmentSequence s = new MemoryAlignmentSequence(
 						arr[1], Integer.parseInt(arr[2]),
 						Integer.parseInt(arr[3]), Integer.parseInt(arr[5]),

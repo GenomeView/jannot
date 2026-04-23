@@ -59,9 +59,10 @@ public class SyntenicParser extends Parser {
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
 		// List<Entry>list=new ArrayList<Entry>();
-		if (set == null)
-			set = new EntrySet();
-		// Map<String,Entry>mapping=new HashMap<String, Entry>();
+		if (set == null) {
+			set = new EntrySet(getLog());
+			// Map<String,Entry>mapping=new HashMap<String, Entry>();
+		}
 
 		LineIterator it = new LineIterator(is);
 		it.setSkipBlanks(true);
@@ -92,7 +93,7 @@ public class SyntenicParser extends Parser {
 //			// FIXME set.getOrCreateEntry(arr[4], source);
 
 		}
-		final SyntenicData data = new SyntenicData(blocks);
+		final SyntenicData data = new SyntenicData(blocks, getLog());
 
 		// add this data to ALL relevant Entry's
 		for (String ref : data.getReferences()) {

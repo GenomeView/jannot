@@ -12,6 +12,7 @@ import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.nameservice.NameService;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * "chromosome" container for a (often short) named nucleotide sequence. If
@@ -52,22 +53,26 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	public final Description description = new Description();
 
+	// map itself is mutable
 	private final Map<DataKey, Data<?>> data = new HashMap<DataKey, Data<?>>();
 
 	private final String id;
 
-	// public AlignmentAnnotation align = null;
+	// needed if new empty sub-Entry's need to be created
+	private final Reporter log;
 
 	/**
 	 * 
 	 * @param id the dirty id, may be an alias previously registered to the
 	 *           NameService. Must not be null
 	 */
-	public Entry(String id) {
+	public Entry(String id, Reporter log) {
 		id = NameService.instance().getPrimaryName(id);
-		if (id == null)
+		if (id == null) {
 			throw new RuntimeException("id is null");
+		}
 		this.id = id;
+		this.log = log;
 
 	}
 
@@ -81,15 +86,18 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 			Data<?> newData = data.get(dk);
 			/* Update maximum size if applicable */
 			long s = 0;
-			if (newData instanceof Sequence)
+			if (newData instanceof Sequence) {
 				s = ((Sequence) newData).size();
+			}
 
-			if (newData instanceof FeatureAnnotation)
+			if (newData instanceof FeatureAnnotation) {
 				s = ((FeatureAnnotation) newData).getMaximumCoordinate();
+			}
 
 			// System.out.println("s update: " + s);
-			if (s > maxSize)
+			if (s > maxSize) {
 				maxSize = s;
+			}
 		}
 		return (int) maxSize;
 	}
@@ -141,8 +149,9 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 		ArrayList<ReadGroup> out = new ArrayList<ReadGroup>();
 		for (DataKey key : data.keySet()) {
 			Data<?> x = data.get(key);
-			if (x instanceof ReadGroup)
+			if (x instanceof ReadGroup) {
 				out.add((ReadGroup) x);
+			}
 		}
 		return out;
 	}
@@ -154,13 +163,15 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	 *         null if such feature is not there and cannot be created either.
 	 */
 	public MemoryFeatureAnnotation getMemoryAnnotation(DataKey type) {
-		if (!data.containsKey(type))
-			this.add(type, new MemoryFeatureAnnotation());
+		if (!data.containsKey(type)) {
+			this.add(type, new MemoryFeatureAnnotation(log));
+		}
 		Data<?> tmp = this.get(type);
-		if (tmp instanceof MemoryFeatureAnnotation)
+		if (tmp instanceof MemoryFeatureAnnotation) {
 			return (MemoryFeatureAnnotation) tmp;
-		else
+		} else {
 			return null;
+		}
 
 	}
 
@@ -170,7 +181,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	 */
 	public Sequence sequence() {
 		if (!data.containsKey(seqKey)) {
-			data.put(seqKey, new MemorySequence());
+			data.put(seqKey, new MemorySequence(log));
 		}
 		return (Sequence) data.get(seqKey);
 	}

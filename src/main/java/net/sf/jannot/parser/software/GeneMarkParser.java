@@ -32,15 +32,17 @@ public class GeneMarkParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		Type t = Type.get("CDS_pred");
 		MemoryFeatureAnnotation fa = set.iterator().next()
 				.getMemoryAnnotation(t);
 		for (String line : new LineIterator(is)) {
 			if (!line.startsWith(" ") || line.contains("Gene")
-					|| line.contains("Length"))
+					|| line.contains("Length")) {
 				continue;
+			}
 			String[] arr = line.replace('<', ' ').trim().split("[ \t]+");
 			Feature f = new Feature(new Location(Integer.parseInt(arr[2]),
 					Integer.parseInt(arr[3])));

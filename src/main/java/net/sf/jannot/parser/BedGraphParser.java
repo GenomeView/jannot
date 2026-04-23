@@ -27,8 +27,9 @@ public class BedGraphParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		LineIterator it = new LineIterator(is);
 		it.setSkipComments(true);
 		it.setCommentIdentifier("#");
@@ -53,7 +54,8 @@ public class BedGraphParser extends Parser {
 				last = arr[0];
 
 				if (e != null) {
-					e.add(dataKey, new FloatArrayWiggle(values.elements()));
+					e.add(dataKey,
+							new FloatArrayWiggle(values.elements(), getLog()));
 					getLog().log(Level.INFO,
 							"Adding: " + e + "\t" + values.size());
 					values = new FloatArrayList();
@@ -62,8 +64,9 @@ public class BedGraphParser extends Parser {
 			}
 			float val = Float.parseFloat(arr[3]);
 			/* Make sure the array is big enough */
-			if (end > values.size())
+			if (end > values.size()) {
 				values.setSize(end);
+			}
 			for (int i = start; i < end; i++) {
 				values.set(i, val);
 			}

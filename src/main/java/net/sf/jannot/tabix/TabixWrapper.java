@@ -8,6 +8,7 @@ import java.io.IOException;
 import net.sf.jannot.Data;
 import net.sf.jannot.DensityEstimate;
 import net.sf.jannot.Location;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * abstract wrapper for density-like data like {@link FeatureWrapper},
@@ -18,14 +19,21 @@ import net.sf.jannot.Location;
 public abstract class TabixWrapper<T> implements Data<T>, DensityEstimate {
 
 	private static final int RECORDSIZE = 12;
-	protected String key;
-	protected IndexedFeatureFile data;
-	protected TabIndex idx;
+	protected final String key;
+	protected final IndexedFeatureFile data;
+	protected final TabIndex idx;
+	private final Reporter log;
 
-	TabixWrapper(String key, IndexedFeatureFile data, TabIndex idx) {
+	TabixWrapper(String key, IndexedFeatureFile data, TabIndex idx,
+			Reporter log) {
+		this.log = log;
 		this.data = data;
 		this.key = key;
 		this.idx = idx;
+	}
+
+	public Reporter getLog() {
+		return log;
 	}
 
 	public String label() {

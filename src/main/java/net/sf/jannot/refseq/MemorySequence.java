@@ -7,6 +7,7 @@ import cern.colt.list.ByteArrayList;
 import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.utils.ArrayIterable;
 import net.sf.jannot.utils.SequenceTools;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * A (mutable) sequence (list of chars) in memory
@@ -16,8 +17,8 @@ public class MemorySequence extends Sequence {
 	private DefaultByteArrayList sequence = new DefaultByteArrayList(
 			(byte) 0xff);
 
-	public MemorySequence() {
-
+	public MemorySequence(Reporter log) {
+		super(log);
 	}
 
 	/**
@@ -26,15 +27,17 @@ public class MemorySequence extends Sequence {
 	 * @param sequence sequence to make a copy of
 	 */
 	public MemorySequence(MemorySequence sequence) {
+		super(sequence.getLog());
 		this.sequence = sequence.sequence.copy();
 		this.size = sequence.size;
 	}
 
-	public MemorySequence(String string) {
-		this(new StringBuffer(string));
+	public MemorySequence(String string, Reporter log) {
+		this(new StringBuffer(string), log);
 	}
 
-	public MemorySequence(StringBuffer string) {
+	public MemorySequence(StringBuffer string, Reporter log) {
+		super(log);
 		setSequence(string);
 	}
 
@@ -64,29 +67,6 @@ public class MemorySequence extends Sequence {
 				+ getReverseNucleotide(pos + 1) + getReverseNucleotide(pos);
 		return mapping.get(codon);
 	}
-
-	// /**
-	// * Gets a subsequence from this sequence. The selected sequence is
-	// * [start,end[. The coordinates are one based.
-	// *
-	// * @param start
-	// * the start coordinate, this one will be included in the
-	// * sequence. This is a one-based coordinate.
-	// * @param end
-	// * the end coordinate, this one will not be included in the
-	// * sequence. This is a one-based coordinate.
-	// * @return the selected subsequence.
-	// */
-	// @Deprecated
-	// public String getSubSequence(int start, int end) {
-	// start--;// = startPos;
-	// end--;// = startPos;
-	// StringBuffer out = new StringBuffer();
-	// for (int i = start; i < end; i++) {
-	// out.append(get(i));
-	// }
-	// return out.toString();
-	// }
 
 	static class DefaultByteArrayList extends ByteArrayList {
 
@@ -164,7 +144,10 @@ public class MemorySequence extends Sequence {
 
 	}
 
-	/* Zero based setter for the sequence */
+	/**
+	 * @param pos Zero based
+	 * @param c   character to put at pos
+	 */
 	private void set(int pos, char c) {
 		int coded = encode(c);
 		int mask = 15;
@@ -183,8 +166,11 @@ public class MemorySequence extends Sequence {
 		sequence.set(pos / 2, (byte) newCurrent);
 	}
 
-	/* Zero based getter for the sequence */
-
+	/**
+	 * 
+	 * @param pos Zero based position
+	 * @return sequence char at pos
+	 */
 	protected char get(int pos) {
 		int current = sequence.get(pos / 2);
 		int mask = 15;
@@ -196,89 +182,18 @@ public class MemorySequence extends Sequence {
 		return decode(current);
 	}
 
-	// @Deprecated
-	// public final String getSequence() {
-	// return getSubSequence(1, size + 1);
-	// }
-
-	// private int startPos = 1;
-
 	@Override
 	public String toString() {
 		return stringRepresentation();
 	}
 
-	// /**
-	// * Set the sequences starting from the given position.
-	// *
-	// * @param seq
-	// * @param start
-	// * 1 based start coordinate
-	// */
-	// public void setSequence(String seq, int start) {
-	// setSequence(new StringBuffer(seq), start);
-	// }
-
 	public void setSequence(String sequence) {
 		setSequence(new StringBuffer(sequence));
 	}
 
-	// public char getNucleotide(int index) {
-	// if (index < 1 || index > size())
-	// return '_';
-	// return get(index - 1);
-	//
-	// }
-
-	// public char getReverseNucleotide(int index) {
-	// return SequenceTools.complement(getNucleotide(index));
-	// }
-
 	public int size() {
 		return size;
 	}
-
-	// public char getAminoAcid(int pos, AminoAcidMapping mapping) {
-	// String codon = "" + getNucleotide(pos) + getNucleotide(pos + 1)
-	// + getNucleotide(pos + 2);
-	// return mapping.get(codon);
-	// }
-	//
-	// public char getReverseAminoAcid(int pos, AminoAcidMapping mapping) {
-	// String codon = "" + getReverseNucleotide(pos + 2)
-	// + getReverseNucleotide(pos + 1) + getReverseNucleotide(pos);
-	// return mapping.get(codon);
-	// }
-	//
-	// /**
-	// * Gets a subsequence from this sequence. The selected sequence is
-	// * [start,end[. The coordinates are one based.
-	// *
-	// * @param start
-	// * the start coordinate, this one will be included in the
-	// * sequence. This is a one-based coordinate.
-	// * @param end
-	// * the end coordinate, this one will not be included in the
-	// * sequence. This is a one-based coordinate.
-	// * @return the selected subsequence.
-	// */
-	// public String getSubSequence(int start, int end) {
-	// start--;// = startPos;
-	// end--;// = startPos;
-	// StringBuffer out = new StringBuffer();
-	// for (int i = start; i < end; i++) {
-	// out.append(get(i));
-	// }
-	// return out.toString();
-	// }
-	//
-	// // public int getStartPos() {
-	// // return startPos;
-	// }
-
-	// public int getEndPos() {
-	// return size();
-	// }
 
 	public void addSequence(String seq) {
 		int currentLength = size();
@@ -286,8 +201,6 @@ public class MemorySequence extends Sequence {
 			set(i + currentLength, seq.charAt(i));
 			size++;
 		}
-//		setChanged();
-//		notifyObservers();
 
 	}
 
@@ -298,28 +211,14 @@ public class MemorySequence extends Sequence {
 		}
 
 		this.size = seq.length();
-//		setChanged();
-//		notifyObservers();
 
 	}
 
-	// public void setSequence(StringBuffer seq, int start) {
-	//
-	//
-	// }
-
 	private int size = 0;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get(int, int)
-	 */
 	@Override
 	public Iterable<Character> get(int start, int end) {
 		char[] seq = new char[end - start];
-
-		// getSubSequence(start, end).toCharArray();
 
 		start--;// = startPos;
 		end--;// = startPos;
@@ -330,31 +229,9 @@ public class MemorySequence extends Sequence {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get()
-	 */
 	@Override
 	public Iterable<Character> get() {
 		return get(1, size() + 1);
-		// return new ArrayIterable<Character>();
-		// char[] seq = getSequence().toCharArray();
-		// return new ArrayIterable<Character>(seq);
 	}
-
-	// /**
-	// * Set the length of the sequence explicitly. Set it to a negative number
-	// to
-	// * use the actual size of the sequence.
-	// *
-	// *
-	// * @param size
-	// */
-	// public void setSize(int size) {
-	// this.size = size;
-	// setChanged();
-	// notifyObservers();
-	// }
 
 }

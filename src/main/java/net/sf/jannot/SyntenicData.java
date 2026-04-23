@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import tudelft.utilities.logging.Reporter;
+
 /**
  * Contains Syntenic Data which is just a set of {@link SyntenicBlock}s. Work in
  * progress, not yet working, part of #34
@@ -15,21 +17,27 @@ import java.util.stream.Collectors;
 public class SyntenicData implements Data<SyntenicBlock> {
 
 	private final List<SyntenicBlock> data = new ArrayList<>();
-
 	// the range (Location) of the IDs found in data. LinkedHashMap to fix order
 	private final Map<String, Location> range = new LinkedHashMap<>();
+	private final Reporter log;
 
 	/**
 	 * 
 	 * @param d             the data. List to fix the order for visualization
 	 * @param referencename the name of the reference. U
 	 */
-	public SyntenicData(List<SyntenicBlock> d) {
+	public SyntenicData(List<SyntenicBlock> d, Reporter log) {
+		this.log = log;
 		this.data.addAll(d);
 		for (SyntenicBlock b : data) {
 			extendRange(b.reference(), b.refLocation());
 			extendRange(b.target(), b.targetLocation());
 		}
+	}
+
+	@Override
+	public Reporter getLog() {
+		return log;
 	}
 
 	/**
@@ -97,7 +105,7 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	public SyntenicData get(String name) {
 		return new SyntenicData(data.stream().filter(
 				d -> d.reference().equals(name) | d.target().equals(name))
-				.collect(Collectors.toList()));
+				.collect(Collectors.toList()), log);
 	}
 
 	/**
@@ -110,6 +118,7 @@ public class SyntenicData implements Data<SyntenicBlock> {
 		return range.get(name);
 	}
 
+	@Override
 	public String toString() {
 		return "SyntenicData[" + data + "]";
 	}

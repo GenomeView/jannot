@@ -9,12 +9,14 @@ import java.net.URISyntaxException;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.pileup.PileNormalization;
 import net.sf.jannot.tabix.codec.SWigCodec;
+import tudelft.utilities.logging.Reporter;
 
 public class SWigWrapper extends TabixWrapper<Pile>
 		implements PileNormalization {
 
-	SWigWrapper(String key, IndexedFeatureFile data, TabIndex idx) {
-		super(key, data, idx);
+	SWigWrapper(String key, IndexedFeatureFile data, TabIndex idx,
+			Reporter log) {
+		super(key, data, idx, log);
 	}
 
 	@Override

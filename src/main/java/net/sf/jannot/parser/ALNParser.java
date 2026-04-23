@@ -31,8 +31,9 @@ public class ALNParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		List<Entry> list = new ArrayList<Entry>();
 		boolean header = true;
 		LineIterator it = new LineIterator(is);
@@ -49,7 +50,7 @@ public class ALNParser extends Parser {
 			} else {
 				String[] arr = line.split("  +");
 				if (header) {
-					list.add(new Entry(arr[0].split(" ")[0].trim()));
+					list.add(new Entry(arr[0].split(" ")[0].trim(), getLog()));
 				}
 				((MemorySequence) list.get(index).sequence())
 						.addSequence(arr[1]);
@@ -70,7 +71,7 @@ public class ALNParser extends Parser {
 				getLog().log(Level.INFO, "adding alignment: " + align);
 			}
 			// ref.alignment.addAll(alist);
-			AlignmentAnnotation alignAnnot = new AlignmentAnnotation();
+			AlignmentAnnotation alignAnnot = new AlignmentAnnotation(getLog());
 			ref.add(dataKey, alignAnnot);
 			alignAnnot.addAll((Iterable<Alignment>) alist);
 

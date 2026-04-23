@@ -34,8 +34,9 @@ public class BroadSolexa extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		LineIterator it = new LineIterator(is);
 
 //		long time = System.currentTimeMillis();
@@ -71,7 +72,7 @@ public class BroadSolexa extends Parser {
 						// ")[0].split("\t")[0]);
 					}
 					if (!entry.contains(dataKey)) {
-						entry.add(dataKey, new MemoryReadSet());
+						entry.add(dataKey, new MemoryReadSet(getLog()));
 					}
 				} catch (Exception e) {
 					getLog().log(Level.SEVERE, "Failed to parse " + is

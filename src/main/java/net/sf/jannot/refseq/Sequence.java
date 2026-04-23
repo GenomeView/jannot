@@ -4,6 +4,7 @@
 package net.sf.jannot.refseq;
 
 import net.sf.jannot.Data;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * a Data set with {@link Character}s
@@ -13,10 +14,23 @@ import net.sf.jannot.Data;
  */
 public abstract class Sequence implements Data<Character> {
 
+	private final Reporter log;
+
+	public Sequence(Reporter log) {
+		this.log = log;
+	}
+
+	@Override
+	public Reporter getLog() {
+		return log;
+	}
+
+	@Override
 	public String label() {
 		return "Sequence";
 	}
 
+	@Override
 	public boolean canSave() {
 		return false;
 	}
@@ -36,11 +50,6 @@ public abstract class Sequence implements Data<Character> {
 	@Override
 	public abstract Iterable<Character> get(int start, int end);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get()
-	 */
 	@Override
 	public abstract Iterable<Character> get();
 
@@ -52,7 +61,7 @@ public abstract class Sequence implements Data<Character> {
 	 * @return
 	 */
 	public Sequence subsequence(int start, int end) {
-		return new SubSequence(this, start, end);
+		return new SubSequence(this, start, end, getLog());
 	}
 
 	/**

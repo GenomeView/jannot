@@ -5,14 +5,13 @@ package net.sf.jannot.alignment.maf;
 
 import net.sf.jannot.Located;
 import net.sf.jannot.Location;
-import net.sf.jannot.Strand;
-import net.sf.jannot.refseq.Sequence;
 
 /**
  * @author Thomas Abeel
  * 
  */
-public abstract class AbstractAlignmentBlock implements Comparable<AbstractAlignmentBlock>, Located,
+public abstract class AbstractAlignmentBlock
+		implements Comparable<AbstractAlignmentBlock>, Located,
 		Iterable<AbstractAlignmentSequence> {
 	/* Buffers for finding nucleotides */
 	// protected int[] position = null;
@@ -23,32 +22,6 @@ public abstract class AbstractAlignmentBlock implements Comparable<AbstractAlign
 		this.loc = new Location(start, end);
 	}
 
-	// public void setRef(Entry entry) {
-	// this.ref = entry;
-	// update(entry);
-	// }
-
-	// /**
-	// * @param reference
-	// */
-	// private void update(Entry reference) {
-	// this.ref = reference;
-	//
-	// for (AlignmentSequence as : this) {
-	// System.out.println(as);
-	// if (as.entry() == ref) {
-	//
-	// return;
-	// }
-	// }
-	//
-	// }
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
 	@Override
 	public int compareTo(AbstractAlignmentBlock o) {
 		int thisVal = this.hashCode();
@@ -56,16 +29,6 @@ public abstract class AbstractAlignmentBlock implements Comparable<AbstractAlign
 		return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
 	}
 
-	//
-	// /*
-	// * (non-Javadoc)
-	// *
-	// * @see net.sf.jannot.Located#getLocation()
-	// */
-	// @Override
-	// public Location getLocation() {
-	// return loc;
-	// }
 	@Override
 	public int start() {
 		return loc.start;

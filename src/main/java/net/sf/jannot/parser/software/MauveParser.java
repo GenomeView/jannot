@@ -31,8 +31,9 @@ public class MauveParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		LineIterator it = new LineIterator(is);
 		it.setCommentIdentifier("#");
 		it.setSkipBlanks(true);
@@ -43,13 +44,7 @@ public class MauveParser extends Parser {
 
 		StringBuffer buffer = null;
 		boolean marker = true;
-		// boolean next = false;
 		String headerLine = null;
-
-		// ArrayList<AbstractAlignmentBlock> blocks = new
-		// ArrayList<AbstractAlignmentBlock>();
-		// ArrayList<AbstractAlignmentBlock> seqs = new
-		// ArrayList<AbstractAlignmentBlock>();
 
 		for (String line : it) {
 
@@ -67,7 +62,7 @@ public class MauveParser extends Parser {
 					String name = arr[3].substring(arr[3].lastIndexOf('/') + 1)
 							.split("\\.")[0];
 					entry = set.getOrCreateEntry(name);
-					ma = new MAFMemoryMultipleAlignment();
+					ma = new MAFMemoryMultipleAlignment(getLog());
 					entry.add(dataKey, ma);
 				}
 
@@ -114,7 +109,7 @@ public class MauveParser extends Parser {
 
 		String[] prevLocArr = prevArr[1].split(":")[1].split("-");
 
-		MemorySequence seq = new MemorySequence(buffer.toString());
+		MemorySequence seq = new MemorySequence(buffer.toString(), getLog());
 		AbstractAlignmentSequence s = new MemoryAlignmentSequence(prevArr[3],
 				Integer.parseInt(prevLocArr[0]),
 				Integer.parseInt(prevLocArr[1])

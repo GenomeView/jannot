@@ -47,7 +47,7 @@ public class TestSequence {
 
 	@Test
 	public void testSubSequence() {
-		MemorySequence a = new MemorySequence("AGTCG");
+		MemorySequence a = new MemorySequence("AGTCG", log);
 
 		assertEquals("GT", a.subsequence(2, 4).stringRepresentation());
 		assertEquals("AGTCG", a.subsequence(1, 6).stringRepresentation());

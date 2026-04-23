@@ -48,8 +48,9 @@ public class FastaParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		final LineIterator it = new LineIterator(is);
 		StringBuffer current = null; // accumulates all lines after last '>'
 		final ArrayList<StringBuffer> seq = new ArrayList<StringBuffer>();
@@ -73,19 +74,17 @@ public class FastaParser extends Parser {
 			}
 		}
 		if (!forceEntries && likelyMultipleAlign(seq)) {
-			AlignmentAnnotation alignAnnot = new AlignmentAnnotation();
+			AlignmentAnnotation alignAnnot = new AlignmentAnnotation(getLog());
 			Entry ref = set.getOrCreateEntry(names.get(0));
 
-			// ref.data.get(dataKey);
 			if (ref != null) {
 				List<Alignment> alist = new ArrayList<Alignment>();
-				ReferenceSequence rs = new ReferenceSequence(seq.get(0));
+				ReferenceSequence rs = new ReferenceSequence(seq.get(0),
+						getLog());
 				for (int i = 0; i < seq.size(); i++) {
-					// System.out.println(names.get(i));
 					Alignment align = new Alignment(names.get(i),
-							new MemorySequence(seq.get(i)), rs);
+							new MemorySequence(seq.get(i), getLog()), rs);
 					alist.add(align);
-					// System.out.println("adding alignment: " + align);
 				}
 				alignAnnot.addAll((Iterable<Alignment>) alist);
 				ref.add(dataKey, alignAnnot);
@@ -93,18 +92,14 @@ public class FastaParser extends Parser {
 		} else {
 			for (int i = 0; i < seq.size(); i++) {
 				Entry e = set.getOrCreateEntry(names.get(i));
-				// Sequence s=(Sequence) e.sequence();
-				e.setSequence(new MemorySequence(seq.get(i)));
-				// s.setSequence();
-
-				// e.description.add("header", description.get(i));
+				e.setSequence(new MemorySequence(seq.get(i), getLog()));
 			}
 		}
 
 		return set;
 	}
 
-	/*
+	/**
 	 * Check if all sequences are the same size and if there is no other data
 	 * besides the sequences.
 	 */
@@ -122,15 +117,16 @@ public class FastaParser extends Parser {
 	@Override
 	public void write(OutputStream os, Entry entry) {
 		PrintWriter out = new PrintWriter(new BufferedOutputStream(os));
-		// if (source == null || source.equals(entry.defaultSource)) {
-		if (entry.description.get("header") != null)
+		if (entry.description.get("header") != null) {
 			out.println(">" + entry.description.get("header"));
-		else
+		} else {
 			out.println(">" + entry.getID());
-		Sequence seq = (Sequence) entry.sequence();
+		}
+		Sequence seq = entry.sequence();
 		int i = 1;
-		for (; i < seq.size() - 80; i += 80)
+		for (; i < seq.size() - 80; i += 80) {
 			out.println(ss(seq.get(i, i + 80), 80));
+		}
 		out.println(ss(seq.get(i, seq.size() + 1), seq.size() - i + 1));
 
 		// }

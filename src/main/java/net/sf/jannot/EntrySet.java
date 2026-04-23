@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import net.sf.nameservice.NameService;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Stores all available {@link Entry}s. Each {@link Entry} is a named chromosome
@@ -24,18 +25,21 @@ import net.sf.nameservice.NameService;
  */
 public class EntrySet implements Iterable<Entry> {
 
-// we now have SyntenicData in the Entry
-//	/**
-//	 * EntrySet level annotation, typically annotation types spanning multiple
-//	 * {@link Entry}s like comparative data
-//	 */
-//	final public SyntenicAnnotation syntenic = new SyntenicAnnotation();
-
 	final public Description description = new Description();
 
 	// sorts entries to 'natural' (alphabetical) order
 	private final ConcurrentSkipListSet<Entry> entries = new ConcurrentSkipListSet<Entry>();
 	private final HashMap<String, Entry> map = new HashMap<String, Entry>();
+
+	private final Reporter log;
+
+	/**
+	 * 
+	 * @param log the Reporter, used to create dummy entries if needed
+	 */
+	public EntrySet(Reporter log) {
+		this.log = log;
+	}
 
 	/*
 	 * @return map[key], or if that is null map[key.lowercase] , or if that is
@@ -44,12 +48,15 @@ public class EntrySet implements Iterable<Entry> {
 	 */
 	private Entry mapGet(String key) {
 		Entry out = map.get(key);
-		if (out == null)
+		if (out == null) {
 			out = map.get(key.toLowerCase());
-		if (out == null)
+		}
+		if (out == null) {
 			out = map.get("chr" + key);
-		if (out == null && key.toLowerCase().startsWith("chr"))
+		}
+		if (out == null && key.toLowerCase().startsWith("chr")) {
 			out = map.get(key.substring(3));
+		}
 
 		return out;
 	}
@@ -68,7 +75,7 @@ public class EntrySet implements Iterable<Entry> {
 	public synchronized Entry getOrCreateEntry(String key) {
 		key = NameService.instance().getPrimaryName(key);
 		if (mapGet(key) == null) {
-			Entry e = new Entry(key);
+			Entry e = new Entry(key, log);
 			map.put(key, e);
 			entries.add(e);
 		}
@@ -92,10 +99,9 @@ public class EntrySet implements Iterable<Entry> {
 	public void clear() {
 		entries.clear();
 		map.clear();
-		// syntenic.clear();
-
 	}
 
+	@Override
 	public String toString() {
 		return "EntrySet[" + map + "]";
 	}

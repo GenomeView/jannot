@@ -48,7 +48,7 @@ public class TestVCF {
 		String dataIdentifier = "CEU.trio.2010_03.genotypes.vcf.gz";
 		String indexIdentifier = dataIdentifier + ".tbi";
 
-		EntrySet entries = new EntrySet();
+		EntrySet entries = new EntrySet(log);
 		Locator fIndex = new Locator(DataManager.file(indexIdentifier), log);
 		Locator fData = new Locator(DataManager.file(dataIdentifier), log);
 		DataSource ds = DataSourceFactory.create(fData, fIndex, log);

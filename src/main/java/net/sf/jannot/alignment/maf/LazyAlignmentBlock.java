@@ -41,25 +41,13 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 		this.log = log;
 	}
 
+	public Reporter getLog() {
+		return log;
+	}
+
 	public void add(AbstractAlignmentSequence as) {
 		list.add(as);
 	}
-
-//	@Override
-//	public int translate(int pos) {
-//		if (position == null){
-////			System.out.println("Translate lazy load");
-//			lazyLoad();
-////			System.out.println("Pos after: "+position);
-//			
-//		}
-//		if (pos < position.length)
-//			return position[pos];
-//		else {
-//			System.err.println("Wrong translate: " + position.length + "\t" + pos);
-//			return position[position.length - 1];
-//		}
-//	}
 
 	private boolean lazyLoading = false;
 
@@ -72,7 +60,6 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 			return;
 		lazyLoading = true;
 
-//		System.out.println("  maf.bgz access ... ");
 		// make a mapping id -> alignment sequence
 		Map<String, AbstractAlignmentSequence> idMap = new HashMap<String, AbstractAlignmentSequence>();
 		for (AbstractAlignmentSequence s : list) {
@@ -81,8 +68,6 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 
 		try {
 			zr.seek(offsetStart);
-			// long lineNumber = zr.getFilePointer();
-			// while (lineNumber >= 0 && lineNumber <= offsetEnd) {
 			String line = zr.readLine();
 			// System.err.println("Processing block");
 			while (!line.startsWith("#") && !line.isEmpty()) {
@@ -97,7 +82,8 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 
 						if (alSeq != null) {
 //							System.err.println("Loading sequence for: " + id);
-							MemorySequence seq = new MemorySequence(cols[6]);
+							MemorySequence seq = new MemorySequence(cols[6],
+									getLog());
 							alSeq.noNucleotides = Integer.parseInt(cols[3]);
 							int startNuc = Integer.parseInt(cols[2]);
 							int totalLength = Integer.parseInt(cols[5]);
@@ -120,15 +106,8 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 					}
 				}
 				line = zr.readLine();
-				// }
-				// lineNumber = zr.getFilePointer();
 			}
 
-//			AbstractAlignmentSequence as = list.get(0);
-//			this.loc = new Location(as.start(), as.end());
-//			 System.err.println("Initing with: " + as);
-//			 System.err.println("\tseq=" + as.seq());
-//			super.initPosition(as);
 		} catch (NumberFormatException | IOException e) {
 			log.log(Level.WARNING, "lazy load failed", e);
 		}

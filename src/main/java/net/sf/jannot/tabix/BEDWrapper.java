@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 
 import net.sf.jannot.Feature;
 import net.sf.jannot.tabix.codec.BEDCodec;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -16,8 +17,9 @@ import net.sf.jannot.tabix.codec.BEDCodec;
  */
 public class BEDWrapper extends FeatureWrapper {
 
-	BEDWrapper(String key, IndexedFeatureFile data, TabIndex idx) {
-		super(key, data, idx);
+	BEDWrapper(String key, IndexedFeatureFile data, TabIndex idx,
+			Reporter log) {
+		super(key, data, idx, log);
 	}
 
 	@Override

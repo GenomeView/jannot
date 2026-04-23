@@ -6,6 +6,7 @@ package net.sf.jannot.wiggle;
 import java.io.IOException;
 
 import net.sf.jannot.utils.ArrayIterable;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -14,14 +15,25 @@ import net.sf.jannot.utils.ArrayIterable;
  */
 public abstract class AbstractWiggle implements Graph, Query {
 
-	public String label() {
-		return "wiggle";
-	}
+	private final Reporter log;
 
 	private FloatCache buffer5 = null;
 
 	private int lastStart = -1, lastEnd = -1, lastRes = -1;
 	private float[] last = null;
+
+	public AbstractWiggle(Reporter log) {
+		this.log = log;
+	}
+
+	@Override
+	public Reporter getLog() {
+		return log;
+	}
+
+	public String label() {
+		return "wiggle";
+	}
 
 	@Override
 	public float[] get(int start, int end, int resolutionIndex)

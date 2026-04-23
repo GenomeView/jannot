@@ -33,9 +33,12 @@ import tudelft.utilities.logging.Reporter;
 
 public class DAS extends DataSource {
 
-	private String serverPrefix;
+	private final String serverPrefix;
 
-	private DSN dsn = null;
+	private final DSN dsn;
+	private EntryPoint ep = null;
+	private String reference = null;
+	private EntryPointParser entryPoints = null;
 
 	public DAS(String serverPrefix, Reporter log)
 			throws MalformedURLException, ParserConfigurationException,
@@ -49,8 +52,6 @@ public class DAS extends DataSource {
 		return dsn;
 	}
 
-	private EntryPointParser entryPoints = null;
-
 	private class EntryPointParser extends DefaultHandler {
 		private Stack<String> parserStack = new Stack<String>();
 		private ArrayList<EntryPoint> epList = new ArrayList<EntryPoint>();
@@ -58,7 +59,6 @@ public class DAS extends DataSource {
 		@Override
 		public void endElement(String uri, String localName, String name)
 				throws SAXException {
-			// TODO Auto-generated method stub
 			super.endElement(uri, localName, name);
 			String stackName = parserStack.pop();
 			if (!name.equals(stackName)) {
@@ -70,7 +70,6 @@ public class DAS extends DataSource {
 		@Override
 		public void startElement(String uri, String localName, String name,
 				Attributes attributes) throws SAXException {
-			// TODO Auto-generated method stub
 			super.startElement(uri, localName, name, attributes);
 			parserStack.push(name);
 			if (name.equalsIgnoreCase("SEGMENT")) {
@@ -88,22 +87,12 @@ public class DAS extends DataSource {
 
 	}
 
-	static public class EntryPoint {
-		String id;
-		int start, stop;
-
-		public String toString() {
-			return id + " [" + start + "," + stop + "]";
-		}
-	}
-
 	private static class SequenceParser extends DefaultHandler {
 		StringBuffer seq = null;
 
 		@Override
 		public void startElement(String uri, String localName, String name,
 				Attributes attributes) throws SAXException {
-			// TODO Auto-generated method stub
 			super.startElement(uri, localName, name, attributes);
 			if (name.equalsIgnoreCase("DNA")) {
 				seq = new StringBuffer();
@@ -113,7 +102,6 @@ public class DAS extends DataSource {
 		@Override
 		public void characters(char[] ch, int start, int length)
 				throws SAXException {
-			// TODO Auto-generated method stub
 			super.characters(ch, start, length);
 			seq.append(ch, start, length);
 		}
@@ -125,23 +113,16 @@ public class DAS extends DataSource {
 			SAXException, IOException, URISyntaxException {
 		StringBuffer seq = this.getSequence(ref, ep);
 		Entry out = set.getOrCreateEntry(ref + ":" + ep);
-//		out.setID();
-		out.setSequence(new MemorySequence(seq));
-		// System.out.println("Ref: " + ref);
-		// if (ref.contains("Homo")) {
-		System.out.println("Ref: " + ref);
+		out.setSequence(new MemorySequence(seq, getLog()));
+		getLog().log(Level.INFO, "Ref: " + ref);
 
 		for (String source : this.getDSN().getSources(ref)) {
 			List<Feature> list = this.getFeatures(source, ep);
 			for (Feature f : list) {
-//				out.annotation.addAll(list);
 				MemoryFeatureAnnotation fa = out.getMemoryAnnotation(f.type());
 				fa.add(f);
 			}
 		}
-		// System.out.println("** " + list);
-
-		// }
 
 	}
 
@@ -158,7 +139,6 @@ public class DAS extends DataSource {
 		@Override
 		public void characters(char[] ch, int st, int length)
 				throws SAXException {
-			// TODO Auto-generated method stub
 			super.characters(ch, st, length);
 			if (parserStack.peek().equalsIgnoreCase("START")) {
 				start = Integer.parseInt(new String(ch, st, length));
@@ -172,9 +152,9 @@ public class DAS extends DataSource {
 				strand = ch[st];
 			}
 			if (parserStack.peek().equalsIgnoreCase("score")) {
-				if (length == 1 && ch[st] == '-')
+				if (length == 1 && ch[st] == '-') {
 					score = 0;
-				else {
+				} else {
 					score = Double.parseDouble(new String(ch, st, length));
 				}
 			}
@@ -183,7 +163,6 @@ public class DAS extends DataSource {
 		@Override
 		public void endElement(String uri, String localName, String name)
 				throws SAXException {
-			// TODO Auto-generated method stub
 			super.endElement(uri, localName, name);
 			String stackName = parserStack.pop();
 			if (!name.equals(stackName)) {
@@ -231,17 +210,11 @@ public class DAS extends DataSource {
 			ParserConfigurationException, URISyntaxException {
 		SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 		FeatureParser featp = new FeatureParser();
-		// System.out.println("Getting features: " + featureDSN);
-		// System.out.println(serverPrefix + "/das/" + featureDSN +
-		// "/features?segment=" + e.id + ":" + e.start + "," + e.stop);
 		parser.parse(URIFactory.url(serverPrefix + "/das/" + source
 				+ "/features?segment=" + e.id + ":" + e.start + "," + e.stop)
 				.openStream(), featp);
 		return featp.list;
 	}
-
-	private EntryPoint ep = null;
-	private String reference = null;
 
 	public void setEntryPoint(EntryPoint ep) {
 		this.ep = ep;
@@ -289,8 +262,9 @@ public class DAS extends DataSource {
 
 	@Override
 	public EntrySet read(EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		if (ep == null || reference == null) {
 			getLog().log(Level.SEVERE,
 					"Both the EntryPoint and the Reference need to be set!");
@@ -337,4 +311,14 @@ public class DAS extends DataSource {
 		return 0;
 	}
 
+}
+
+class EntryPoint {
+	String id;
+	int start, stop;
+
+	@Override
+	public String toString() {
+		return id + " [" + start + "," + stop + "]";
+	}
 }

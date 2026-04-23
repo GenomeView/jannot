@@ -41,8 +41,9 @@ public class BEDParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		Type type = null;
 		LineIterator it = new LineIterator(is);
 		it.setSkipBlanks(true);
@@ -53,11 +54,13 @@ public class BEDParser extends Parser {
 				String name = BEDTools.parseTrack(line).get("name");
 				getLog().log(Level.INFO, BEDTools.parseTrack(line).toString());
 				getLog().log(Level.INFO, "NAME: " + name);
-				if (name != null)
+				if (name != null) {
 					type = Type.get(name);
+				}
 				continue;
-			} else if (line.startsWith("browser"))
+			} else if (line.startsWith("browser")) {
 				continue;
+			}
 			Feature f = BEDTools.parseLine(line, type, defaultType);
 			MemoryFeatureAnnotation fa = set
 					.getOrCreateEntry(f.qualifier("chrom"))
@@ -78,9 +81,10 @@ public class BEDParser extends Parser {
 			if (entry.get(data) instanceof FeatureAnnotation) {
 				String headerLine = "track name=\"" + entry.get(data).label()
 						+ "\"";
-				if (entry.description.keys().size() > 0)
+				if (entry.description.keys().size() > 0) {
 					headerLine += " description=\""
 							+ entry.description.toString() + "\"";
+				}
 				out.println(headerLine);
 				FeatureAnnotation fa = (FeatureAnnotation) entry.get(data);
 				for (Feature f : fa.get()) {
@@ -106,10 +110,11 @@ public class BEDParser extends Parser {
 		out.append(f.strand().symbol() + "\t");
 		out.append((f.start() - 1) + "\t");
 		out.append(f.end() + "\t");
-		if (f.getColor() != null)
+		if (f.getColor() != null) {
 			out.append(f.getColor().toString());
-		else
+		} else {
 			out.append("");
+		}
 		return out.toString();
 	}
 

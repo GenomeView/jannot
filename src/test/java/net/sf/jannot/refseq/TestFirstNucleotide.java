@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import net.sf.jannot.Cleaner;
@@ -14,6 +15,7 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.IndexedFastaDataSource;
 import net.sf.jannot.source.Locator;
+import net.sf.nameservice.NameService;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -23,6 +25,11 @@ import tudelft.utilities.logging.Reporter;
  */
 public class TestFirstNucleotide {
 	private static final Reporter log = mock(Reporter.class);
+
+	@Before
+	public void before() throws ReadFailedException {
+		NameService.init(log);
+	}
 
 	@Test
 	public void testNucleotide() throws MalformedURLException, IOException,

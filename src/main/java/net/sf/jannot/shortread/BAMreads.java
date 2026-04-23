@@ -13,6 +13,7 @@ import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.util.CloseableIterator;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.SAMDataSource;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -35,12 +36,23 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 	private CachingQueryReader cqr;
 	private int keyIndex;
 	private SAMDataSource source;
+	private int maxLenght = 0;
+
+	public BAMreads(SAMDataSource source, String key, Reporter log) {
+		super(log);
+		this.source = source;
+		// returned reader is already silent. Changing default here is indirect.
+		// SamReaderFactory.setDefaultValidationStringency(ValidationStringency.SILENT);
+		this.keyIndex = source.getReader().getFileHeader()
+				.getSequenceIndex(key.toString());
+		cqr = CachingQueryReader.create(source);
+		this.key = key;
+
+	}
 
 	public int getPairLength() {
 		return qFastMaxPairedLenght;
 	}
-
-	private int maxLenght = 0;
 
 	@Override
 	public Iterable<SAMRecord> get(int start, int end) {
@@ -60,20 +72,6 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 
 	public String label() {
 		return source.getSourceKey().toString();
-	}
-
-	private static final Logger logger = Logger
-			.getLogger(BAMreads.class.getCanonicalName());
-
-	public BAMreads(SAMDataSource source, String key) {
-		this.source = source;
-		// returned reader is already silent. Changing default here is indirect.
-		// SamReaderFactory.setDefaultValidationStringency(ValidationStringency.SILENT);
-		this.keyIndex = source.getReader().getFileHeader()
-				.getSequenceIndex(key.toString());
-		cqr = CachingQueryReader.create(source);
-		this.key = key;
-
 	}
 
 	public String getKey() {

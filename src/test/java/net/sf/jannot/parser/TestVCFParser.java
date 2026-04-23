@@ -19,6 +19,7 @@ package net.sf.jannot.parser;
 import java.io.File;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import net.sf.jannot.Data;
@@ -28,9 +29,11 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.nameservice.NameService;
 import support.DataManager;
 import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;
@@ -45,6 +48,11 @@ public class TestVCFParser {
 	private static final Reporter log = new ReportToLogger(
 			TestVCFParser.class.toString());
 
+	@Before
+	public void before() throws ReadFailedException {
+		NameService.init(log);
+	}
+
 	@Test
 	public void testTinySize() throws Exception {
 
@@ -54,8 +62,9 @@ public class TestVCFParser {
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("20", es.firstEntry().getID());
 		int count = 0;
-		for (Entry e : es)
+		for (Entry e : es) {
 			count++;
+		}
 		Assert.assertEquals(1, count);
 		Data d = es.firstEntry().get(Type.get("tiny.vcf"));
 		for (DataKey dk : es.firstEntry()) {
@@ -83,8 +92,9 @@ public class TestVCFParser {
 		Assert.assertEquals("gi|395136682|gb|CP003248.1|",
 				es.firstEntry().getID());
 		int count = 0;
-		for (Entry e : es)
+		for (Entry e : es) {
 			count++;
+		}
 		Assert.assertEquals(1, count);
 		Data d = es.firstEntry().get(Type.get("regular.vcf"));
 		for (DataKey dk : es.firstEntry()) {

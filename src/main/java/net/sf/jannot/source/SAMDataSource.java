@@ -55,15 +55,17 @@ public class SAMDataSource extends DataSource {
 	 */
 	public SAMDataSource(Locator data, Locator index, Reporter log) {
 		super(data, log);
-		if (data == null || index == null)
+		if (data == null || index == null) {
 			throw new NullPointerException(
 					"Neither data nor index provided: " + data + "; " + index);
+		}
 		try {
 			if (data.isURL()) {
-				if (index.isURL())
+				if (index.isURL()) {
 					init(data.url(), index.url());
-				else
+				} else {
 					init(data.url(), index.file());
+				}
 			} else {
 				init(data.file(), index.file());
 			}
@@ -107,30 +109,38 @@ public class SAMDataSource extends DataSource {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		SAMDataSource other = (SAMDataSource) obj;
 		if (content == null) {
-			if (other.content != null)
+			if (other.content != null) {
 				return false;
-		} else if (!content.equals(other.content))
+			}
+		} else if (!content.equals(other.content)) {
 			return false;
+		}
 		if (index == null) {
-			if (other.index != null)
+			if (other.index != null) {
 				return false;
-		} else if (!index.equals(other.index))
+			}
+		} else if (!index.equals(other.index)) {
 			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public EntrySet read(EntrySet set) {
-		if (set == null)
-			set = new EntrySet();
+		if (set == null) {
+			set = new EntrySet(getLog());
+		}
 		SamReader inputSam = getReader();
 
 		SAMSequenceDictionary tmpDic = inputSam.getFileHeader()
@@ -138,8 +148,8 @@ public class SAMDataSource extends DataSource {
 		for (int i = 0; i < tmpDic.size(); i++) {
 			SAMSequenceRecord org = inputSam.getFileHeader().getSequence(i);
 			Entry e = set.getOrCreateEntry(org.getSequenceName());
-			e.add(getSourceKey(), new BAMreads(this, org.getSequenceName()));
-			// e.shortReads.add(this, new BAMreads(this, e));
+			e.add(getSourceKey(),
+					new BAMreads(this, org.getSequenceName(), getLog()));
 
 		}
 		return set;
@@ -157,8 +167,9 @@ public class SAMDataSource extends DataSource {
 		} catch (IOException e) {
 			getLog().log(Level.WARNING, "failed to close", e);
 		}
-		if (content instanceof SeekableFileCachedHTTPStream)
+		if (content instanceof SeekableFileCachedHTTPStream) {
 			((SeekableFileCachedHTTPStream) content).closeAll();
+		}
 
 	}
 
@@ -269,6 +280,7 @@ class SAMKey implements DataKey {
 		return this.string;
 	}
 
+	@Override
 	public int compareTo(DataKey o) {
 		return toString().compareTo(toString());
 	}

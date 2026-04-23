@@ -7,18 +7,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import net.sf.jannot.Data;
-import net.sf.jannot.pileup.Pile;
-import net.sf.jannot.pileup.PileNormalization;
-import net.sf.jannot.pileup.PileTools;
-import net.sf.jannot.tdf.TDFData.TrackType;
 
 import org.broad.igv.tdf.TDFDataset;
 import org.broad.igv.tdf.TDFReader;
 import org.broad.igv.tdf.TDFTile;
 import org.broad.igv.track.WindowFunction;
+
+import net.sf.jannot.Data;
+import net.sf.jannot.pileup.Pile;
+import net.sf.jannot.pileup.PileNormalization;
+import net.sf.jannot.pileup.PileTools;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -26,7 +25,6 @@ import org.broad.igv.track.WindowFunction;
  */
 public class TDFData implements Data<Pile>, PileNormalization {
 
-	private Logger log = Logger.getLogger(TDFData.class.getCanonicalName());
 	private String chr;
 
 	private int size = -1;
@@ -37,8 +35,36 @@ public class TDFData implements Data<Pile>, PileNormalization {
 
 	private int maxZoom;
 	private TrackType trackType;
-	
-	public TrackType trackType(){
+
+	private final Reporter log;
+
+	/**
+	 * @param chr
+	 * @param tr
+	 */
+	public TDFData(String chr, TDFReader tr, Reporter log) {
+		this.chr = chr;
+		this.tr = tr;
+		this.log = log;
+		trackType = TrackType.OTHER;
+		try {
+			TrackType.valueOf(tr.getTrackType());
+		} catch (IllegalArgumentException ie) {
+			log.log(Level.WARNING, "JAnnot does not recognize this track type: "
+					+ tr.getTrackType());
+		}
+		log.log(Level.INFO, "Track type: " + tr.getTrackType());
+		log.log(Level.INFO, "Datasets: " + tr.getDatasetNames());
+		log.log(Level.INFO, "Groups: " + tr.getGroupNames());
+		log.log(Level.INFO,
+				"Track names: " + Arrays.toString(tr.getTrackNames()));
+		maxZoom = tr.getMaxZoom();
+
+		wf = tr.getWindowFunctions().get(0);
+
+	}
+
+	public TrackType trackType() {
 		return trackType;
 	}
 
@@ -47,32 +73,9 @@ public class TDFData implements Data<Pile>, PileNormalization {
 		return out.substring(out.lastIndexOf('/') + 1);
 
 	}
-	
-	enum TrackType{
-		SENSEAWARECOVERAGE,COVERAGE,OTHER;
-	}
-	
-	/**
-	 * @param chr
-	 * @param tr
-	 */
-	public TDFData(String chr, TDFReader tr) {
-		this.chr = chr;
-		this.tr = tr;
-		trackType=TrackType.OTHER;
-		try{
-			TrackType.valueOf(tr.getTrackType());
-		}catch(IllegalArgumentException ie){
-			log.warning("JAnnot does not recognize this track type: "+tr.getTrackType());
-		}
-		log.info("Track type: "+tr.getTrackType());
-		log.info("Datasets: "+tr.getDatasetNames());
-		log.info("Groups: "+tr.getGroupNames());
-		log.info("Track names: "+Arrays.toString(tr.getTrackNames()));
-		maxZoom = tr.getMaxZoom();
 
-		wf = tr.getWindowFunctions().get(0);
-
+	enum TrackType {
+		SENSEAWARECOVERAGE, COVERAGE, OTHER;
 	}
 
 	public List<WindowFunction> availableWindowFunctions() {
@@ -83,18 +86,12 @@ public class TDFData implements Data<Pile>, PileNormalization {
 		this.wf = wf;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get(int, int)
-	 */
 	@Override
 	public Iterable<Pile> get(int start, int end) {
-		log.log(Level.FINEST, "TDF query: " + start + "\t" + end);
 		if (size < 0) {
 			TDFDataset data = tr.getDataset(chr, 0, wf);
 			this.size = data.getTileWidth();
-			log.info("Setting TDF data size to " + this.size);
+			log.log(Level.INFO, "Setting TDF data size to " + this.size);
 
 		}
 		if (end < 0)
@@ -111,7 +108,7 @@ public class TDFData implements Data<Pile>, PileNormalization {
 		}
 
 		TDFDataset data = tr.getDataset(chr, zoom, wf);
-		
+
 		ArrayList<Pile> out = new ArrayList<Pile>();
 		for (TDFTile tft : data.getTiles(start, end)) {
 			for (int i = 0; i < tft.getSize(); i++) {
@@ -135,21 +132,11 @@ public class TDFData implements Data<Pile>, PileNormalization {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#get()
-	 */
 	@Override
 	public Iterable<Pile> get() {
 		return get(1, size);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Data#canSave()
-	 */
 	@Override
 	public boolean canSave() {
 		return false;
@@ -166,6 +153,11 @@ public class TDFData implements Data<Pile>, PileNormalization {
 	@Override
 	public boolean supportsNormalization() {
 		return true;
+	}
+
+	@Override
+	public Reporter getLog() {
+		return log;
 	}
 
 }

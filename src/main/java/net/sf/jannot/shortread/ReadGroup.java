@@ -3,8 +3,9 @@
  */
 package net.sf.jannot.shortread;
 
-import net.sf.jannot.Data;
 import htsjdk.samtools.SAMRecord;
+import net.sf.jannot.Data;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -12,6 +13,12 @@ import htsjdk.samtools.SAMRecord;
  * 
  */
 public abstract class ReadGroup implements Data<SAMRecord> {
+
+	private final Reporter log;
+
+	public ReadGroup(Reporter log) {
+		this.log = log;
+	}
 
 	/**
 	 * Returns the maximum length of a read. In case this information is not
@@ -24,8 +31,7 @@ public abstract class ReadGroup implements Data<SAMRecord> {
 	 * 
 	 * Get the second read in a mate-pair.
 	 * 
-	 * @param one
-	 *            the read for which to find the mate
+	 * @param one the read for which to find the mate
 	 * @return the mate
 	 */
 	public abstract SAMRecord getSecondRead(SAMRecord one);
@@ -50,6 +56,9 @@ public abstract class ReadGroup implements Data<SAMRecord> {
 	 * @param second
 	 * @return
 	 */
-	public abstract SAMRecord getFirstRead(SAMRecord second) ;
+	public abstract SAMRecord getFirstRead(SAMRecord second);
 
+	public Reporter getLog() {
+		return log;
+	}
 }
