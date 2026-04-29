@@ -10,17 +10,17 @@ import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.parser.Parser;
 import net.sf.jannot.shortread.MemoryReadSet;
-import tudelft.utilities.logging.Reporter;
 
 public class MapViewParser extends Parser {
 
 	/**
 	 * @param dataKey
 	 */
-	public MapViewParser(DataKey dataKey, Reporter log) {
-		super(dataKey, log);
+	public MapViewParser(DataKey dataKey, Global global) {
+		super(dataKey, global);
 	}
 
 	@Override

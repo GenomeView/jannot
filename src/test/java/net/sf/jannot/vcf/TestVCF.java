@@ -1,24 +1,23 @@
 package net.sf.jannot.vcf;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import net.sf.jannot.variation.Variation;
-import net.sf.nameservice.NameService;
 import support.DataManager;
-import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -32,26 +31,25 @@ import tudelft.utilities.logging.Reporter;
  * 
  */
 public class TestVCF {
+	private final Global global;
 
-	@Before
-	public void init() throws ReadFailedException {
-		Reporter log = new ReportToLogger((getClass().getSimpleName()));
-		NameService.init(log);
+	public TestVCF() throws IOException, ReadFailedException {
+		global = new Global();
 	}
 
 	@Test
 	public void test_loadEntries() throws Exception {
-		ReportToLogger log = new ReportToLogger(getClass().getSimpleName());
+		Reporter log = global.getLog();
 
 		int i = 0;
 
 		String dataIdentifier = "CEU.trio.2010_03.genotypes.vcf.gz";
 		String indexIdentifier = dataIdentifier + ".tbi";
 
-		EntrySet entries = new EntrySet(log);
+		EntrySet entries = new EntrySet(global);
 		Locator fIndex = new Locator(DataManager.file(indexIdentifier), log);
 		Locator fData = new Locator(DataManager.file(dataIdentifier), log);
-		DataSource ds = DataSourceFactory.create(fData, fIndex, log);
+		DataSource ds = DataSourceFactory.create(fData, fIndex, global);
 
 		// File fileData = new File(dataFile);
 		// File indexData = new File(indexFile);

@@ -10,19 +10,19 @@ import java.util.logging.Level;
 import be.abeel.io.LineIterator;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
-import tudelft.utilities.logging.Reporter;
 
 public class PTTParser extends Parser {
 
 	/**
 	 * @param dataKey
 	 */
-	public PTTParser(Reporter log) {
-		super(null, log);
+	public PTTParser(Global global) {
+		super(null, global);
 	}
 
 	/**

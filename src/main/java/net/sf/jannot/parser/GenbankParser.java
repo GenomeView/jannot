@@ -11,6 +11,7 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Global;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
 import net.sf.jannot.refseq.MemorySequence;
@@ -25,10 +26,10 @@ public class GenbankParser extends Parser {
 
 	/**
 	 * @param dataKey
-	 * @param log     the {@link Reporter} to log issues to
+	 * @param global  the {@link Reporter} to log issues to
 	 */
-	public GenbankParser(DataKey key, Reporter log) {
-		super(key, log);
+	public GenbankParser(DataKey key, Global global) {
+		super(key, global);
 
 	}
 

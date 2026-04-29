@@ -6,8 +6,8 @@ package net.sf.jannot.source;
 import java.io.InputStream;
 
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.parser.Parser;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * Extends DataSource.
@@ -22,8 +22,8 @@ public abstract class AbstractStreamDataSource extends DataSource {
 
 	private InputStream ios;
 
-	protected AbstractStreamDataSource(Locator l, Reporter log) {
-		super(l, log);
+	protected AbstractStreamDataSource(Locator l, Global global) {
+		super(l, global);
 	}
 
 	public final void setParser(Parser parser) {
@@ -37,7 +37,7 @@ public abstract class AbstractStreamDataSource extends DataSource {
 	@Override
 	public EntrySet read(EntrySet set) {
 		if (set == null) {
-			set = new EntrySet(getLog());
+			set = new EntrySet(global);
 		}
 		return parser.parse(ios, set);
 	}

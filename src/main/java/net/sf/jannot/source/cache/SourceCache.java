@@ -14,9 +14,9 @@ import java.util.Set;
 
 import atk.io.ExtensionFileFilter;
 import atk.util.MD5Tools;
+import net.sf.jannot.Global;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
-import tudelft.utilities.logging.Reporter;
 
 public class SourceCache {
 	// singleton class with only static members.
@@ -26,8 +26,9 @@ public class SourceCache {
 	public static boolean contains(URL url) {
 
 		// System.out.println("URL cache: " + cacheDir);
-		if (!cacheDir.exists())
+		if (!cacheDir.exists()) {
 			cacheDir.mkdir();
+		}
 		File[] files = cacheDir.listFiles(new ExtensionFileFilter("url"));
 		Set<String> names = new HashSet<String>();
 		String md5 = MD5Tools.md5(url.toString());
@@ -39,10 +40,11 @@ public class SourceCache {
 
 	}
 
-	public static DataSource get(URL url, Reporter log) throws IOException {
-		System.out.println("Retrieving from cache: " + url);
+	public static DataSource get(URL url, Global global) throws IOException {
+		// System.out.println("Retrieving from cache: " + url);
 		return new FileSource(
-				new File(cacheDir, MD5Tools.md5(url.toString()) + ".url"), log);
+				new File(cacheDir, MD5Tools.md5(url.toString()) + ".url"),
+				global);
 	}
 
 	public static OutputStream startCaching(URL url)

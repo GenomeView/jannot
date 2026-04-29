@@ -12,15 +12,15 @@ import java.net.URL;
 import java.util.logging.Level;
 
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.parser.ParserFactory;
 import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
-import tudelft.utilities.logging.Reporter;
 
 public class CachedURLSource extends URLSource {
 
-	public CachedURLSource(URL url, Reporter log) throws IOException {
-		super(url, log);
+	public CachedURLSource(URL url, Global global) throws IOException {
+		super(url, global);
 
 	}
 
@@ -29,12 +29,13 @@ public class CachedURLSource extends URLSource {
 		if (!SourceCache.contains(url)) {
 			new SSL(getLog()).certify(url);
 			try {
-				super.setParser(
-						ParserFactory.create(url.openStream(), url, getLog()));
+				super.setParser(ParserFactory.create(url.openStream(), url,
+						getGlobal()));
 				final PipedInputStream in = new PipedInputStream();
 				final PipedOutputStream forParser = new PipedOutputStream(in);
 
 				new Thread(new Runnable() {
+					@Override
 					public void run() {
 						try {
 							OutputStream out = SourceCache.startCaching(url);
@@ -71,7 +72,7 @@ public class CachedURLSource extends URLSource {
 			return super.read(set);
 		} else {
 			try {
-				return SourceCache.get(url, getLog()).read(set);
+				return SourceCache.get(url, getGlobal()).read(set);
 			} catch (IOException e) {
 				// FIXME this shouldn't happen
 				getLog().log(Level.SEVERE, "failed to read " + url, e);

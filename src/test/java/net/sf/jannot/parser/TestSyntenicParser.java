@@ -20,31 +20,36 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.Test;
 
 import net.sf.jannot.Data;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.SyntenicData;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
-import net.sf.nameservice.NameService;
 import support.DataManager;
-import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;
 
 public class TestSyntenicParser {
 	private static final String SYN_FILE = "test.syn";
-	private static Reporter log = new ReportToLogger(
-			TestSyntenicParser.class.toString());
+	private final Reporter log;
+	private final Global global;
+
+	public TestSyntenicParser() throws IOException, ReadFailedException {
+		global = new Global();
+		log = global.getLog();
+	}
 
 	@Test
 	public void testParserMini() throws Exception {
-		NameService.init(log);
 		File f = DataManager.file(SYN_FILE);
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read(new EntrySet(log));
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		EntrySet es = ds.read(new EntrySet(global));
 
 		Data<?> data = es.getOrCreateEntry("anthracis")
 				.get(SyntenicParser.SYNTENIC_KEY);

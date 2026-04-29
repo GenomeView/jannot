@@ -10,11 +10,11 @@ import be.abeel.io.LineIterator;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -33,8 +33,8 @@ public class MaqSNPParser extends Parser {
 	/**
 	 * @param dataKey
 	 */
-	public MaqSNPParser(Reporter log) {
-		super(null, log);
+	public MaqSNPParser(Global global) {
+		super(null, global);
 	}
 
 	@Override

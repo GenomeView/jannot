@@ -11,8 +11,6 @@ import java.util.Map;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.shortread.ReadGroup;
-import net.sf.nameservice.NameService;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * "chromosome" container for a (often short) named nucleotide sequence. If
@@ -58,21 +56,21 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	private final String id;
 
-	// needed if new empty sub-Entry's need to be created
-	private final Reporter log;
+	private final Global global;
 
 	/**
 	 * 
-	 * @param id the dirty id, may be an alias previously registered to the
-	 *           NameService. Must not be null
+	 * @param id     the dirty id, may be an alias previously registered to the
+	 *               NameService. Must not be null
+	 * @param global the {@link Global} structures
 	 */
-	public Entry(String id, Reporter log) {
-		id = NameService.instance().getPrimaryName(id);
+	public Entry(String id, Global global) {
+		id = global.getNameService().getPrimaryName(id);
 		if (id == null) {
 			throw new RuntimeException("id is null");
 		}
 		this.id = id;
-		this.log = log;
+		this.global = global;
 
 	}
 
@@ -164,7 +162,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	 */
 	public MemoryFeatureAnnotation getMemoryAnnotation(DataKey type) {
 		if (!data.containsKey(type)) {
-			this.add(type, new MemoryFeatureAnnotation(log));
+			this.add(type, new MemoryFeatureAnnotation(global.getLog()));
 		}
 		Data<?> tmp = this.get(type);
 		if (tmp instanceof MemoryFeatureAnnotation) {
@@ -181,7 +179,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	 */
 	public Sequence sequence() {
 		if (!data.containsKey(seqKey)) {
-			data.put(seqKey, new MemorySequence(log));
+			data.put(seqKey, new MemorySequence(global.getLog()));
 		}
 		return (Sequence) data.get(seqKey);
 	}

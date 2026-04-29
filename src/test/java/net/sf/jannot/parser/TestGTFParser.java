@@ -22,13 +22,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.Type;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
-import net.sf.nameservice.NameService;
 import support.DataManager;
-import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -41,12 +40,12 @@ public class TestGTFParser {
 	@Test
 	public void testParserMini() throws Exception {
 
-		Reporter log = new ReportToLogger(TestGTFParser.class.toString());
-		NameService.init(log);
+		Global global = new Global();
+		Reporter log = global.getLog();
 
 		File f = DataManager.file("doubleScore.gtf");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read(new EntrySet(log));
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		EntrySet es = ds.read(new EntrySet(global));
 		double score = es.firstEntry().getMemoryAnnotation(Type.get("gene"))
 				.get(0).getScore();
 		Assert.assertEquals(0, score, 0.0001);

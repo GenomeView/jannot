@@ -8,12 +8,12 @@ import java.io.InputStream;
 import be.abeel.io.LineIterator;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * Parser for the output of the GeneMark gene caller
@@ -26,8 +26,8 @@ public class GeneMarkParser extends Parser {
 	/**
 	 * @param dataKey
 	 */
-	public GeneMarkParser(Reporter log) {
-		super(null, log);
+	public GeneMarkParser(Global global) {
+		super(null, global);
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import htsjdk.samtools.seekablestream.SeekableFileStream;
 import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
@@ -35,15 +36,15 @@ public class TDFDataSource extends DataSource {
 
 	/**
 	 * @param file
-	 * @param log  the {@link Reporter} to log issues to.
+	 * @param global the {@link Reporter} to log issues to.
 	 * @throws URISyntaxException
 	 * @throws ReadFailedException
 	 * @throws IOException
 	 * @throws MalformedURLException
 	 */
-	public TDFDataSource(Locator l, Reporter log) throws ReadFailedException,
+	public TDFDataSource(Locator l, Global global) throws ReadFailedException,
 			URISyntaxException, MalformedURLException, IOException {
-		super(l, log);
+		super(l, global);
 		if (!l.isURL()) {
 			s = new SeekableFileStream(l.file());
 		} else {
@@ -59,7 +60,7 @@ public class TDFDataSource extends DataSource {
 	public EntrySet read(EntrySet set) {
 
 		if (set == null) {
-			set = new EntrySet(getLog());
+			set = new EntrySet(getGlobal());
 		}
 
 		Set<String> chrs = new HashSet<String>();

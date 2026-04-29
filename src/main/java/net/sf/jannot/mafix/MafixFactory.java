@@ -12,39 +12,41 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import be.abeel.io.LineIterator;
+import htsjdk.samtools.seekablestream.SeekableStream;
 import htsjdk.samtools.util.BlockCompressedInputStream;
 import htsjdk.samtools.util.BlockCompressedOutputStream;
-import htsjdk.samtools.seekablestream.SeekableStream;
-import be.abeel.io.LineIterator;
 
 /**
- * @author thpar 
+ * @author thpar
  * @author Thomas Abeel
  * 
  */
 public class MafixFactory {
 
-
 	/**
 	 * Read the original MAF file and write it to the block zipped stream. Add
 	 * every new Alignment Block to the index.
-	 * @throws URISyntaxException 
+	 * 
+	 * @throws URISyntaxException
 	 */
-	public static void generateBlockZippedFile(InputStream is, File out) throws FileNotFoundException, IOException, URISyntaxException {
-		BufferedInputStream bis=new BufferedInputStream(is, 1024*1024);
-		LineIterator it=new LineIterator(bis);
+	public static void generateBlockZippedFile(InputStream is, File out)
+			throws FileNotFoundException, IOException, URISyntaxException {
+		BufferedInputStream bis = new BufferedInputStream(is, 1024 * 1024);
+		LineIterator it = new LineIterator(bis);
 
 		BlockCompressedOutputStream bcos = new BlockCompressedOutputStream(out);
 
-		for(String line:it){
+		for (String line : it) {
 			bcos.write(line.getBytes());
 			bcos.write(System.getProperty("line.separator").getBytes());
-		
+
 		}
 
 		bcos.close();
 
 	}
+
 	/**
 	 * Reads a line from the inputstream until a \n or \n\r is encountered. The
 	 * file pointer will be positioned at the beginning of the next line after
@@ -55,11 +57,13 @@ public class MafixFactory {
 	 * @return a string with the read characters. Null when no more characters
 	 *         are being read.
 	 */
-	private static String readLine(BlockCompressedInputStream bcos) throws IOException {
+	private static String readLine(BlockCompressedInputStream bcos)
+			throws IOException {
 
 		int readChar = bcos.read();
-		if (readChar < 0)
+		if (readChar < 0) {
 			return null; // EOF
+		}
 
 		StringBuffer lineBuffer = new StringBuffer();
 		long readAheadCharPos = 0;
@@ -67,30 +71,32 @@ public class MafixFactory {
 
 		readAheadCharPos = bcos.getFilePointer();
 		readAheadChar = bcos.read();
-		
+
 		while (readAheadChar >= 0 && readChar != '\n' && readChar != '\r') {
-			lineBuffer.append((char)readChar);
+			lineBuffer.append((char) readChar);
 
 			readChar = readAheadChar;
 
 			readAheadCharPos = bcos.getFilePointer();
 			// int available =bcos.available();
 			readAheadChar = bcos.read();
-			
+
 		}
 		if (readChar >= 0 && readAheadChar >= 0) {
-			if (readAheadCharPos >= 0 && !(readChar == '\r' && readAheadChar == '\n')) {
+			if (readAheadCharPos >= 0
+					&& !(readChar == '\r' && readAheadChar == '\n')) {
 				// the readAhead ate a char from the next line.
 				// cough it up...
 				bcos.seek(readAheadCharPos);
 			}
 		}
-		
+
 		return lineBuffer.toString();
 	}
 
-	public static void generateIndex(SeekableStream is, File out) throws IOException {
-		System.out.println("Generating index");
+	public static void generateIndex(SeekableStream is, File out)
+			throws IOException {
+		// System.out.println("Generating index");
 		MAFIndex idx = new MAFIndex();
 
 		/**
@@ -164,11 +170,13 @@ public class MafixFactory {
 //				System.out.println("Strands: "+blockStrands.toString());
 				if (inBlock && line.isEmpty()) {
 					MAFEntry mafEntry = new MAFEntry();
-					nucPosition = fixPosition(nucPosition, blockStrands.charAt(0), srcSize, alignmentLength);
+					nucPosition = fixPosition(nucPosition,
+							blockStrands.charAt(0), srcSize, alignmentLength);
 					mafEntry.setNucStart(nucPosition);
 					mafEntry.setAlignmentLength(alignmentLength);
 					mafEntry.setOffsetPair(blockStart);
-					mafEntry.setSpecies(idx.encodeSpecies(thisChrom,blockSpecies,blockStrands.toString()));
+					mafEntry.setSpecies(idx.encodeSpecies(thisChrom,
+							blockSpecies, blockStrands.toString()));
 
 					idx.addEntry(thisChrom, mafEntry);
 					inBlock = false;
@@ -184,7 +192,8 @@ public class MafixFactory {
 			mafEntry.setNucStart(nucPosition);
 			mafEntry.setAlignmentLength(alignmentLength);
 			mafEntry.setOffsetPair(blockStart);
-			mafEntry.setSpecies(idx.encodeSpecies(thisChrom,blockSpecies,blockStrands.toString()));
+			mafEntry.setSpecies(idx.encodeSpecies(thisChrom, blockSpecies,
+					blockStrands.toString()));
 			idx.addEntry(thisChrom, mafEntry);
 			inBlock = false;
 		}
@@ -197,11 +206,13 @@ public class MafixFactory {
 	 * @param charAt
 	 * @return
 	 */
-	private static int fixPosition(int start, char strand, int srcSize, int noNucleotides) {
-		if (strand == '+')
+	private static int fixPosition(int start, char strand, int srcSize,
+			int noNucleotides) {
+		if (strand == '+') {
 			return start;
-		else if (strand == '-')
+		} else if (strand == '-') {
 			return srcSize - start - noNucleotides;
+		}
 		throw new RuntimeException("Could not fix position...");
 	}
 

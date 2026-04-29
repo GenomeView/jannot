@@ -15,6 +15,7 @@ import htsjdk.samtools.seekablestream.SeekableFileStream;
 import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.refseq.FaidxData;
@@ -33,14 +34,14 @@ public class IndexedFastaDataSource extends DataSource {
 	private final Locator data;
 
 	/**
-	 * @param data  the data file
-	 * @param index the index file that indexes the data
-	 * @param log   the {@link Reporter} to log issues to
+	 * @param data   the data file
+	 * @param index  the index file that indexes the data
+	 * @param global the {@link Reporter} to log issues to
 	 */
-	public IndexedFastaDataSource(Locator data, Locator index, Reporter log)
+	public IndexedFastaDataSource(Locator data, Locator index, Global global)
 			throws MalformedURLException, IOException, ReadFailedException,
 			URISyntaxException {
-		super(data, log);
+		super(data, global);
 		if (data.isURL()) {
 			content = new SeekableFileCachedHTTPStream(data.url());
 		} else {
@@ -57,7 +58,7 @@ public class IndexedFastaDataSource extends DataSource {
 			throw new RuntimeException("Boenk!");
 		}
 		if (set == null) {
-			set = new EntrySet(getLog());
+			set = new EntrySet(getGlobal());
 			// SAMFileReader inputSam = getReader();
 		}
 

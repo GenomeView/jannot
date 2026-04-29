@@ -6,6 +6,7 @@ package net.sf.jannot.source;
 import java.io.IOException;
 
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -17,19 +18,19 @@ import tudelft.utilities.logging.Reporter;
 public abstract class DataSource implements Comparable<DataSource> {
 
 	protected final Locator locator;
-	private final Reporter log;
+	protected final Global global;
 
 	/**
 	 * 
-	 * @param l   the Locator of this, used for loading it
-	 * @param log the logger to use. Must not be null
+	 * @param l      the Locator of this, used for loading it
+	 * @param global the {@link Global}. Must not be null
 	 */
-	protected DataSource(Locator l, Reporter log) {
-		if (log == null) {
+	protected DataSource(Locator l, Global global) {
+		if (global == null) {
 			throw new NullPointerException("log must be not null");
 		}
 		this.locator = l;
-		this.log = log;
+		this.global = global;
 	}
 
 	@Override
@@ -69,6 +70,10 @@ public abstract class DataSource implements Comparable<DataSource> {
 	 * @return the {@link Reporter} used for logging issues
 	 */
 	public Reporter getLog() {
-		return log;
+		return global.getLog();
+	}
+
+	public Global getGlobal() {
+		return global;
 	}
 }

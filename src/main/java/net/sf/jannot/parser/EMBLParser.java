@@ -18,12 +18,12 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.refseq.MemorySequence;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * Parser for EMBL files.
@@ -35,8 +35,8 @@ import tudelft.utilities.logging.Reporter;
  */
 public class EMBLParser extends Parser {
 
-	public EMBLParser(Reporter log) {
-		super(null, log);
+	public EMBLParser(Global global) {
+		super(null, global);
 	}
 
 	@Override
@@ -215,7 +215,7 @@ public class EMBLParser extends Parser {
 			// System.out.println("Ignoring database reference line: " + line);
 		} else if (line.startsWith("CC")) {
 			// TODO implement comments stuff
-			System.out.println("Ignoring comments line: " + line);
+			// System.out.println("Ignoring comments line: " + line);
 		} else if (line.startsWith("AS")) {
 			// TODO implement assembly stuff
 			// System.out.println("Ignoring assembly line: " + line);

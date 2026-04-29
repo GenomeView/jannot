@@ -1,22 +1,18 @@
 package net.sf.jannot.refseq;
 
-import static org.mockito.Mockito.mock;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import net.sf.jannot.Cleaner;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.IndexedFastaDataSource;
 import net.sf.jannot.source.Locator;
-import net.sf.nameservice.NameService;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -24,26 +20,25 @@ import tudelft.utilities.logging.Reporter;
  * 
  */
 public class TestFirstNucleotide {
-	private static final Reporter log = mock(Reporter.class);
+	private final Global global;
 
-	@Before
-	public void before() throws ReadFailedException {
-		NameService.init(log);
+	public TestFirstNucleotide() throws ReadFailedException, IOException {
+		global = new Global();
 	}
 
 	@Test
 	public void testNucleotide() throws MalformedURLException, IOException,
 			ReadFailedException, URISyntaxException {
 
-		log.log(Level.INFO, "Loading source");
+		global.getLog().log(Level.INFO, "Loading source");
 		Locator l = new Locator("http://genomeview.org/frigg/genome.fasta",
-				log);
+				global.getLog());
 		Locator i = new Locator("http://genomeview.org/frigg/genome.fasta.fai",
-				log);
+				global.getLog());
 
-		IndexedFastaDataSource ifd = new IndexedFastaDataSource(l, i, log);
+		IndexedFastaDataSource ifd = new IndexedFastaDataSource(l, i, global);
 		System.out.println("Reading entries");
-		EntrySet es = ifd.read(new EntrySet(log));
+		EntrySet es = ifd.read(new EntrySet(global));
 
 		System.out.println("Query");
 		for (Character c : es.getEntry("chr1").sequence().get(1, 1000)) {

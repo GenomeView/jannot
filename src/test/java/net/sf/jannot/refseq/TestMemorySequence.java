@@ -5,11 +5,13 @@ package net.sf.jannot.refseq;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 import net.sf.jannot.Entry;
-import tudelft.utilities.logging.ReportToLogger;
-import tudelft.utilities.logging.Reporter;
+import net.sf.jannot.Global;
+import net.sf.jannot.exception.ReadFailedException;
 
 /**
  * 
@@ -18,8 +20,12 @@ import tudelft.utilities.logging.Reporter;
  */
 public class TestMemorySequence {
 
-	private Reporter log = new ReportToLogger(
-			TestMemorySequence.class.getSimpleName());
+	private final Global global;
+
+	public TestMemorySequence() throws IOException, ReadFailedException {
+		global = new Global();
+
+	}
 
 	/**
 	 * When adding a String to an empty sequence, the sequence should be
@@ -29,7 +35,7 @@ public class TestMemorySequence {
 
 	@Test
 	public void addSequenceTest() {
-		Entry entry = new Entry("test", log);
+		Entry entry = new Entry("test", global);
 		MemorySequence seq = (MemorySequence) entry.sequence();
 		String seqString = "actgactg";
 		seq.addSequence(seqString);

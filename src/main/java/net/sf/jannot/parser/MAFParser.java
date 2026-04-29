@@ -10,6 +10,7 @@ import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.Strand;
 import net.sf.jannot.alignment.maf.AbstractAlignmentSequence;
 import net.sf.jannot.alignment.maf.MAFMemoryMultipleAlignment;
@@ -26,10 +27,10 @@ public class MAFParser extends Parser {
 
 	/**
 	 * @param dataKey the datakey for the data to parse
-	 * @param log     the {@link Reporter} to log issues to
+	 * @param global  the {@link Reporter} to log issues to
 	 */
-	public MAFParser(DataKey dataKey, Reporter log) {
-		super(dataKey, log);
+	public MAFParser(DataKey dataKey, Global global) {
+		super(dataKey, global);
 	}
 
 	@Override

@@ -15,11 +15,11 @@ import htsjdk.samtools.seekablestream.SeekableFileStream;
 import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.Type;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.mafix.IndexedMAF;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -40,10 +40,10 @@ public class IndexedMAFDataSource extends DataSource {
 	 * @throws IOException
 	 * @throws MalformedURLException
 	 */
-	public IndexedMAFDataSource(Locator data, Locator index, Reporter log)
+	public IndexedMAFDataSource(Locator data, Locator index, Global global)
 			throws MalformedURLException, IOException, ReadFailedException,
 			URISyntaxException {
-		super(data, log);
+		super(data, global);
 		if (data.isURL()) {
 			content = new SeekableFileCachedHTTPStream(data.url());
 		} else {
@@ -59,7 +59,7 @@ public class IndexedMAFDataSource extends DataSource {
 			throw new RuntimeException("Boenk!");
 		}
 		if (set == null) {
-			set = new EntrySet(getLog());
+			set = new EntrySet(getGlobal());
 			// SAMFileReader inputSam = getReader();
 		}
 

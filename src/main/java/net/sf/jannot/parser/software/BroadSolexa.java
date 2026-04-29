@@ -10,10 +10,10 @@ import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.parser.Parser;
 import net.sf.jannot.parser.ParserError;
 import net.sf.jannot.shortread.MemoryReadSet;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * A short read parser for Broad data
@@ -25,10 +25,10 @@ public class BroadSolexa extends Parser {
 
 	/**
 	 * @param dataKey
-	 * @param log     the Reporter to log issues to
+	 * @param global  the Reporter to log issues to
 	 */
-	public BroadSolexa(DataKey dataKey, Reporter log) {
-		super(dataKey, log);
+	public BroadSolexa(DataKey dataKey, Global global) {
+		super(dataKey, global);
 
 	}
 

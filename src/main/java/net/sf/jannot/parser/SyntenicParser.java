@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.StringKey;
@@ -50,10 +51,10 @@ public class SyntenicParser extends Parser {
 
 	/**
 	 * @param dataKey
-	 * @param log     the {@link Reporter} to log issues to
+	 * @param global  the {@link Reporter} to log issues to
 	 */
-	public SyntenicParser(DataKey dataKey, Reporter log) {
-		super(dataKey, log);
+	public SyntenicParser(DataKey dataKey, Global global) {
+		super(dataKey, global);
 	}
 
 	@Override

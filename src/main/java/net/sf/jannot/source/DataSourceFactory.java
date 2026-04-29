@@ -7,12 +7,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 
+import net.sf.jannot.Global;
 import net.sf.jannot.bigwig.BigWigDataSource;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.cache.CachedURLSource;
 import net.sf.jannot.tabix.IndexedFeatureFile;
 import net.sf.jannot.tdf.TDFDataSource;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -20,8 +20,7 @@ import tudelft.utilities.logging.Reporter;
  * 
  */
 public class DataSourceFactory {
-	// private static Logger log =
-	// Logger.getLogger(DataSourceFactory.class.getCanonicalName());
+	public static boolean disableURLCaching = true;
 
 	public enum Sources {
 		LOCALFILE, URL;// , DAS;
@@ -42,9 +41,7 @@ public class DataSourceFactory {
 		}
 	}
 
-	public static boolean disableURLCaching = true;
-
-	public static DataSource create(Locator locator, Reporter log)
+	public static DataSource create(Locator locator, Global log)
 			throws URISyntaxException, IOException, ReadFailedException {
 		return create(locator, null, log);
 
@@ -54,58 +51,64 @@ public class DataSourceFactory {
 	 * 
 	 * @param data
 	 * @param index
-	 * @param log   the logger to be used for the datasource; also used to
-	 *              report issues creating the datasource
+	 * @param global the {@link Global} data
 	 * @return
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 * @throws ReadFailedException
 	 */
-	public static DataSource create(Locator data, Locator index, Reporter log)
+	public static DataSource create(Locator data, Locator index, Global global)
 			throws URISyntaxException, IOException, ReadFailedException {
-		log.log(Level.INFO, "Data: " + data);
-		log.log(Level.INFO, "Index: " + index);
+		global.getLog().log(Level.INFO, "Data: " + data);
+		global.getLog().log(Level.INFO, "Index: " + index);
 		if (data.isURL()) {
-			new SSL(log).certify(data.url());
+			new SSL(global.getLog()).certify(data.url());
 		}
 
 		if (data.isTDF()) {
-			return new TDFDataSource(data, log);
+			return new TDFDataSource(data, global);
 		}
 
-		if (data.isBigWig())
-			return new BigWigDataSource(data, log);
+		if (data.isBigWig()) {
+			return new BigWigDataSource(data, global);
+		}
 
 		if (index == null) {
-			log.log(Level.INFO, "Could not find index");
+			global.getLog().log(Level.INFO, "Could not find index");
 			if (data.isURL()) {
 				if (disableURLCaching) {
-					log.log(Level.INFO, "Loading as regular URLSource");
-					return new URLSource(data.url(), log);
+					global.getLog().log(Level.INFO,
+							"Loading as regular URLSource");
+					return new URLSource(data.url(), global);
 				} else {
-					log.log(Level.INFO, "Loading as CachedURLSource");
-					return new CachedURLSource(data.url(), log);
+					global.getLog().log(Level.INFO,
+							"Loading as CachedURLSource");
+					return new CachedURLSource(data.url(), global);
 				}
 			} else {
-				log.log(Level.INFO, "Loading as FileSource");
-				return new FileSource(data.file(), log);
+				global.getLog().log(Level.INFO, "Loading as FileSource");
+				return new FileSource(data.file(), global);
 			}
 		} else {
 
 			if (data.isBAM()) {
-				return new SAMDataSource(data, index, log);
+				return new SAMDataSource(data, index, global);
 			}
-			if (data.isFasta())
-				return new IndexedFastaDataSource(data, index, log);
+			if (data.isFasta()) {
+				return new IndexedFastaDataSource(data, index, global);
+			}
 
-			if (data.isTabix())
-				return new IndexedFeatureFile(data, index, log);
+			if (data.isTabix()) {
+				return new IndexedFeatureFile(data, index, global);
+			}
 
-			if (data.isMaf())
-				return new IndexedMAFDataSource(data, index, log);
+			if (data.isMaf()) {
+				return new IndexedMAFDataSource(data, index, global);
+			}
 		}
-		log.log(Level.SEVERE, "Could not construct data source for \n\t" + data
-				+ "\n\t" + index);
+		global.getLog().log(Level.SEVERE,
+				"Could not construct data source for \n\t" + data + "\n\t"
+						+ index);
 		return null;
 
 	}

@@ -9,12 +9,12 @@ import be.abeel.io.LineIterator;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * Parser for the output of the TransTermHP program as described in
@@ -33,10 +33,10 @@ import tudelft.utilities.logging.Reporter;
 public class TransTermHPParser extends Parser {
 
 	/**
-	 * @param log the reporter to log issues to
+	 * @param global the reporter to log issues to
 	 */
-	public TransTermHPParser(Reporter log) {
-		super(null, log);
+	public TransTermHPParser(Global global) {
+		super(null, global);
 	}
 
 	@Override

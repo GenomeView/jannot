@@ -8,6 +8,7 @@ import cern.colt.Arrays;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.Strand;
 import net.sf.jannot.alignment.maf.AbstractAlignmentBlock;
 import net.sf.jannot.alignment.maf.AbstractAlignmentSequence;
@@ -22,10 +23,10 @@ public class MauveParser extends Parser {
 
 	/**
 	 * @param dataKey
-	 * @param log     the {@link Reporter} to log issues to
+	 * @param global  the {@link Reporter} to log issues to
 	 */
-	public MauveParser(DataKey dataKey, Reporter log) {
-		super(dataKey, log);
+	public MauveParser(DataKey dataKey, Global global) {
+		super(dataKey, global);
 
 	}
 
@@ -51,7 +52,7 @@ public class MauveParser extends Parser {
 
 				/* Start new block */
 			} else if (line.charAt(0) == '>') {
-				System.out.println("Parsing: " + line);
+				// System.out.println("Parsing: " + line);
 				String[] arr = line.split("[ ]+");
 				String[] locArr = arr[1].split(":")[1].split("-");
 

@@ -36,15 +36,17 @@ public class BEDTools {
 			final String defaultType) {
 		/* Any other lines */
 		final String[] arr = line.split("\t");
-		if (type == null)
+		if (type == null) {
 			if (defaultType != null) {
 				type = Type.get(defaultType);
 			} else {
 				if (arr.length == 12) {
 					type = Type.get("CDS");
-				} else
+				} else {
 					type = Type.get("BED");
+				}
 			}
+		}
 
 		final Feature f;
 		SortedSet<Location> tmp = getLocations(arr);
@@ -60,8 +62,9 @@ public class BEDTools {
 		f.addQualifier("chrom", arr[0]);
 
 		/* Optional name */
-		if (arr.length > 3)
+		if (arr.length > 3) {
 			f.addQualifier("Name", arr[3]);
+		}
 		/*
 		 * If user only specified 4 column, (s)he may have forgotten the name
 		 * column and put a score instead at position 3
@@ -76,8 +79,9 @@ public class BEDTools {
 		}
 
 		/* Optional score */
-		if (arr.length > 4)
+		if (arr.length > 4) {
 			f.setScore(Double.parseDouble(arr[4]));
+		}
 
 		/* Optional strand */
 		if (arr.length > 5) {
@@ -130,12 +134,15 @@ public class BEDTools {
 						+ chromLoc.start;
 				int end = Integer.parseInt(arrSize[i].trim()) + start - 1;
 				Location loc = new Location(start, end);
-				if (loc.start < codingLoc.start && loc.end > codingLoc.start)
+				if (loc.start < codingLoc.start && loc.end > codingLoc.start) {
 					loc.setStart(codingLoc.start);
-				if (loc.start < codingLoc.end && loc.end > codingLoc.end)
+				}
+				if (loc.start < codingLoc.end && loc.end > codingLoc.end) {
 					loc.setEnd(codingLoc.end);
-				if (loc.start >= codingLoc.start && loc.end <= codingLoc.end)
+				}
+				if (loc.start >= codingLoc.start && loc.end <= codingLoc.end) {
 					tmp.add(loc);
+				}
 
 			}
 		} else {
@@ -177,17 +184,19 @@ public class BEDTools {
 		}
 
 		for (String s : matchList) {
-			System.out.println("QQ=" + s);
+			// System.out.println("QQ=" + s);
 			// String[] arr = trackLine.split(" ");
 			// for (String s : arr) {
 			String[] kv = s.split("=");
-			if (kv.length > 1)
-				if (kv[1].charAt(0) == '\'' || kv[1].charAt(0) == '\"')
+			if (kv.length > 1) {
+				if (kv[1].charAt(0) == '\'' || kv[1].charAt(0) == '\"') {
 					out.put(kv[0], kv[1].substring(1, kv[1].length() - 1));
-				else
+				} else {
 					out.put(kv[0], kv[1]);
-			else
+				}
+			} else {
 				out.put(kv[0], null);
+			}
 
 		}
 		// }

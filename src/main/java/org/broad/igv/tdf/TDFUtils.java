@@ -27,19 +27,22 @@ import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-
+import org.broad.igv.track.WindowFunction;
 
 import htsjdk.samtools.seekablestream.SeekableFileStream;
 
-import org.broad.igv.track.WindowFunction;
-
 /**
  * @author jrobinso
+ * 
+ *         FIXME this tool is workoug only with system.out. Don't use it
+ *         internally
  */
 public class TDFUtils {
 
-	public static void dumpRootAttributes(String ibfFile) throws URISyntaxException, FileNotFoundException {
-		TDFReader reader = TDFReader.getReader(new SeekableFileStream(new File(ibfFile)));
+	public static void dumpRootAttributes(String ibfFile)
+			throws URISyntaxException, FileNotFoundException {
+		TDFReader reader = TDFReader
+				.getReader(new SeekableFileStream(new File(ibfFile)));
 		System.out.println("Track line = " + reader.getTrackLine());
 		TDFGroup group = reader.getGroup("/");
 		for (Map.Entry<String, String> entries : group.attributes.entrySet()) {
@@ -49,8 +52,10 @@ public class TDFUtils {
 		System.out.println(reader.getTrackLine());
 	}
 
-	public static void dumpDatasets(String ibfFile) throws URISyntaxException, FileNotFoundException {
-		TDFReader reader = TDFReader.getReader(new SeekableFileStream(new File(ibfFile)));
+	public static void dumpDatasets(String ibfFile)
+			throws URISyntaxException, FileNotFoundException {
+		TDFReader reader = TDFReader
+				.getReader(new SeekableFileStream(new File(ibfFile)));
 		System.out.println("DATASETS");
 		for (String dsName : reader.getDatasetNames()) {
 			System.out.println(dsName);
@@ -58,7 +63,8 @@ public class TDFUtils {
 
 			System.out.println("Attributes");
 			for (Map.Entry<String, String> entry : ds.attributes.entrySet()) {
-				System.out.println("\t" + entry.getKey() + " = " + entry.getValue());
+				System.out.println(
+						"\t" + entry.getKey() + " = " + entry.getValue());
 			}
 			System.out.println();
 
@@ -71,8 +77,10 @@ public class TDFUtils {
 		}
 	}
 
-	public static void dumpAllTiles(String ibfFile) throws URISyntaxException, FileNotFoundException {
-		TDFReader reader = TDFReader.getReader(new SeekableFileStream(new File(ibfFile)));
+	public static void dumpAllTiles(String ibfFile)
+			throws URISyntaxException, FileNotFoundException {
+		TDFReader reader = TDFReader
+				.getReader(new SeekableFileStream(new File(ibfFile)));
 		System.out.println("DATASETS");
 		for (String dsName : reader.getDatasetNames()) {
 			System.out.println(dsName);
@@ -88,13 +96,16 @@ public class TDFUtils {
 		}
 	}
 
-	public static void dumpTile(String ibfFile, String dsName, int tileNumber) throws URISyntaxException, FileNotFoundException {
+	public static void dumpTile(String ibfFile, String dsName, int tileNumber)
+			throws URISyntaxException, FileNotFoundException {
 
-		TDFReader reader = TDFReader.getReader(new SeekableFileStream(new File(ibfFile)));
+		TDFReader reader = TDFReader
+				.getReader(new SeekableFileStream(new File(ibfFile)));
 		TDFDataset ds = reader.getDataset(dsName);
 		TDFTile tile = reader.readTile(ds, tileNumber);
 		if (tile == null) {
-			System.out.println("Null tile: " + dsName + " [" + tileNumber + "]");
+			System.out
+					.println("Null tile: " + dsName + " [" + tileNumber + "]");
 		} else {
 			dumpTileData(reader, tile);
 		}
@@ -116,9 +127,11 @@ public class TDFUtils {
 		}
 	}
 
-	public static void dumpRange(String ibfFile, String dsName, int startLocation, int endLocation)
+	public static void dumpRange(String ibfFile, String dsName,
+			int startLocation, int endLocation)
 			throws URISyntaxException, FileNotFoundException {
-		TDFReader reader = TDFReader.getReader(new SeekableFileStream(new File(ibfFile)));
+		TDFReader reader = TDFReader
+				.getReader(new SeekableFileStream(new File(ibfFile)));
 		TDFDataset ds = reader.getDataset(dsName);
 
 		int tileWidth = ds.tileWidth;
@@ -128,7 +141,8 @@ public class TDFUtils {
 		for (int tileNumber = startTile; tileNumber <= endTile; tileNumber++) {
 			TDFTile tile = reader.readTile(ds, tileNumber);
 			if (tile == null) {
-				System.out.println("Null tile: " + dsName + " [" + tileNumber + "]");
+				System.out.println(
+						"Null tile: " + dsName + " [" + tileNumber + "]");
 			} else {
 				int nTracks = reader.getTrackNames().length;
 				int nBins = tile.getSize();
@@ -158,9 +172,11 @@ public class TDFUtils {
 	 * window functions [window functions] track type (string) track line
 	 * (string) # of tracks [track names]
 	 */
-	public static void dumpSummary(String ibfFile) throws URISyntaxException, FileNotFoundException {
+	public static void dumpSummary(String ibfFile)
+			throws URISyntaxException, FileNotFoundException {
 
-		TDFReader reader = TDFReader.getReader(new SeekableFileStream(new File(ibfFile)));
+		TDFReader reader = TDFReader
+				.getReader(new SeekableFileStream(new File(ibfFile)));
 
 		System.out.println("Version: " + reader.getVersion());
 		System.out.println("Window Functions");
@@ -182,7 +198,8 @@ public class TDFUtils {
 
 			System.out.println("Attributes");
 			for (Map.Entry<String, String> entry : ds.attributes.entrySet()) {
-				System.out.println("\t" + entry.getKey() + " = " + entry.getValue());
+				System.out.println(
+						"\t" + entry.getKey() + " = " + entry.getValue());
 			}
 			System.out.println();
 
@@ -216,8 +233,10 @@ public class TDFUtils {
 			TDFGroup group = reader.getGroup(name);
 
 			System.out.println("Attributes");
-			for (Map.Entry<String, String> entry : group.attributes.entrySet()) {
-				System.out.println("\t" + entry.getKey() + " = " + entry.getValue());
+			for (Map.Entry<String, String> entry : group.attributes
+					.entrySet()) {
+				System.out.println(
+						"\t" + entry.getKey() + " = " + entry.getValue());
 			}
 			System.out.println();
 

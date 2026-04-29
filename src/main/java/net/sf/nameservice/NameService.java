@@ -17,32 +17,10 @@ public class NameService {
 	// all keys are stored in UPPER CASE.
 	private final Map<String, String> map = new HashMap<String, String>();
 	private final Reporter log;
-	private static NameService instance;
 
-	private NameService(Reporter reporter) throws ReadFailedException {
+	public NameService(Reporter reporter) throws ReadFailedException {
 		this.log = reporter;
 		resetDefault();
-	}
-
-	/**
-	 * must be called before any use of NameService.
-	 * 
-	 * @param reporter
-	 * @throws ReadFailedException if init fails.
-	 */
-	public static void init(Reporter reporter) throws ReadFailedException {
-		if (instance != null) {
-			instance.log.log(Level.WARNING, "NameService already initialized");
-			return;
-		}
-		instance = new NameService(reporter);
-	}
-
-	public static NameService instance() {
-		if (instance == null)
-			throw new IllegalStateException("NameService not initialized");
-
-		return instance;
 	}
 
 	/**
@@ -54,10 +32,11 @@ public class NameService {
 	 */
 	public String getPrimaryName(String key) {
 		key = key.trim();
-		if (map.containsKey(key.toUpperCase()))
+		if (map.containsKey(key.toUpperCase())) {
 			return map.get(key.toUpperCase());
-		else
+		} else {
 			return key;
+		}
 	}
 
 	public void resetDefault() throws ReadFailedException {

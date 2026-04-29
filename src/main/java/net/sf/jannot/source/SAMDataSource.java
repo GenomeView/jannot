@@ -25,6 +25,7 @@ import net.sf.jannot.Cleaner;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.shortread.BAMreads;
@@ -51,10 +52,10 @@ public class SAMDataSource extends DataSource {
 	/**
 	 * @param data
 	 * @param index2
-	 * @param log    the {@link Reporter} to log issues to
+	 * @param global the {@link Reporter} to log issues to
 	 */
-	public SAMDataSource(Locator data, Locator index, Reporter log) {
-		super(data, log);
+	public SAMDataSource(Locator data, Locator index, Global global) {
+		super(data, global);
 		if (data == null || index == null) {
 			throw new NullPointerException(
 					"Neither data nor index provided: " + data + "; " + index);
@@ -70,7 +71,8 @@ public class SAMDataSource extends DataSource {
 				init(data.file(), index.file());
 			}
 		} catch (IOException | ReadFailedException | URISyntaxException e) {
-			log.log(Level.WARNING, "failed to init SAMDataSource", e);
+			global.getLog().log(Level.WARNING, "failed to init SAMDataSource",
+					e);
 		}
 	}
 
@@ -139,7 +141,7 @@ public class SAMDataSource extends DataSource {
 	@Override
 	public EntrySet read(EntrySet set) {
 		if (set == null) {
-			set = new EntrySet(getLog());
+			set = new EntrySet(getGlobal());
 		}
 		SamReader inputSam = getReader();
 

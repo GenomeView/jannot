@@ -12,14 +12,13 @@ import org.junit.Test;
 
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import support.DataManager;
-import tudelft.utilities.logging.ReportToLogger;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -28,13 +27,17 @@ import tudelft.utilities.logging.Reporter;
  */
 public class TestFastaParser {
 
-	private Reporter log = new ReportToLogger("test");
+	private final Global global;
+
+	public TestFastaParser() throws IOException, ReadFailedException {
+		global = new Global();
+	}
 
 	private void testFile(File file)
 			throws URISyntaxException, IOException, ReadFailedException {
-
-		DataSource ds = DataSourceFactory.create(new Locator(file, log), log);
-		EntrySet es = ds.read(new EntrySet(log));
+		DataSource ds = DataSourceFactory
+				.create(new Locator(file, global.getLog()), global);
+		EntrySet es = ds.read(new EntrySet(global));
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("TestFasta", es.firstEntry().getID());
 		int count = 0;
@@ -59,15 +62,16 @@ public class TestFastaParser {
 	@Test
 	public void testWrite() throws Exception {
 		File f = DataManager.file("mini.fasta");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read(new EntrySet(log));
+		DataSource ds = DataSourceFactory
+				.create(new Locator(f, global.getLog()), global);
+		EntrySet es = ds.read(new EntrySet(global));
 
 		File out = File.createTempFile("unittesting.", ".fasta");
 		out.deleteOnExit();
 
 		FileOutputStream fos = new FileOutputStream(out);
 		for (Entry e : es) {
-			new FastaParser(log).write(fos, e);
+			new FastaParser(global).write(fos, e);
 		}
 		fos.close();
 
@@ -78,9 +82,9 @@ public class TestFastaParser {
 	@Test
 	public void testMFasta() throws Exception {
 
-		DataSource ds = DataSourceFactory.create(
-				new Locator(DataManager.file("10313-CDS.fasta"), log), log);
-		EntrySet es = ds.read(new EntrySet(log));
+		DataSource ds = DataSourceFactory.create(new Locator(
+				DataManager.file("10313-CDS.fasta"), global.getLog()), global);
+		EntrySet es = ds.read(new EntrySet(global));
 
 		assertEquals(11386 / 2, es.size());
 		// EntrySet sorts the names alphabetically... Makes not much sense in

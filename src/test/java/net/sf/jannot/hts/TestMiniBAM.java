@@ -1,18 +1,21 @@
 package net.sf.jannot.hts;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 import junit.framework.Assert;
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
+import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import support.DataManager;
-import tudelft.utilities.logging.ReportToLogger;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -20,8 +23,14 @@ import tudelft.utilities.logging.Reporter;
  * 
  */
 public class TestMiniBAM {
-	private static Reporter log = new ReportToLogger(
-			TestMiniBAM.class.toString());
+
+	private final Global global;
+	private DistributingReporter log;
+
+	public TestMiniBAM() throws IOException, ReadFailedException {
+		this.global = new Global();
+		this.log = global.getLog();
+	}
 
 	@Test
 	public void testShortRead() throws Exception {
@@ -29,9 +38,9 @@ public class TestMiniBAM {
 		Locator fData = new Locator(DataManager.file("tworead.bam"), log);
 		Locator fIndex = new Locator(DataManager.file("tworead.bam.bai"), log);
 
-		DataSource ds = DataSourceFactory.create(fData, fIndex, log);
+		DataSource ds = DataSourceFactory.create(fData, fIndex, global);
 		Assert.assertNotNull(ds);
-		EntrySet entries = ds.read(new EntrySet(log));
+		EntrySet entries = ds.read(new EntrySet(global));
 		Entry e = entries.getEntry("chr4");
 		int dkCount = 0;
 		int readCount = 0;

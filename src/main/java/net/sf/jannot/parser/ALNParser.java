@@ -12,20 +12,20 @@ import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.alignment.ReferenceSequence;
 import net.sf.jannot.alignment.mfa.Alignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.refseq.MemorySequence;
-import tudelft.utilities.logging.Reporter;
 
 public class ALNParser extends Parser {
 
 	/**
 	 * @param dataKey
-	 * @log the {@link Reporter} to log to
+	 * @param global  the {@link Global}
 	 */
-	public ALNParser(DataKey dataKey, Reporter log) {
-		super(dataKey, log);
+	public ALNParser(DataKey dataKey, Global global) {
+		super(dataKey, global);
 
 	}
 
@@ -47,7 +47,8 @@ public class ALNParser extends Parser {
 			} else {
 				String[] arr = line.split("  +");
 				if (header) {
-					list.add(new Entry(arr[0].split(" ")[0].trim(), getLog()));
+					list.add(new Entry(arr[0].split(" ")[0].trim(),
+							getGlobal()));
 				}
 				((MemorySequence) list.get(index).sequence())
 						.addSequence(arr[1]);
@@ -61,7 +62,7 @@ public class ALNParser extends Parser {
 			ReferenceSequence rs = new ReferenceSequence(
 					(MemorySequence) list.get(0).sequence());
 			for (int i = 0; i < list.size(); i++) {
-				System.out.println(list.get(i).getID());
+				// System.out.println(list.get(i).getID());
 				Alignment align = new Alignment(list.get(i).getID(),
 						(MemorySequence) list.get(i).sequence(), rs);
 				alist.add(align);

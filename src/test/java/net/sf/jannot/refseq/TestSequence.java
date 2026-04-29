@@ -13,16 +13,22 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.IndexedFastaDataSource;
 import net.sf.jannot.source.Locator;
-import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;
 
 public class TestSequence {
 
-	private static final Reporter log = new ReportToLogger(
-			TestSequence.class.toString());
+	private final Global global;
+
+	private final Reporter log;
+
+	public TestSequence() throws IOException, ReadFailedException {
+		this.global = new Global();
+		this.log = global.getLog();
+	}
 
 	@Ignore // urls give access denied
 	@Test
@@ -35,8 +41,8 @@ public class TestSequence {
 				"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta.fai",
 				log);
 
-		EntrySet es = new IndexedFastaDataSource(l, i, log)
-				.read(new EntrySet(log));
+		EntrySet es = new IndexedFastaDataSource(l, i, global)
+				.read(new EntrySet(global));
 		Sequence seq = es.firstEntry().sequence();
 		String tmp = "";
 		for (Character c : seq.get(1, 4)) {

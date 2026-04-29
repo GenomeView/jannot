@@ -15,12 +15,12 @@ import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.alignment.ReferenceSequence;
 import net.sf.jannot.alignment.mfa.Alignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.refseq.Sequence;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * In case of multiple alignments it is strongly advised to set the dataKey
@@ -35,15 +35,15 @@ public class FastaParser extends Parser {
 	 */
 	public static boolean forceEntries = false;
 
-	public FastaParser(Reporter log) {
-		super(null, log);
+	public FastaParser(Global global) {
+		super(null, global);
 	}
 
 	/**
 	 * @param dataKey
 	 */
-	public FastaParser(DataKey dataKey, Reporter log) {
-		super(dataKey, log);
+	public FastaParser(DataKey dataKey, Global global) {
+		super(dataKey, global);
 	}
 
 	@Override

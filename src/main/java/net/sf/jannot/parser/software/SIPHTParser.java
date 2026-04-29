@@ -12,6 +12,7 @@ import cern.colt.Arrays;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.StringKey;
@@ -26,10 +27,10 @@ import tudelft.utilities.logging.Reporter;
 public class SIPHTParser extends Parser {
 	/**
 	 * @param stringKey
-	 * @param log       the {@link Reporter} to log issues to
+	 * @param global    the {@link Reporter} to log issues to
 	 */
-	public SIPHTParser(StringKey stringKey, Reporter log) {
-		super(stringKey, log);
+	public SIPHTParser(StringKey stringKey, Global global) {
+		super(stringKey, global);
 	}
 
 	@Override

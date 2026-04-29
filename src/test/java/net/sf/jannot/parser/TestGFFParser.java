@@ -17,18 +17,19 @@
 package net.sf.jannot.parser;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.Type;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import support.DataManager;
-import tudelft.utilities.logging.ReportToLogger;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -36,14 +37,18 @@ import tudelft.utilities.logging.Reporter;
  * 
  */
 public class TestGFFParser {
-	private static Reporter log = new ReportToLogger(
-			TestGFFParser.class.toString());
+	private final Global global;
+
+	public TestGFFParser() throws IOException, ReadFailedException {
+		this.global = new Global();
+	}
 
 	@Test
 	public void testParserMini() throws Exception {
 		File f = DataManager.file("doubleScore.gff3");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read(new EntrySet(log));
+		DataSource ds = DataSourceFactory
+				.create(new Locator(f, global.getLog()), global);
+		EntrySet es = ds.read(new EntrySet(global));
 		double score = es.firstEntry().getMemoryAnnotation(Type.get("gene"))
 				.get(0).getScore();
 		Assert.assertEquals(0, score, 0.0001);

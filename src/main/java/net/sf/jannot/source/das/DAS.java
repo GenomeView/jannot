@@ -23,13 +23,13 @@ import be.abeel.net.URIFactory;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.source.DataSource;
-import tudelft.utilities.logging.Reporter;
 
 public class DAS extends DataSource {
 
@@ -40,10 +40,10 @@ public class DAS extends DataSource {
 	private String reference = null;
 	private EntryPointParser entryPoints = null;
 
-	public DAS(String serverPrefix, Reporter log)
+	public DAS(String serverPrefix, Global global)
 			throws MalformedURLException, ParserConfigurationException,
 			SAXException, IOException, URISyntaxException {
-		super(null, log);
+		super(null, global);
 		this.serverPrefix = serverPrefix;
 		dsn = new DSN(serverPrefix);
 	}
@@ -229,8 +229,8 @@ public class DAS extends DataSource {
 			ParserConfigurationException, URISyntaxException {
 		SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 		SequenceParser seqp = new SequenceParser();
-		System.out.println(
-				ref + "/dna?segment=" + e.id + ":" + e.start + "," + e.stop);
+		// System.out.println(ref + "/dna?segment=" + e.id + ":" + e.start + ","
+		// + e.stop);
 		parser.parse(URIFactory.url(
 				ref + "/dna?segment=" + e.id + ":" + e.start + "," + e.stop)
 				.openStream(), seqp);
@@ -263,7 +263,7 @@ public class DAS extends DataSource {
 	@Override
 	public EntrySet read(EntrySet set) {
 		if (set == null) {
-			set = new EntrySet(getLog());
+			set = new EntrySet(getGlobal());
 		}
 		if (ep == null || reference == null) {
 			getLog().log(Level.SEVERE,

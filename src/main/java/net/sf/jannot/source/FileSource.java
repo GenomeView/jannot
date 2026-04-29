@@ -8,9 +8,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.sf.jannot.Global;
 import net.sf.jannot.parser.Parser;
 import net.sf.jannot.parser.ParserFactory;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * Extends AbstractStreamDataSource. It prepares the data to be read.
@@ -26,12 +26,12 @@ public class FileSource extends AbstractStreamDataSource {
 		return file;
 	}
 
-	public FileSource(File file, Reporter log) throws IOException {
-		super(new Locator(file.toString(), log), log);
+	public FileSource(File file, Global global) throws IOException {
+		super(new Locator(file.toString(), global.getLog()), global);
 		InputStream ios1, ios2;
 		ios1 = new FileInputStream(file);
 		ios2 = new FileInputStream(file);
-		Parser p = ParserFactory.create(ios1, file, log);
+		Parser p = ParserFactory.create(ios1, file, global);
 		ios1.close();
 		super.setParser(p);
 		super.setIos(ios2);
@@ -43,8 +43,9 @@ public class FileSource extends AbstractStreamDataSource {
 		if (file.getParentFile() != null) {
 			return ".../" + file.getParentFile().getName() + "/"
 					+ file.getName().toString();
-		} else
+		} else {
 			return file.getName().toString();
+		}
 
 	}
 

@@ -12,9 +12,9 @@ import be.abeel.io.LineIterator;
 import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.wiggle.TroveArrayWiggle;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -23,8 +23,8 @@ import tudelft.utilities.logging.Reporter;
  */
 public class WiggleParser extends Parser {
 
-	public WiggleParser(Reporter log) {
-		super(null, log);
+	public WiggleParser(Global global) {
+		super(null, global);
 	}
 
 	@Override

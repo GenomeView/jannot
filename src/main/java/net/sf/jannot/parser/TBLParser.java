@@ -9,11 +9,11 @@ import be.abeel.io.LineIterator;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -30,12 +30,11 @@ import tudelft.utilities.logging.Reporter;
 public class TBLParser extends Parser {
 
 	/**
-	 * @param log
+	 * @param global
 	 * @param dataKey
 	 */
-	public TBLParser(Reporter log) {
-		super(null, log);
-		// TODO Auto-generated constructor stub
+	public TBLParser(Global global) {
+		super(null, global);
 	}
 
 	@Override

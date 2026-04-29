@@ -20,13 +20,15 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import net.sf.jannot.Global;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.parser.software.BlastM8Parser;
 import support.DataManager;
-import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -36,13 +38,18 @@ import tudelft.utilities.logging.Reporter;
  */
 public class TestParserDetection {
 	private static final String PAF = "YJM1447_vs_R64.paf";
-	private Reporter log = new ReportToLogger(
-			TestParserDetection.class.toString());
+	private final Global global;
+	private final Reporter log;
+
+	public TestParserDetection() throws IOException, ReadFailedException {
+		global = new Global();
+		log = global.getLog();
+	}
 
 	@Test
 	public void testBED() throws Exception {
 		File f = DataManager.file("minibed.bed");
-		Parser p = ParserFactory.create(new FileInputStream(f), "file", log);
+		Parser p = ParserFactory.create(new FileInputStream(f), "file", global);
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
 				p instanceof BEDParser);
@@ -52,7 +59,7 @@ public class TestParserDetection {
 	@Test
 	public void testVCF() throws Exception {
 		File f = DataManager.file("tiny.vcf");
-		Parser p = ParserFactory.create(new FileInputStream(f), "file", log);
+		Parser p = ParserFactory.create(new FileInputStream(f), "file", global);
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
 				p instanceof VCFParser);
@@ -62,7 +69,7 @@ public class TestParserDetection {
 	@Test
 	public void testBlast() throws Exception {
 		File f = DataManager.file("testblast.m8");
-		Parser p = ParserFactory.create(new FileInputStream(f), "file", log);
+		Parser p = ParserFactory.create(new FileInputStream(f), "file", global);
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
 				p instanceof BlastM8Parser);
@@ -72,7 +79,7 @@ public class TestParserDetection {
 	@Test
 	public void testPAF() throws Exception {
 		File f = DataManager.file("minibed.bed");
-		Parser p = ParserFactory.create(new FileInputStream(f), "file", log);
+		Parser p = ParserFactory.create(new FileInputStream(f), "file", global);
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
 				p instanceof BEDParser);
@@ -82,7 +89,7 @@ public class TestParserDetection {
 	@Test
 	public void testSyntenic() throws Exception {
 		File f = DataManager.file(PAF);
-		Parser p = ParserFactory.create(new FileInputStream(f), "file", log);
+		Parser p = ParserFactory.create(new FileInputStream(f), "file", global);
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
 				p instanceof SyntenicParser);

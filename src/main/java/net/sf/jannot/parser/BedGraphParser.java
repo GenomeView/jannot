@@ -11,17 +11,19 @@ import cern.colt.list.FloatArrayList;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.wiggle.FloatArrayWiggle;
 import tudelft.utilities.logging.Reporter;
 
 public class BedGraphParser extends Parser {
 
 	/**
+	 * @param global
 	 * @param dataKey
 	 * @param log     the {@link Reporter} to log issues to.
 	 */
-	public BedGraphParser(DataKey datakey, Reporter log) {
-		super(datakey, log);
+	public BedGraphParser(DataKey datakey, Global global) {
+		super(datakey, global);
 
 	}
 

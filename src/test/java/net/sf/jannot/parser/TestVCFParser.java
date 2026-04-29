@@ -17,9 +17,9 @@
 package net.sf.jannot.parser;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import net.sf.jannot.Data;
@@ -27,15 +27,14 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Global;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
-import net.sf.nameservice.NameService;
 import support.DataManager;
-import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -45,20 +44,20 @@ import tudelft.utilities.logging.Reporter;
  */
 public class TestVCFParser {
 
-	private static final Reporter log = new ReportToLogger(
-			TestVCFParser.class.toString());
+	private final Reporter log;
+	private final Global global;
 
-	@Before
-	public void before() throws ReadFailedException {
-		NameService.init(log);
+	public TestVCFParser() throws ReadFailedException, IOException {
+		global = new Global();
+		log = global.getLog();
 	}
 
 	@Test
 	public void testTinySize() throws Exception {
 
 		File f = DataManager.file("tiny.vcf");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read(new EntrySet(log));
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		EntrySet es = ds.read(new EntrySet(global));
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("20", es.firstEntry().getID());
 		int count = 0;
@@ -86,8 +85,8 @@ public class TestVCFParser {
 	public void testRegularSize() throws Exception {
 
 		File f = DataManager.file("regular.vcf");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read(new EntrySet(log));
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		EntrySet es = ds.read(new EntrySet(global));
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("gi|395136682|gb|CP003248.1|",
 				es.firstEntry().getID());

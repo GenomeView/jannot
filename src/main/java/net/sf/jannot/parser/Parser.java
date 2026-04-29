@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.Type;
 import tudelft.utilities.logging.Reporter;
 
@@ -24,20 +25,28 @@ public abstract class Parser {
 	 * determine the name of the data
 	 */
 	protected final DataKey dataKey;
-	private final Reporter log;
+	private final Global global;
 
 	/**
 	 * 
 	 * @param dataKey
-	 * @param log     the {@link Reporter} to report parser issues to.
+	 * @param global  the {@link Global}.
 	 */
-	public Parser(DataKey dataKey, Reporter log) {
+	public Parser(DataKey dataKey, Global global) {
 		this.dataKey = dataKey;
-		this.log = log;
+		this.global = global;
 	}
 
+	/**
+	 * 
+	 * @return convenience method for getGlobal().getLog()
+	 */
 	public Reporter getLog() {
-		return log;
+		return global.getLog();
+	}
+
+	public Global getGlobal() {
+		return global;
 	}
 
 	@Override

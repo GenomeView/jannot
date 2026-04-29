@@ -8,6 +8,7 @@ import java.io.InputStream;
 import be.abeel.io.LineIterator;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
@@ -19,11 +20,10 @@ public class BlastM8Parser extends Parser {
 
 	/**
 	 * @param dataKey
-	 * @param log     the {@link Reporter} to log issues to
+	 * @param global  the {@link Reporter} to log issues to
 	 */
-	public BlastM8Parser(Reporter log) {
-		super(null, log);
-		// TODO Auto-generated constructor stub
+	public BlastM8Parser(Global global) {
+		super(null, global);
 	}
 
 	@Override

@@ -2,13 +2,11 @@ package net.sf.jannot;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Before;
+import java.io.IOException;
+
 import org.junit.Test;
 
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.nameservice.NameService;
-import tudelft.utilities.logging.ReportToLogger;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -16,16 +14,17 @@ import tudelft.utilities.logging.Reporter;
  *
  */
 public class TestEntrySet {
-	Reporter log = new ReportToLogger(TestEntrySet.class.getSimpleName());
 
-	@Before
-	public void before() throws ReadFailedException {
-		NameService.init(log);
+	private final Global global;
+
+	public TestEntrySet() throws IOException, ReadFailedException {
+
+		global = new Global();
 	}
 
 	@Test
 	public void testGet() {
-		EntrySet es = new EntrySet(log);
+		EntrySet es = new EntrySet(global);
 		Entry x = es.getOrCreateEntry("chr1");
 		Entry y = es.getOrCreateEntry("2");
 		assertNotNull(x);

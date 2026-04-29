@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import net.sf.nameservice.NameService;
-import tudelft.utilities.logging.Reporter;
-
 /**
  * Stores all available {@link Entry}s. Each {@link Entry} is a named chromosome
  * and can be selected with the combobox in top of the viewer.
@@ -31,14 +28,14 @@ public class EntrySet implements Iterable<Entry> {
 	private final ConcurrentSkipListSet<Entry> entries = new ConcurrentSkipListSet<Entry>();
 	private final HashMap<String, Entry> map = new HashMap<String, Entry>();
 
-	private final Reporter log;
+	private final Global global;
 
 	/**
 	 * 
 	 * @param log the Reporter, used to create dummy entries if needed
 	 */
-	public EntrySet(Reporter log) {
-		this.log = log;
+	public EntrySet(Global global) {
+		this.global = global;
 	}
 
 	/*
@@ -73,9 +70,9 @@ public class EntrySet implements Iterable<Entry> {
 	 * @return an Entry that has the key as id.
 	 */
 	public synchronized Entry getOrCreateEntry(String key) {
-		key = NameService.instance().getPrimaryName(key);
+		key = global.getNameService().getPrimaryName(key);
 		if (mapGet(key) == null) {
-			Entry e = new Entry(key, log);
+			Entry e = new Entry(key, global);
 			map.put(key, e);
 			entries.add(e);
 		}
@@ -88,7 +85,7 @@ public class EntrySet implements Iterable<Entry> {
 	}
 
 	public synchronized Entry getEntry(String string) {
-		return mapGet(NameService.instance().getPrimaryName(string));
+		return mapGet(global.getNameService().getPrimaryName(string));
 
 	}
 

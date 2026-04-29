@@ -20,11 +20,11 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -36,8 +36,8 @@ public class GTFParser extends Parser {
 	/**
 	 * @param dataKey
 	 */
-	public GTFParser(Reporter log) {
-		super(null, log);
+	public GTFParser(Global global) {
+		super(null, global);
 	}
 
 	/**

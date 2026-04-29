@@ -19,8 +19,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.zip.GZIPOutputStream;
 
-import cern.colt.Arrays;
-
 import be.abeel.io.LineIterator;
 
 /**
@@ -89,8 +87,9 @@ class MAFIndex {
 	 * @param indexFile
 	 */
 	void writeToFile(File indexFile) throws IOException {
-		System.out.println("Writing index to file");
-		GZIPOutputStream gzo = new GZIPOutputStream(new FileOutputStream(indexFile));
+		// System.out.println("Writing index to file");
+		GZIPOutputStream gzo = new GZIPOutputStream(
+				new FileOutputStream(indexFile));
 
 		PrintWriter pw = new PrintWriter(gzo);
 
@@ -123,15 +122,14 @@ class MAFIndex {
 				// String strands = mafEntry.getEncodedStrands();
 				String speciesCode = mafEntry.getEncodedSpecies();
 
-				pw.println(nuc + "\t" + alignmentLength + "\t" + fileStart + "\t" + "\t" + "\t" + speciesCode);
+				pw.println(nuc + "\t" + alignmentLength + "\t" + fileStart
+						+ "\t" + "\t" + "\t" + speciesCode);
 
 			}
 		}
 
 		pw.close();
 	}
-
-	
 
 	void addEntry(String chr, MAFEntry mafEntry) {
 		ChrIndex chrIndex = chromIndexes.get(chr);
@@ -143,7 +141,8 @@ class MAFIndex {
 		Map<Integer, MAFEntry> index = chrIndex.index;
 
 		index.put(mafEntry.getNucStart(), mafEntry);
-		int endNucPosition = mafEntry.getNucStart() + mafEntry.getAlignmentLength() - 1;
+		int endNucPosition = mafEntry.getNucStart()
+				+ mafEntry.getAlignmentLength() - 1;
 
 		int startTileNumber = getTileNumber(mafEntry.getNucStart());
 		int endTileNumber = getTileNumber(endNucPosition);
@@ -166,8 +165,7 @@ class MAFIndex {
 	/**
 	 * Tiles are counted zero based
 	 * 
-	 * @param chr
-	 *            name of the chromosome
+	 * @param chr        name of the chromosome
 	 * @param tileNumber
 	 * @return list with all alignment starts within this tile
 	 */
@@ -205,8 +203,9 @@ class MAFIndex {
 		SortedSet<MAFEntry> mafEntries = new TreeSet<MAFEntry>();
 
 		ChrIndex chrIndex = chromIndexes.get(chr);
-		if (chrIndex == null)
+		if (chrIndex == null) {
 			return mafEntries;
+		}
 
 		Map<Integer, MAFEntry> index = chrIndex.index;
 		Map<Integer, List<Integer>> tiling = chrIndex.tiling;
@@ -229,7 +228,8 @@ class MAFIndex {
 		return mafEntries;
 	}
 
-	void loadFromStream(InputStream indexFile) throws FileNotFoundException, IOException {
+	void loadFromStream(InputStream indexFile)
+			throws FileNotFoundException, IOException {
 		LineIterator lit = new LineIterator(indexFile);
 
 		String currentChrom = new String();
@@ -258,8 +258,9 @@ class MAFIndex {
 	}
 
 	MAFEntry getMAFEntry(String chr, int nucPosition) {
-		if (!chromIndexes.containsKey(chr))
+		if (!chromIndexes.containsKey(chr)) {
 			return null;
+		}
 		return chromIndexes.get(chr).index.get(nucPosition);
 	}
 
@@ -274,8 +275,7 @@ class MAFIndex {
 	 * Returns the list of species/chromosome the reference chromosomse is
 	 * mapped to, including the reference chromosome itself on place 0.
 	 * 
-	 * @param chr
-	 *            the reference chromosome
+	 * @param chr the reference chromosome
 	 * @return
 	 */
 	List<String> getSpecies(String chr) {
@@ -299,13 +299,15 @@ class MAFIndex {
 	 * @param blockStrands
 	 * @return
 	 */
-	int[] encodeSpecies(String refChrom, List<String> blockSpecies, String blockStrands) {
+	int[] encodeSpecies(String refChrom, List<String> blockSpecies,
+			String blockStrands) {
 		int[] out = new int[blockSpecies.size()];
 		List<String> list = chromSpecies.get(refChrom);
 		for (int i = 0; i < blockSpecies.size(); i++) {
 			int sign = 1;
-			if (blockStrands.charAt(i+1) == '-')
+			if (blockStrands.charAt(i + 1) == '-') {
 				sign = -1;
+			}
 			out[i] = sign * list.indexOf(blockSpecies.get(i));
 		}
 		return out;

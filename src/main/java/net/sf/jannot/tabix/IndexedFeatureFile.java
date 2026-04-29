@@ -15,12 +15,12 @@ import be.abeel.util.LRUCache;
 import htsjdk.samtools.util.BlockCompressedInputStream;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
 import net.sf.jannot.picard.LineBlockCompressedInputStream;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -64,9 +64,9 @@ public class IndexedFeatureFile extends DataSource {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public IndexedFeatureFile(Locator data, Locator index, Reporter log)
+	public IndexedFeatureFile(Locator data, Locator index, Global global)
 			throws IOException, URISyntaxException {
-		super(data, log);
+		super(data, global);
 		this.data = data;
 		// this.index = index;
 		this.size = data.length();
@@ -521,7 +521,7 @@ public class IndexedFeatureFile extends DataSource {
 	@Override
 	public EntrySet read(EntrySet add) {
 		if (add == null) {
-			add = new EntrySet(getLog());
+			add = new EntrySet(getGlobal());
 			// System.out.println("Tabix names: " + idx.names);
 		}
 

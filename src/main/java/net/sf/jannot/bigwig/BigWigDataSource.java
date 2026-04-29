@@ -15,6 +15,7 @@ import htsjdk.samtools.seekablestream.SeekableFileStream;
 import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
@@ -31,7 +32,8 @@ import tudelft.utilities.logging.Reporter;
  */
 public class BigWigDataSource extends DataSource {
 
-	private SeekableStream s = null;
+	private final SeekableStream s;
+	private final BBFileReader tr;
 
 	/**
 	 * @param file
@@ -41,9 +43,10 @@ public class BigWigDataSource extends DataSource {
 	 * @throws IOException
 	 * @throws MalformedURLException
 	 */
-	public BigWigDataSource(Locator l, Reporter log) throws ReadFailedException,
-			URISyntaxException, MalformedURLException, IOException {
-		super(l, log);
+	public BigWigDataSource(Locator l, Global global)
+			throws ReadFailedException, URISyntaxException,
+			MalformedURLException, IOException {
+		super(l, global);
 		if (!l.isURL()) {
 			s = new SeekableFileStream(l.file());
 		} else {
@@ -53,13 +56,11 @@ public class BigWigDataSource extends DataSource {
 
 	}
 
-	private BBFileReader tr = null;
-
 	@Override
 	public EntrySet read(EntrySet set) {
 
 		if (set == null) {
-			set = new EntrySet(getLog());
+			set = new EntrySet(global);
 		}
 
 		Set<String> chrs = new HashSet<String>();

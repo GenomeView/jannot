@@ -21,7 +21,6 @@ package net.sf.jannot;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,7 +77,7 @@ public class ConvertWig2TDF {
 	private List<String> chromosomes = new ArrayList<String>();
 	private Set<String> visitedChromosomes = new HashSet<String>();
 	private Map<String, String> attributes = new HashMap<String, String>();
-	private PrintStream out = System.out;
+	// private PrintStream out = System.out;
 
 	private List<WindowFunction> windowFunctions = Arrays.asList(
 			WindowFunction.mean, WindowFunction.min, WindowFunction.max);// ,
@@ -171,7 +170,7 @@ public class ConvertWig2TDF {
 				String msg = "Error: Data is not sorted @ " + chr + " " + start
 						+ "  (last position = " + lastStartPosition
 						+ "   max ext factor = " + maxExtFactor + ")";
-				out.println(msg);
+				// out.println(msg);
 				throw new RuntimeException(msg);
 			}
 		} else {
@@ -216,7 +215,7 @@ public class ConvertWig2TDF {
 		if (visitedChromosomes.contains(chr)) {
 			String msg = "Error: Data is not ordered by start position. Chromosome "
 					+ chr + " appears in multiple blocks";
-			out.println(msg);
+			// out.println(msg);
 			throw new RuntimeException(msg);
 
 		}
@@ -224,8 +223,8 @@ public class ConvertWig2TDF {
 
 		chromosomes.add(chr);
 
-		out.println();
-		out.println("Processing chromosome " + chr);
+		// out.println();
+		// out.println("Processing chromosome " + chr);
 		if (zoomLevels != null) {
 			for (Zoom zl : zoomLevels) {
 				zl.close();
@@ -276,7 +275,7 @@ public class ConvertWig2TDF {
 
 		if (rawData == null) {
 			// TODO -- delete .tdf file?
-			out.println(
+			log.log(Level.WARNING,
 					"No features were found that matched chromosomes in genome: "
 							+ trackName);
 
@@ -401,7 +400,7 @@ public class ConvertWig2TDF {
 		Raw(String chr, int chrLength, int tileWidth) {
 
 			this.tileWidth = tileWidth;
-			int nTiles = (int) (chrLength / tileWidth) + 1;
+			int nTiles = chrLength / tileWidth + 1;
 			dsName = "/" + chr + "/raw";
 			writer.createDataset(dsName, TDFDataset.DataType.FLOAT, tileWidth,
 					nTiles);
@@ -415,8 +414,8 @@ public class ConvertWig2TDF {
 		 */
 		private void addData(int start, int end, float[] data, String name) {
 
-			int startTileNumber = (int) (start / tileWidth);
-			int endTileNumber = (int) (end / tileWidth);
+			int startTileNumber = start / tileWidth;
+			int endTileNumber = end / tileWidth;
 
 			// Check for closed tiles -- tiles we are guaranteed to not revisit
 			int tmp = (start - maxExtFactor) / tileWidth;
@@ -619,8 +618,7 @@ public class ConvertWig2TDF {
 							}
 						}
 					}
-					tile = new TDFVaryTile((int) tileStart, binWidth, starts,
-							data);
+					tile = new TDFVaryTile(tileStart, binWidth, starts, data);
 
 				} else {
 					float[][] data = new float[nTracks][nBins];
@@ -656,10 +654,11 @@ public class ConvertWig2TDF {
 			String[] oldLabels = labels;
 			labels = new String[noDataColumns];
 			for (int i = 0; i < labels.length; i++) {
-				if (i < oldLabels.length)
+				if (i < oldLabels.length) {
 					labels[i] = oldLabels[i];
-				else
+				} else {
 					labels[i] = "noLabel";
+				}
 			}
 		}
 		setTrackParameters(trackName, trackName, labels);
@@ -799,7 +798,7 @@ public class ConvertWig2TDF {
 		for (int i = startIndex; i < arr.length; i++) {
 			out[i - startIndex] = Float.parseFloat(arr[i]);
 		}
-		// System.out.println("Parsing number of values="+out.length);
+		log.log(Level.INFO, "Parsing number of values=" + out.length);
 		return out;
 	}
 
@@ -843,7 +842,7 @@ public class ConvertWig2TDF {
 				variableStep = true;
 				if (chr != null) {
 					mapLength.put(chr, pos);
-					System.out.println("putting: " + chr + "\t" + pos);
+					// System.out.println("putting: " + chr + "\t" + pos);
 
 				}
 				span = getInt("span", arr, 1);
@@ -852,7 +851,7 @@ public class ConvertWig2TDF {
 			} else if (line.startsWith("fixedStep")) {
 				if (chr != null) {
 					mapLength.put(chr, pos);
-					System.out.println("putting: " + chr + "\t" + pos);
+					// System.out.println("putting: " + chr + "\t" + pos);
 
 				}
 				variableStep = false;
@@ -869,38 +868,41 @@ public class ConvertWig2TDF {
 					if (variableStep) {
 						try {
 							pos = Integer.parseInt(arr[0]);
-							if (pos > max)
+							if (pos > max) {
 								max = pos;
+							}
 						} catch (NumberFormatException e) {
-							System.err.println("boom NFE: " + line);
-
+							log.log(Level.WARNING, "boom NFE: " + line, e);
 							// Seems we couldn't parse the number after all.
 						}
 					} else {
 						pos += stepSize;
-						if (pos > max)
+						if (pos > max) {
 							max = pos;
+						}
 
 					}
 				} else {
 					try {
 						if (!arr[0].equals(chr) && chr != null) {
 							mapLength.put(chr, pos);
-							System.out.println("putting: " + chr + "\t" + pos);
+							// System.out.println("putting: " + chr + "\t" +
+							// pos);
 						}
 						pos = Integer.parseInt(arr[2]);
 						chr = arr[0];
-						if (pos > max)
+						if (pos > max) {
 							max = pos;
+						}
 					} catch (NumberFormatException e) {
-						System.err.println("boom NFE: " + line);
+						log.log(Level.WARNING, "boom NFE: " + line);
 						// Seems we couldn't parse the number after all.
 					}
 				}
 			}
 
 		}
-		System.out.println("putting: " + chr + "\t" + pos);
+		// System.out.println("putting: " + chr + "\t" + pos);
 		mapLength.put(chr, pos);
 
 		int zoom = 0;
@@ -908,7 +910,7 @@ public class ConvertWig2TDF {
 			max /= 2;
 			zoom++;
 		}
-		System.out.println("Zoom levels needed: " + zoom);
+		log.log(Level.INFO, "Zoom levels needed: " + zoom);
 		if (wiggleMode && variableStep) {
 			maxColumns -= 1;
 		} else if (wiggleMode && !variableStep) {
@@ -925,16 +927,18 @@ public class ConvertWig2TDF {
 
 	private static int getInt(String string, String[] arr, int defaultValue) {
 		String ret = get(string, arr);
-		if (ret != null)
+		if (ret != null) {
 			return Integer.parseInt(ret);
-		else
+		} else {
 			return defaultValue;
+		}
 	}
 
 	private static String get(String string, String[] arr) {
 		for (String a : arr) {
-			if (a.startsWith(string))
+			if (a.startsWith(string)) {
 				return a.split("=")[1];
+			}
 		}
 		return null;
 

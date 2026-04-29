@@ -19,6 +19,7 @@ package net.sf.jannot.parser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,23 +27,21 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
+import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.Type;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
-import net.sf.nameservice.NameService;
 import support.DataManager;
-import tudelft.utilities.logging.ReportToLogger;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -50,19 +49,20 @@ import tudelft.utilities.logging.Reporter;
  * 
  */
 public class TestBEDParser {
-	private static Reporter log = new ReportToLogger(
-			TestBEDParser.class.toString());
 
-	@Before
-	public void before() throws ReadFailedException {
-		NameService.init(log);
+	private Global global;
+	private DistributingReporter log;
+
+	public TestBEDParser() throws IOException, ReadFailedException {
+		this.global = new Global();
+		this.log = global.getLog();
 	}
 
 	@Test
 	public void testParserMini() throws Exception {
 		File f = DataManager.file("minibed.bed");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read(new EntrySet(log));
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		EntrySet es = ds.read(new EntrySet(global));
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("chr7", es.firstEntry().getID());
 		int count = 0;
@@ -81,8 +81,8 @@ public class TestBEDParser {
 	@Test
 	public void testParserBare() throws Exception {
 		File f = DataManager.file("barebed.bed");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read(new EntrySet(log));
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		EntrySet es = ds.read(new EntrySet(global));
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("chr7", es.firstEntry().getID());
 		int count = 0;
@@ -101,9 +101,9 @@ public class TestBEDParser {
 	@Test
 	public void testSave() throws Exception {
 		File f = DataManager.file("barebed.bed");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), log);
-		EntrySet es = ds.read(new EntrySet(log));
-		BEDParser output = new BEDParser("save.bed", log);
+		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		EntrySet es = ds.read(new EntrySet(global));
+		BEDParser output = new BEDParser("save.bed", global);
 		FileOutputStream fos = new FileOutputStream("save.bed");
 		for (Entry e : es) {
 			output.write(fos, e);
@@ -125,8 +125,8 @@ public class TestBEDParser {
 		File fileData = DataManager.file("ItemRGBDemo.txt");
 		InputStream is = new FileInputStream(fileData);
 
-		EntrySet entries = new EntrySet(log);
-		BEDParser parser = new BEDParser(fileData.getName(), log);
+		EntrySet entries = new EntrySet(global);
+		BEDParser parser = new BEDParser(fileData.getName(), global);
 		log.log(Level.INFO, "	> fileData: " + fileData + "( "
 				+ fileData.length() + " KB)");
 		// We parse the sample file
