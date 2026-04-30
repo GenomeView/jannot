@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.seekablestream.SeekableStream;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -33,8 +33,9 @@ public class Cleaner {
 
 	public static void register(SamReader sfr, SeekableStream content, File f) {
 		sfrs.add(sfr);
-		if(f!=null)
+		if (f != null) {
 			files.add(f);
+		}
 		streams.add(content);
 	}
 
@@ -43,16 +44,15 @@ public class Cleaner {
 		files.add(f);
 	}
 
-	private static Logger log = Logger.getLogger(Cleaner.class.getCanonicalName());
-
-	public static void exit() {
+	public static void exit(Reporter log) {
 
 		for (SeekableStream s : streams) {
 			try {
 
 				s.close();
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Failed to close SeekableStream "+s.getSource(), e);
+				log.log(Level.WARNING,
+						"Failed to close SeekableStream " + s.getSource(), e);
 			}
 		}
 
@@ -60,7 +60,8 @@ public class Cleaner {
 			try {
 				sfr.close();
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Failed to close SAMFileReader "+sfr, e);
+				log.log(Level.WARNING, "Failed to close SAMFileReader " + sfr,
+						e);
 			}
 		}
 
@@ -68,7 +69,8 @@ public class Cleaner {
 			try {
 				raf.close();
 			} catch (IOException e) {
-				log.log(Level.WARNING, "Failed to close RandomAccessFile "+raf, e);
+				log.log(Level.WARNING,
+						"Failed to close RandomAccessFile " + raf, e);
 			}
 
 		}
@@ -77,9 +79,9 @@ public class Cleaner {
 		for (File file : files) {
 
 			if (file.delete()) {
-				log.info("Successfully deleted: " + file);
+				log.log(Level.INFO, "Successfully deleted: " + file);
 			} else {
-				log.info("Failed to delete: " + file);
+				log.log(Level.INFO, "Failed to delete: " + file);
 			}
 
 		}

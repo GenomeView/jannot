@@ -50,7 +50,7 @@ public class TestFirstNucleotide {
 			System.out.print(c);
 		}
 
-		Cleaner.exit();
+		Cleaner.exit(global.getLog());
 
 	}
 }

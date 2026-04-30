@@ -25,12 +25,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.WeakHashMap;
-import java.util.logging.Logger;
 
-import net.sf.jannot.source.SAMDataSource;
+import be.abeel.util.LRUCache;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.util.CloseableIterator;
-import be.abeel.util.LRUCache;
+import net.sf.jannot.source.SAMDataSource;
 
 /**
  * A wrapper for {@link SAMDataSource} that supports query by interval and is
@@ -41,7 +40,6 @@ import be.abeel.util.LRUCache;
  */
 public class CachingQueryReader {
 
-	private static Logger log = Logger.getLogger(CachingQueryReader.class.getCanonicalName());
 	private String cachedChr = "";
 	private static int maxTileCount = 30;
 	private int tileSize = 8000;
@@ -51,8 +49,9 @@ public class CachingQueryReader {
 	private static WeakHashMap<SAMDataSource, CachingQueryReader> wmap = new WeakHashMap<SAMDataSource, CachingQueryReader>();
 
 	public static CachingQueryReader create(SAMDataSource ds) {
-		if (wmap.get(ds) == null)
+		if (wmap.get(ds) == null) {
 			wmap.put(ds, new CachingQueryReader(ds));
+		}
 		return wmap.get(ds);
 	}
 
@@ -69,7 +68,8 @@ public class CachingQueryReader {
 
 	private EmptyIterator<SAMRecord> empty = new EmptyIterator<SAMRecord>();
 
-	public CloseableIterator<SAMRecord> query(String sequence, int start, int end, boolean contained) {
+	public CloseableIterator<SAMRecord> query(String sequence, int start,
+			int end, boolean contained) {
 
 		int startTile = (start + 1) / getTileSize(sequence);
 		int endTile = end / getTileSize(sequence); // <= inclusive
@@ -156,7 +156,8 @@ public class CachingQueryReader {
 				int aStart = record.getAlignmentStart();
 				int aEnd = record.getAlignmentEnd();// record.getEnd();
 				int idx0 = Math.max(0, (aStart - start) / tileSize);
-				int idx1 = Math.min(tiles.size() - 1, (record.getAlignmentEnd() - start) / tileSize);
+				int idx1 = Math.min(tiles.size() - 1,
+						(record.getAlignmentEnd() - start) / tileSize);
 
 				// Loop over tiles this read overlaps
 				for (int i = idx0; i <= idx1; i++) {
@@ -195,7 +196,8 @@ public class CachingQueryReader {
 	 * @return the tileSize
 	 */
 	public int getTileSize(String chr) {
-		if (chr.equals("M") || chr.equals("chrM") || chr.equals("MT") || chr.equals("chrMT")) {
+		if (chr.equals("M") || chr.equals("chrM") || chr.equals("MT")
+				|| chr.equals("chrMT")) {
 			return 100;
 		} else {
 			return tileSize;
@@ -227,8 +229,7 @@ public class CachingQueryReader {
 		}
 
 		/**
-		 * @param tileNumber
-		 *            the tileNumber to set
+		 * @param tileNumber the tileNumber to set
 		 */
 		public void setTileNumber(int tileNumber) {
 			this.tileNumber = tileNumber;
@@ -242,8 +243,7 @@ public class CachingQueryReader {
 		}
 
 		/**
-		 * @param start
-		 *            the start to set
+		 * @param start the start to set
 		 */
 		public void setStart(int start) {
 			this.start = start;
@@ -257,8 +257,7 @@ public class CachingQueryReader {
 		}
 
 		/**
-		 * @param containedRecords
-		 *            the containedRecords to set
+		 * @param containedRecords the containedRecords to set
 		 */
 		public void setContainedRecords(List<SAMRecord> containedRecords) {
 			this.containedRecords = containedRecords;
@@ -272,8 +271,7 @@ public class CachingQueryReader {
 		}
 
 		/**
-		 * @param overlappingRecords
-		 *            the overlappingRecords to set
+		 * @param overlappingRecords the overlappingRecords to set
 		 */
 		public void setOverlappingRecords(List<SAMRecord> overlappingRecords) {
 			this.overlappingRecords = overlappingRecords;
@@ -287,8 +285,7 @@ public class CachingQueryReader {
 		}
 
 		/**
-		 * @param loaded
-		 *            the loaded to set
+		 * @param loaded the loaded to set
 		 */
 		public void setLoaded(boolean loaded) {
 			this.loaded = loaded;
@@ -312,14 +309,17 @@ public class CachingQueryReader {
 			advanceToFirstRecord();
 		}
 
+		@Override
 		public void close() {
 			// No-op
 		}
 
+		@Override
 		public boolean hasNext() {
 			return nextRecord != null;
 		}
 
+		@Override
 		public SAMRecord next() {
 			SAMRecord ret = nextRecord;
 
@@ -328,6 +328,7 @@ public class CachingQueryReader {
 			return ret;
 		}
 
+		@Override
 		public void remove() {
 			// ignored
 		}
@@ -339,7 +340,8 @@ public class CachingQueryReader {
 		private void advanceToNextRecord() {
 			advance();
 
-			while ((nextRecord != null) && (nextRecord.getAlignmentEnd() < start)) {
+			while ((nextRecord != null)
+					&& (nextRecord.getAlignmentEnd() < start)) {
 				advance();
 			}
 		}
@@ -357,4 +359,3 @@ public class CachingQueryReader {
 	}
 }
 // ~ Formatted by Jindent --- http://www.jindent.com
-

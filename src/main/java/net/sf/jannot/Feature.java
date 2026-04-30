@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.event.FeatureEvent;
@@ -28,8 +26,6 @@ import net.sf.jannot.event.FeatureEvent;
  * @author Thomas Abeel
  */
 public class Feature implements Comparable<Feature>, Located {
-
-	private Logger log = Logger.getLogger(Feature.class.getCanonicalName());
 
 	// either location or singleLocation are to be set.
 	private Location[] location = null;
@@ -61,9 +57,10 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	public Feature(List<Location> locations) {
-		if (location == null || locations.size() == 0)
+		if (location == null || locations.size() == 0) {
 			throw new NullPointerException(
 					"location must contain at least 1 element");
+		}
 		setLocation(locations);
 	}
 
@@ -87,16 +84,19 @@ public class Feature implements Comparable<Feature>, Located {
 
 		}
 		/* Remove line breaks in value */
-		if (value != null)
+		if (value != null) {
 			value = value.replaceAll("\n", "");
+		}
 
-		if (!key.equals("score") && qualifiers.containsKey(key))
+		if (!key.equals("score") && qualifiers.containsKey(key)) {
 			qualifiers.put(key, qualifiers.get(key) + "," + value);
-		else
+		} else {
 			qualifiers.put(key, value);
+		}
 
-		if (key.equals("score"))
+		if (key.equals("score")) {
 			scoreBuffer = false;
+		}
 
 	}
 
@@ -107,8 +107,9 @@ public class Feature implements Comparable<Feature>, Located {
 	 * @param value value
 	 */
 	public void setQualifier(String key, String value) {
-		if (key != null)
+		if (key != null) {
 			qualifiers.remove(key);
+		}
 		addQualifier(key, value);
 
 	}
@@ -128,9 +129,10 @@ public class Feature implements Comparable<Feature>, Located {
 	 *                  location.
 	 */
 	public void setLocation(Collection<Location> locations) {
-		if (locations == null || locations.size() == 0)
+		if (locations == null || locations.size() == 0) {
 			throw new IllegalArgumentException(
 					"at least 1 location required for feature");
+		}
 		// FIXME we'd like to check but some implementations of Collection
 		// don't support contains(null)
 		// if (locations.contains(null))
@@ -140,8 +142,9 @@ public class Feature implements Comparable<Feature>, Located {
 		} else {
 			singleLocation = null;
 			SortedSet<Location> set = new TreeSet<Location>();
-			for (Location l : locations)
+			for (Location l : locations) {
 				set.add(l);
+			}
 			location = new Location[set.size()];
 			int idx = 0;
 			for (Location l : set) {
@@ -170,9 +173,9 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	public void setLocation(Location[] l) {
-		if (l.length == 1)
+		if (l.length == 1) {
 			setLocation(l[0]);
-		else {
+		} else {
 			singleLocation = null;
 			this.location = l;
 			for (Location tmp : this.location) {
@@ -252,16 +255,15 @@ public class Feature implements Comparable<Feature>, Located {
 	private int fStart = -1;
 	private int fEnd = -1;
 
-	// private Location fLocation = new Location(-1, -1);
-
 	/**
 	 * Phase is not the same thing as Frame. Phase is the number of bases to
 	 * skip before reading in-frame, while frame is the actual frame identifier
 	 * beginning at 1.
 	 */
 	void updatePhase() {
-		if (singleLocation == null && location == null)
+		if (singleLocation == null && location == null) {
 			return;
+		}
 
 		Location[] tmpLoc = location();
 
@@ -271,10 +273,12 @@ public class Feature implements Comparable<Feature>, Located {
 		int fEnd = 0;
 
 		for (Location l : tmpLoc) {
-			if (l.start() < fStart)
+			if (l.start() < fStart) {
 				fStart = l.start();
-			if (l.end() > fEnd)
+			}
+			if (l.end() > fEnd) {
 				fEnd = l.end();
+			}
 		}
 		this.fStart = fStart;
 		this.fEnd = fEnd;
@@ -283,7 +287,6 @@ public class Feature implements Comparable<Feature>, Located {
 		if (strand == Strand.FORWARD) {
 			for (int i = 0; i < tmpLoc.length; i++) {
 				phase[i] = (byte) currentPhase;
-				// phase.put(location[i], currentPhase);
 				currentPhase = (tmpLoc[i].length() - currentPhase);
 				currentPhase %= 3;
 				currentPhase = 3 - currentPhase;
@@ -291,7 +294,6 @@ public class Feature implements Comparable<Feature>, Located {
 			}
 		} else if (strand == Strand.REVERSE) {
 			for (int i = tmpLoc.length - 1; i >= 0; i--) {
-				// phase.put(tmpLoc.get(i), currentPhase);
 				phase[i] = (byte) currentPhase;
 				currentPhase = (tmpLoc[i].length() - currentPhase);
 				currentPhase %= 3;
@@ -299,9 +301,9 @@ public class Feature implements Comparable<Feature>, Located {
 				currentPhase %= 3;
 			}
 		} else {
-			for (int i = 0; i < tmpLoc.length; i++)
+			for (int i = 0; i < tmpLoc.length; i++) {
 				phase[i] = 0;
-			// phase.put(location.get(i), 0);
+			}
 		}
 
 	}
@@ -309,18 +311,20 @@ public class Feature implements Comparable<Feature>, Located {
 	/**
 	 * 
 	 * @return list,either {@link #location} list, or list containing
-	 *         {@link #singleLocation}, or Location[0] if both are null
+	 *         {@link #singleLocation}, or mew Location[0] if both are null
 	 */
 	public Location[] location() {
 		if (location == null) {
 			assert singleLocation != null;
 			// bug? we just asserted it's not null
-			if (singleLocation == null)
+			if (singleLocation == null) {
 				return new Location[0];
-			else
+			} else {
 				return new Location[] { singleLocation };
-		} else
+			}
+		} else {
 			return location;
+		}
 
 	}
 
@@ -332,13 +336,15 @@ public class Feature implements Comparable<Feature>, Located {
 	public int compareTo(Feature o) {
 
 		int comp = new Integer(fStart).compareTo(o.fStart);
-		if (comp == 0)
+		if (comp == 0) {
 			comp = new Integer(fEnd).compareTo(o.fEnd);
+		}
 
-		if (comp == 0)
+		if (comp == 0) {
 			return new Integer(hashCode()).compareTo(o.hashCode());
-		else
+		} else {
 			return comp;
+		}
 	}
 
 	public Strand strand() {
@@ -380,8 +386,9 @@ public class Feature implements Comparable<Feature>, Located {
 		Feature f = new Feature(loc);
 		f.setStrand(this.strand());
 
-		for (String key : qualifiers.keySet())
+		for (String key : qualifiers.keySet()) {
 			f.addQualifier(key, qualifiers.get(key));
+		}
 		f.type = this.type();
 		return f;
 	}
@@ -389,12 +396,8 @@ public class Feature implements Comparable<Feature>, Located {
 	// private double bufferedScore = Double.NaN;
 	@Deprecated
 	public void setScore(double score) {
-		// if(score!=bufferedScore){
 		setQualifier("score", "" + score);
 		scoreBuffer = false;
-		// bufferedScore=score;
-		// }
-		// this.score = score;
 
 	}
 
@@ -403,20 +406,22 @@ public class Feature implements Comparable<Feature>, Located {
 	 * @return the value in the "score" qualifier.
 	 */
 	public double getScore() {
+		// FIXME what if qualifiers were modified?
 		if (scoreBuffer) {
 			return score;
 		} else {
 			String val = qualifier("score");
-			if (val == null)
+			if (val == null) {
 				return 0;
-			else {
+			} else {
 				scoreBuffer = true;
 				double tmpScore = 0;
 				try {
 					// bug? score may be a list
 					tmpScore = Double.parseDouble(val);
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Could not parse score: " + val, e);
+					// FIXME maybe log something? Maybe not?
+					// why are we not parsing score head-on?
 				}
 				score = tmpScore;
 				return score;
@@ -426,34 +431,38 @@ public class Feature implements Comparable<Feature>, Located {
 
 	@Override
 	public String toString() {
-		if (type != null)
+		if (type != null) {
 			return type.toString() + " [" + new Location(fStart, fEnd) + "]";
-		else
+		} else {
 			return "[" + new Location(fStart, fEnd).toString() + "]";
+		}
 	}
 
 	public int getFrame() {
 		int frame;
 		if (location == null) {
-			if (strand == Strand.REVERSE)
+			if (strand == Strand.REVERSE) {
 				frame = fEnd % 3;
-			else
+			} else {
 				frame = fStart % 3;
+			}
 		} else {
-			if (strand == Strand.REVERSE)
+			if (strand == Strand.REVERSE) {
 				frame = (location[location.length - 1].end()) % 3;
-			else
+			} else {
 				frame = (location[0].start()) % 3;
+			}
 		}
 		return frame == 0 ? 3 : frame;
 
 	}
 
 	public int getPhase(int idx) {
-		if (location == null)
+		if (location == null) {
 			return 0;
-		else
+		} else {
 			return phase[idx];
+		}
 
 	}
 
@@ -486,8 +495,9 @@ public class Feature implements Comparable<Feature>, Located {
 	 */
 	public String getColor() {
 		String notes = this.qualifier("colour");
-		if (notes == null)
+		if (notes == null) {
 			notes = this.qualifier("color");
+		}
 		return notes;
 	}
 
@@ -499,29 +509,20 @@ public class Feature implements Comparable<Feature>, Located {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Located#start()
-	 */
 	@Override
 	public int start() {
 		return fStart;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.Located#end()
-	 */
 	@Override
 	public int end() {
 		return fEnd;
 	}
 
 	public void addLocations(Collection<Location> locs) {
-		for (Location l : locs)
+		for (Location l : locs) {
 			addLocation(l);
+		}
 	}
 
 	/**
@@ -529,11 +530,13 @@ public class Feature implements Comparable<Feature>, Located {
 	 */
 	public void addLocation(Location l) {
 		List<Location> arr = new ArrayList<Location>();
-		if (singleLocation != null)
+		if (singleLocation != null) {
 			arr.add(singleLocation);
+		}
 		if (location != null) {
-			for (Location ll : location)
+			for (Location ll : location) {
 				arr.add(ll);
+			}
 		}
 		arr.add(l);
 		setLocation(arr);
@@ -544,12 +547,15 @@ public class Feature implements Comparable<Feature>, Located {
 	 */
 	public void removeLocation(Location rf) {
 		List<Location> arr = new ArrayList<Location>();
-		if (singleLocation != null)
+		if (singleLocation != null) {
 			throw new RuntimeException("Can not remove the last location!!!");
+		}
 		if (location != null) {
-			for (Location ll : location)
-				if (!ll.equals(rf))
+			for (Location ll : location) {
+				if (!ll.equals(rf)) {
 					arr.add(ll);
+				}
+			}
 		}
 		setLocation(arr);
 

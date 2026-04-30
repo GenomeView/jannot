@@ -30,8 +30,6 @@ import tudelft.utilities.logging.Reporter;
  * 
  */
 public class Locator {
-//	private static Logger log = Logger
-//			.getLogger(Locator.class.getCanonicalName());
 	private String locator;
 	private long length = -1;
 	private boolean exists = false; // exists and can be read
@@ -79,8 +77,9 @@ public class Locator {
 		}
 		if (locator.endsWith(".bai")) {
 			locator = locator.substring(0, locator.length() - 4);
-			if (!locator.endsWith(".bam"))
+			if (!locator.endsWith(".bam")) {
 				locator += ".bam";
+			}
 			init();
 		}
 
@@ -95,8 +94,9 @@ public class Locator {
 
 		if (isURL()) {
 			initURL();
-		} else
+		} else {
 			initFile();
+		}
 
 	}
 
@@ -198,14 +198,18 @@ public class Locator {
 	 */
 	public String getPostfix() {
 
-		if (isTabix())
+		if (isTabix()) {
 			return "tbi";
-		if (isFasta())
+		}
+		if (isFasta()) {
 			return "fai";
-		if (isBAM())
+		}
+		if (isBAM()) {
 			return "bai";
-		if (isMaf())
+		}
+		if (isMaf()) {
 			return "mfi";
+		}
 		return null;
 	}
 
@@ -323,8 +327,9 @@ public class Locator {
 	 * @return
 	 */
 	public Conf getTabixConfiguration() {
-		if (!isTabix())
+		if (!isTabix()) {
 			return null;
+		}
 		if (ext.equals("gff") || ext.equals("gff3")) {
 			return TabixWriter.GFF_CONF;
 		}
@@ -356,11 +361,13 @@ public class Locator {
 	 * @throws MalformedURLException
 	 */
 	public SeekableStream stream() throws IOException, URISyntaxException {
-		if (!exists)
+		if (!exists) {
 			throw new IOException("File can't be read: " + locator);
-		if (!isURL())
+		}
+		if (!isURL()) {
 			return SeekableStreamFactory.getInstance()
 					.getStreamFor(this.file().toString());
+		}
 		return SeekableStreamFactory.getInstance().getStreamFor(this.url());
 	}
 
@@ -373,8 +380,9 @@ public class Locator {
 			int slashIndex = url().getPath().lastIndexOf('/');
 			return url().getPath().substring(slashIndex + 1);
 
-		} else
+		} else {
 			return file().getName();
+		}
 
 	}
 
