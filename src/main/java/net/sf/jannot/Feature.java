@@ -45,23 +45,16 @@ public class Feature implements Comparable<Feature>, Located {
 	private double score = Double.NaN;
 
 	public Feature(Set<Location> location) {
-		setLocation(location);
-	}
+		if (location == null || location.size() == 0) {
+			throw new NullPointerException(
+					"location must contain at least 1 element");
+		}
 
-	public Feature(Location[] location) {
-		setLocation(Arrays.asList(location));
+		setLocation(location);
 	}
 
 	public Feature(Location location) {
 		setLocation(Arrays.asList(location));
-	}
-
-	public Feature(List<Location> locations) {
-		if (location == null || locations.size() == 0) {
-			throw new NullPointerException(
-					"location must contain at least 1 element");
-		}
-		setLocation(locations);
 	}
 
 	/**
