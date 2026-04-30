@@ -39,6 +39,11 @@ public class DistributingReporter implements Reporter {
 		log(level, msg, null);
 	}
 
+	/**
+	 * add child listening to all logs reported to this reporter
+	 * 
+	 * @param reporter a child reporter
+	 */
 	public void add(Reporter reporter) {
 		children.add(reporter);
 	}
