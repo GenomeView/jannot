@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.util.CloseableIterator;
@@ -31,8 +31,6 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 	private HashMap<String, SAMRecord> qFastSecond = new HashMap<String, SAMRecord>();
 	private int qFastMaxPairedLenght;
 
-	private Logger log = Logger.getLogger(BAMreads.class.getCanonicalName());
-
 	private CachingQueryReader cqr;
 	private int keyIndex;
 	private SAMDataSource source;
@@ -50,6 +48,7 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 
 	}
 
+	@Override
 	public int getPairLength() {
 		return qFastMaxPairedLenght;
 	}
@@ -70,6 +69,7 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 		return new BAMiterator(cqr.iterator(), keyIndex);
 	}
 
+	@Override
 	public String label() {
 		return source.getSourceKey().toString();
 	}
@@ -83,25 +83,11 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 		return maxLenght;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.jannot.shortread.ReadGroup#getSecondRead(net.sf.samtools.SAMRecord
-	 * )
-	 */
 	@Override
 	public SAMRecord getSecondRead(SAMRecord one) {
 		return qFastSecond.get(one.getReadName());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.jannot.shortread.ReadGroup#getSecondRead(net.sf.samtools.SAMRecord
-	 * )
-	 */
 	@Override
 	public SAMRecord getFirstRead(SAMRecord second) {
 		return qFastFirst.get(second.getReadName());
@@ -117,17 +103,21 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 			int start = r.start() - 500;
 			int end = r.end() + 500;
 			CloseableIterator<SAMRecord> it = cqr.query(key, start, end, false);
-			if (cqr == null || key == null)
-				log.warning("NullPointerDetected: key=" + key + "\tcqr=" + cqr);
+			if (cqr == null || key == null) {
+				getLog().log(Level.WARNING,
+						"NullPointerDetected: key=" + key + "\tcqr=" + cqr);
+			}
 			while (it.hasNext()) {
 				try {
 					SAMRecord tmp = it.next();
 					int aStart = tmp.getAlignmentStart();
 					int aEnd = tmp.getAlignmentEnd();
-					if (aStart == 0 || aEnd == 0)
+					if (aStart == 0 || aEnd == 0) {
 						continue;
-					if ((aEnd - aStart + 1) > maxLenght)
+					}
+					if ((aEnd - aStart + 1) > maxLenght) {
 						maxLenght = (aEnd - aStart + 1);
+					}
 					qFastBuffer.add(tmp);
 					// byte[] seq = tmp.getReadBases();
 					// if (complete(seq)) {
@@ -135,11 +125,13 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 					// qFastBuffer.add(esr);
 					String name = tmp.getReadName();
 					if (ShortReadTools.isPaired(tmp)
-							&& tmp.getFirstOfPairFlag())
+							&& tmp.getFirstOfPairFlag()) {
 						qFastFirst.put(name, tmp);
+					}
 					if (ShortReadTools.isPaired(tmp)
-							&& tmp.getSecondOfPairFlag())
+							&& tmp.getSecondOfPairFlag()) {
 						qFastSecond.put(name, tmp);
+					}
 
 					if (qFastFirst.containsKey(name)
 							&& qFastSecond.containsKey(name)) {
@@ -152,12 +144,13 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 										- qFastFirst.get(name)
 												.getAlignmentStart()
 										+ 1);
-						if (len > qFastMaxPairedLenght)
+						if (len > qFastMaxPairedLenght) {
 							qFastMaxPairedLenght = len;
+						}
 					}
 
 				} catch (RuntimeException ex) {
-					System.err.println(key);
+					getLog().log(Level.WARNING, "failure in qFast", ex);
 
 				}
 			}
@@ -188,8 +181,9 @@ class BAMiterator implements CloseableIterator<SAMRecord> {
 
 	@Override
 	public boolean hasNext() {
-		if (next == null)
+		if (next == null) {
 			it.close();
+		}
 		return next != null;
 	}
 

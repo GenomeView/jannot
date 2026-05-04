@@ -13,9 +13,11 @@ import net.sf.nameservice.NameService;
 public class Global {
 	private final DistributingReporter log;
 	private final NameService ns;
+	private final JavaLogInterceptor interceptor;
 
 	public Global() throws IOException, ReadFailedException {
 		log = new DistributingReporter();
+		interceptor = new JavaLogInterceptor(log);
 		ns = new NameService(log);
 	}
 

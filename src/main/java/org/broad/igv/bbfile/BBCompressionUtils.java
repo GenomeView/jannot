@@ -19,10 +19,8 @@ package org.broad.igv.bbfile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-
 
 /*
  *   Compression/Decompression Utillity adapted to BigBed/BigWig Compression formats.
@@ -51,8 +49,6 @@ import java.util.zip.Inflater;
  */
 public class BBCompressionUtils {
 
-	private static Logger log = Logger.getLogger(BBCompressionUtils.class.getCanonicalName());
-
 	/*
 	 * Decompress ZLIB commpressed data into a buffer
 	 * 
@@ -62,7 +58,8 @@ public class BBCompressionUtils {
 	 * 
 	 * Return: buffer of uncompressed byte data
 	 */
-	public static byte[] decompress(byte[] data, int uncompressBufSize) {
+	public static byte[] decompress(byte[] data, int uncompressBufSize)
+			throws IOException {
 
 		// mpd: new code
 		byte[] inbuf = data; // input is first assigned to full data
@@ -71,7 +68,8 @@ public class BBCompressionUtils {
 		int off = 0;
 
 		// Create an expandable byte array to hold the decompressed data
-		ByteArrayOutputStream bos = new ByteArrayOutputStream((int) (1.5 * inbuf.length));
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(
+				(int) (1.5 * inbuf.length));
 
 		// Decompress the data
 		byte[] outbuf = new byte[uncompressBufSize];
@@ -99,7 +97,7 @@ public class BBCompressionUtils {
 
 				// } catch (DataFormatException e) {
 			} catch (Exception e) {
-				log.severe(e.getMessage());
+				throw new IOException("Decompress failed", e);
 			}
 		}
 
@@ -113,7 +111,7 @@ public class BBCompressionUtils {
 	}
 
 	/*
-    * */
+	* */
 	public static byte[] compress(byte[] data, int compressBufSize) {
 		Deflater compressor = new Deflater();
 		compressor.setLevel(Deflater.DEFAULT_COMPRESSION);

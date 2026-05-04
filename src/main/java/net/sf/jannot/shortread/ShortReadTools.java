@@ -3,15 +3,13 @@
  */
 package net.sf.jannot.shortread;
 
-import java.util.Arrays;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import net.sf.jannot.Strand;
-import htsjdk.samtools.Cigar;
 import htsjdk.samtools.CigarElement;
 import htsjdk.samtools.CigarOperator;
 import htsjdk.samtools.SAMRecord;
+import net.sf.jannot.Strand;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -28,20 +26,18 @@ public class ShortReadTools {
 		return !isFirstInPair(sr);
 	}
 
-	/**
-	 * Returns nucleotide in the aligned read;
-	 */
-	@Deprecated
-	public static char getNucleotide(SAMRecord sr, int pos) {
-		byte[] construct = null;
-		construct = construct(sr);
-		return (char) construct[pos - 1];
+//	/**
+//	 * Returns nucleotide in the aligned read;
+//	 */
+//	@Deprecated
+//	public static char getNucleotide(SAMRecord sr, int pos) {
+//		byte[] construct = null;
+//		construct = construct(sr);
+//		return (char) construct[pos - 1];
+//
+//	}
 
-	}
-
-	private static Logger log = Logger.getLogger(ShortReadTools.class.getCanonicalName());
-
-	public static byte[] construct(SAMRecord sr) {
+	public static byte[] construct(SAMRecord sr, Reporter log) {
 		int pos = 0;
 		int superPos = 0;
 		byte[] out = new byte[length(sr)];
@@ -63,37 +59,41 @@ public class ShortReadTools {
 						out[pos++] = '-';
 						break;
 					case M:
-						
+
 						/* Bases are present */
-						if(readBases.length>0){
+						if (readBases.length > 0) {
 							assert pos < out.length;
 							assert superPos < readBases.length;
 							out[pos] = readBases[superPos];
-						}else
+						} else {
 							out[pos] = 'M';
+						}
 						pos++;
 						superPos++;
 						break;
 					case S:
-						//out[pos] = readBases[superPos];
-						//pos++;
+						// out[pos] = readBases[superPos];
+						// pos++;
 						superPos++;
 						break;
 					case H:
 						i++;
 						break;
 					default:
-						System.err.println("def: " + co + "\t" + pos + "\t" + superPos + "\t" + out[pos]);
+						System.err.println("def: " + co + "\t" + pos + "\t"
+								+ superPos + "\t" + out[pos]);
 						break;
 
 					}
 				}
 			}
 		} catch (IndexOutOfBoundsException ex) {
-			log.severe("Read bases: " + new String(readBases)+" len: "+readBases.length);
-			log.severe("Cigar string: " + sr.getCigarString());
-			log.log(Level.SEVERE, "Could not get sequence for read", ex);
-			
+			log.log(Level.SEVERE,
+					"Could not get sequence for read. Read bases: "
+							+ new String(readBases) + ". len: "
+							+ readBases.length + ". Cigar string: "
+							+ sr.getCigarString(),
+					ex);
 		}
 
 		return out;

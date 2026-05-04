@@ -37,15 +37,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import net.sf.jannot.picard.LineBlockCompressedInputStream;
-import net.sf.jannot.source.Locator;
-import htsjdk.samtools.util.BlockCompressedInputStream;
-import htsjdk.samtools.util.BlockCompressedOutputStream;
 import htsjdk.samtools.seekablestream.SeekableFileStream;
 import htsjdk.samtools.seekablestream.SeekableHTTPStream;
+import htsjdk.samtools.util.BlockCompressedInputStream;
+import htsjdk.samtools.util.BlockCompressedOutputStream;
+import net.sf.jannot.picard.LineBlockCompressedInputStream;
+import net.sf.jannot.source.Locator;
 
 /**
  * Tabix writer, based on Heng Li's C implementation.
@@ -53,7 +51,6 @@ import htsjdk.samtools.seekablestream.SeekableHTTPStream;
  * @author tarkvara
  */
 public class TabixWriter extends TabixReader {
-	private static final Logger LOG = Logger.getLogger(TabixWriter.class.getCanonicalName());
 	private static final Charset LATIN1 = Charset.forName("ISO-8859-1");
 
 	public static final int TI_PRESET_GENERIC = 0;
@@ -63,9 +60,12 @@ public class TabixWriter extends TabixReader {
 
 	public static final Conf GFF_CONF = new Conf(0, 1, 4, 5, '#', 0);
 	public static final Conf BED_CONF = new Conf(TI_FLAG_UCSC, 1, 2, 3, '#', 0);
-	public static final Conf PSLTBL_CONF = new Conf(TI_FLAG_UCSC, 15, 17, 18, '#', 0);
-	public static final Conf SAM_CONF = new Conf(TI_PRESET_SAM, 3, 4, 0, '@', 0);
-	public static final Conf VCF_CONF = new Conf(TI_PRESET_VCF, 1, 2, 0, '#', 0);
+	public static final Conf PSLTBL_CONF = new Conf(TI_FLAG_UCSC, 15, 17, 18,
+			'#', 0);
+	public static final Conf SAM_CONF = new Conf(TI_PRESET_SAM, 3, 4, 0, '@',
+			0);
+	public static final Conf VCF_CONF = new Conf(TI_PRESET_VCF, 1, 2, 0, '#',
+			0);
 
 	/** The binning index. */
 	List<Map<Integer, List<TPair64>>> binningIndex = new ArrayList<Map<Integer, List<TPair64>>>();
@@ -98,14 +98,18 @@ public class TabixWriter extends TabixReader {
 
 	public void createIndex(Locator idx) throws Exception {
 		LineBlockCompressedInputStream fp;
-		if (!mFn.isURL())
-			fp = new LineBlockCompressedInputStream(new SeekableFileStream(mFn.file()));
-		else
-			fp = new LineBlockCompressedInputStream(new SeekableHTTPStream(mFn.url()));
+		if (!mFn.isURL()) {
+			fp = new LineBlockCompressedInputStream(
+					new SeekableFileStream(mFn.file()));
+		} else {
+			fp = new LineBlockCompressedInputStream(
+					new SeekableHTTPStream(mFn.url()));
+		}
 		makeIndex(fp);
 		fp.close();
 		File indexFile = idx.file();
-		BlockCompressedOutputStream fpidx = new BlockCompressedOutputStream(indexFile);
+		BlockCompressedOutputStream fpidx = new BlockCompressedOutputStream(
+				indexFile);
 		saveIndex(fpidx);
 		fpidx.close();
 	}
@@ -113,7 +117,7 @@ public class TabixWriter extends TabixReader {
 	private void makeIndex(BlockCompressedInputStream fp) throws Exception {
 		int last_bin, save_bin;
 		int last_coor, last_tid, save_tid;
-		long save_off, last_off, lineno = 0, offset0 = (long) -1;
+		long save_off, last_off, lineno = 0, offset0 = -1;
 		String str;
 
 		save_bin = save_tid = last_tid = last_bin = 0xffffffff; // Was unsigned
@@ -129,7 +133,8 @@ public class TabixWriter extends TabixReader {
 			}
 			TIntv intv = getIntv(str);
 			if (intv.beg < 0 || intv.end < 0) {
-				throw new Exception("The indexes overlap or are out of bounds.");
+				throw new Exception(
+						"The indexes overlap or are out of bounds.");
 			}
 			if (last_tid != intv.tid) { // change of chromosomes
 				if (last_tid > intv.tid) {
@@ -140,33 +145,42 @@ public class TabixWriter extends TabixReader {
 				last_tid = intv.tid;
 				last_bin = 0xffffffff;
 			} else if (last_coor > intv.beg) {
-				throw new Exception(String.format("File out of order at line %d.", lineno));
+				throw new Exception(
+						String.format("File out of order at line %d.", lineno));
 			}
-			long tmp = insertLinear(linearIndex.get(intv.tid), intv.beg, intv.end, last_off);
-			if (last_off == 0)
+			long tmp = insertLinear(linearIndex.get(intv.tid), intv.beg,
+					intv.end, last_off);
+			if (last_off == 0) {
 				offset0 = tmp;
+			}
 			if (intv.bin != last_bin) { // then possibly write the binning index
 				if (save_bin != 0xffffffff) { // save_bin==0xffffffffu only
 												// happens to the first record
-					insertBinning(binningIndex.get(save_tid), save_bin, save_off, last_off);
+					insertBinning(binningIndex.get(save_tid), save_bin,
+							save_off, last_off);
 				}
 				save_off = last_off;
 				save_bin = last_bin = intv.bin;
 				save_tid = intv.tid;
-				if (save_tid < 0)
+				if (save_tid < 0) {
 					break;
+				}
 			}
 			if (fp.getFilePointer() <= last_off) {
-				throw new Exception(String.format("Bug in BGZF: %x < %x.", fp.getFilePointer(), last_off));
+				throw new Exception(String.format("Bug in BGZF: %x < %x.",
+						fp.getFilePointer(), last_off));
 			}
 			last_off = fp.getFilePointer();
 			last_coor = intv.beg;
 		}
-		if (save_tid >= 0)
-			insertBinning(binningIndex.get(save_tid), save_bin, save_off, fp.getFilePointer());
+		if (save_tid >= 0) {
+			insertBinning(binningIndex.get(save_tid), save_bin, save_off,
+					fp.getFilePointer());
+		}
 		mergeChunks();
 		fillMissing();
-		if (offset0 != (long) -1 && !linearIndex.isEmpty() && linearIndex.get(0) != null) {
+		if (offset0 != -1 && !linearIndex.isEmpty()
+				&& linearIndex.get(0) != null) {
 			int beg = (int) (offset0 >> 32), end = (int) (offset0 & 0xffffffff);
 			for (int i = beg; i <= end; ++i) {
 				linearIndex.get(0).set(i, 0L);
@@ -174,7 +188,8 @@ public class TabixWriter extends TabixReader {
 		}
 	}
 
-	private void insertBinning(Map<Integer, List<TPair64>> binningForChr, int bin, long beg, long end) {
+	private void insertBinning(Map<Integer, List<TPair64>> binningForChr,
+			int bin, long beg, long end) {
 		if (!binningForChr.containsKey(bin)) {
 			binningForChr.put(bin, new ArrayList<TPair64>());
 		}
@@ -182,7 +197,8 @@ public class TabixWriter extends TabixReader {
 		list.add(new TPair64(beg, end));
 	}
 
-	private long insertLinear(List<Long> linearForChr, int beg, int end, long offset) {
+	private long insertLinear(List<Long> linearForChr, int beg, int end,
+			long offset) {
 		beg = beg >> TAD_LIDX_SHIFT;
 		end = (end - 1) >> TAD_LIDX_SHIFT;
 
@@ -236,13 +252,15 @@ public class TabixWriter extends TabixReader {
 		}
 	}
 
-	public static void writeInt(final OutputStream os, int value) throws IOException {
+	public static void writeInt(final OutputStream os, int value)
+			throws IOException {
 		byte[] buf = new byte[4];
 		ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).putInt(value);
 		os.write(buf);
 	}
 
-	public static void writeLong(final OutputStream os, long value) throws IOException {
+	public static void writeLong(final OutputStream os, long value)
+			throws IOException {
 		byte[] buf = new byte[8];
 		ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).putLong(value);
 		os.write(buf);
@@ -317,8 +335,7 @@ public class TabixWriter extends TabixReader {
 	 * Override getIntv because it's a good time to figure out which bin things
 	 * should go into.
 	 * 
-	 * @param line
-	 *            a line read from the source file
+	 * @param line a line read from the source file
 	 * @return an object describing the interval
 	 */
 	@Override
@@ -330,16 +347,21 @@ public class TabixWriter extends TabixReader {
 
 	private int reg2bin(int beg, int end) {
 		--end;
-		if (beg >> 14 == end >> 14)
+		if (beg >> 14 == end >> 14) {
 			return 4681 + (beg >> 14);
-		if (beg >> 17 == end >> 17)
+		}
+		if (beg >> 17 == end >> 17) {
 			return 585 + (beg >> 17);
-		if (beg >> 20 == end >> 20)
+		}
+		if (beg >> 20 == end >> 20) {
 			return 73 + (beg >> 20);
-		if (beg >> 23 == end >> 23)
+		}
+		if (beg >> 23 == end >> 23) {
 			return 9 + (beg >> 23);
-		if (beg >> 26 == end >> 26)
+		}
+		if (beg >> 26 == end >> 26) {
 			return 1 + (beg >> 26);
+		}
 		return 0;
 	}
 
@@ -351,7 +373,8 @@ public class TabixWriter extends TabixReader {
 		char commentChar;
 		int linesToSkip;
 
-		public Conf(int preset, int chrColumn, int startColumn, int endColumn, char commentChar, int linesToSkip) {
+		public Conf(int preset, int chrColumn, int startColumn, int endColumn,
+				char commentChar, int linesToSkip) {
 			this.preset = preset;
 			this.chrColumn = chrColumn;
 			this.startColumn = startColumn;

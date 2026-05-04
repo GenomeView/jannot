@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import be.abeel.util.LRUCache;
 import htsjdk.samtools.util.BlockCompressedInputStream;
@@ -31,7 +31,6 @@ public class IndexedFeatureFile extends DataSource {
 	private final static int MAX_BIN = 37450;
 	private final static int TAD_LIDX_SHIFT = 14;
 	private ArrayList<TabixLine> empty = new ArrayList<TabixLine>();
-	private Logger log = Logger.getLogger(IndexedFeatureFile.class.toString());
 	private int tileSize;
 
 	// FIXME a lot of duplicated stuff from CachingQueryReader with respect to
@@ -547,7 +546,7 @@ public class IndexedFeatureFile extends DataSource {
 				e.add(Type.get(data.toString()),
 						new VCFWrapper(name, this, idx, getLog()));
 			} else {
-				log.severe(
+				global.getLog().log(Level.SEVERE,
 						"Don't now how to read this file, can't figure out the type: "
 								+ data);
 			}
