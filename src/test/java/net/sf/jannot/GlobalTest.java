@@ -1,0 +1,40 @@
+package net.sf.jannot;
+
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.junit.Test;
+
+import net.sf.jannot.exception.ReadFailedException;
+import tudelft.utilities.logging.Reporter;
+
+public class GlobalTest {
+	private final Global global;
+
+	public GlobalTest() throws IOException, ReadFailedException {
+		global = new Global();
+
+	}
+
+	@Test
+	public void testLog() {
+		Reporter listen = mock(Reporter.class);
+		global.getLog().add(listen);
+
+		// WARNING DO NOT USE THIS LOGGING MECHANISM
+		// check that the archaic logging to java system logger is intercepted
+		Logger syslogger = Logger.getLogger(getClass().getSimpleName());
+		syslogger.log(Level.WARNING, "test message");
+
+		// Check that the global Reporter received that 
+		verify(listen, times(1)).log(eq(Level.WARNING), eq("test message"),
+				eq(null));
+
+	}
+}
