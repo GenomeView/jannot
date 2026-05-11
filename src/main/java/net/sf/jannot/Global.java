@@ -15,6 +15,13 @@ public class Global {
 	private final NameService ns;
 	private final JavaLogInterceptor interceptor;
 
+	public Global(DistributingReporter log, JavaLogInterceptor interceptor,
+			NameService ns) {
+		this.log = log;
+		this.interceptor = interceptor;
+		this.ns = ns;
+	}
+
 	public Global() throws IOException, ReadFailedException {
 		log = new DistributingReporter();
 		interceptor = new JavaLogInterceptor(log);
