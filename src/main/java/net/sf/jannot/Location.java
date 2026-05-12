@@ -11,7 +11,7 @@ import net.sf.jannot.event.ChangeEvent;
  */
 public class Location implements Comparable<Location> {
 
-	private int start, end; // FIXME mutable
+	protected int start, end; // FIXME mutable
 	private final boolean fuzzyStart;
 	private final boolean fuzzyEnd;
 
@@ -21,7 +21,7 @@ public class Location implements Comparable<Location> {
 	 * 
 	 * This change is not recorded using a ChangeEvent.
 	 */
-	private Feature parent = null;
+	protected Feature parent = null;
 
 	@Override
 	public String toString() {
@@ -162,10 +162,19 @@ public class Location implements Comparable<Location> {
 		return false;
 	}
 
+	/**
+	 * @return copy of current. Undo actions on the original will not affect the
+	 *         copy
+	 */
 	public Location copy() {
 		return new Location(start, end, fuzzyStart, fuzzyEnd);
 	}
 
+	/**
+	 * Set/override the parent feature
+	 * 
+	 * @param f the new parent feature.
+	 */
 	void setParent(Feature f) {
 		this.parent = f;
 	}
@@ -189,7 +198,6 @@ public class Location implements Comparable<Location> {
 	}
 
 	/**
-	 * 
 	 * @param x a number that is to be scaled relative to this
 	 * @return the position as number relative to this. x=start returns 0, x=end
 	 *         returns 1, and extrapolates linearly.
@@ -199,83 +207,82 @@ public class Location implements Comparable<Location> {
 		return (double) (x - start) / (end - start);
 	}
 
-	class SetEndEvent implements ChangeEvent {
-		/* New position */
-		private int to;
+}
 
-		/* Original position */
-		private int from;
+class SetEndEvent implements ChangeEvent {
+	/* New position */
+	private int to;
 
-		private Location l;
+	/* Original position */
+	private int from;
 
-		public SetEndEvent(Location l, int orig, int newpos) {
-			this.l = l;
-			this.from = orig;
-			this.to = newpos;
+	private Location l;
+
+	public SetEndEvent(Location l, int orig, int newpos) {
+		this.l = l;
+		this.from = orig;
+		this.to = newpos;
+	}
+
+	@Override
+	public void doChange() {
+		l.end = to;
+		if (l.parent != null) {
+			l.parent.updatePhase();
 		}
 
-		@Override
-		public void doChange() {
-			l.end = to;
-			if (parent != null) {
-				parent.updatePhase();
-			}
+	}
 
+	@Override
+	public void undoChange() {
+		assert (l.end == to);
+		l.end = from;
+		if (l.parent != null) {
+			l.parent.updatePhase();
 		}
 
-		@Override
-		public void undoChange() {
-			assert (l.end == to);
-			l.end = from;
-			if (parent != null) {
-				parent.updatePhase();
-			}
+	}
 
+	@Override
+	public String toString() {
+		return new String("Set end from " + from + " to " + to);
+	}
+}
+
+class SetStartEvent implements ChangeEvent {
+
+	private int to;
+
+	private int from;
+
+	private Location l;
+
+	public SetStartEvent(Location l, int originalPosition, int newPosition) {
+		this.l = l;
+		this.from = originalPosition;
+		this.to = newPosition;
+	}
+
+	@Override
+	public void doChange() {
+		l.start = to;
+		if (l.parent != null) {
+			l.parent.updatePhase();
 		}
 
-		@Override
-		public String toString() {
-			return new String("Set end from " + from + " to " + to);
+	}
+
+	@Override
+	public void undoChange() {
+		assert (l.start == to);
+		l.start = from;
+		if (l.parent != null) {
+			l.parent.updatePhase();
 		}
 	}
 
-	class SetStartEvent implements ChangeEvent {
-
-		private int to;
-
-		private int from;
-
-		private Location l;
-
-		public SetStartEvent(Location l, int originalPosition,
-				int newPosition) {
-			this.l = l;
-			this.from = originalPosition;
-			this.to = newPosition;
-		}
-
-		@Override
-		public void doChange() {
-			l.start = to;
-			if (parent != null) {
-				parent.updatePhase();
-			}
-
-		}
-
-		@Override
-		public void undoChange() {
-			assert (l.start == to);
-			l.start = from;
-			if (parent != null) {
-				parent.updatePhase();
-			}
-		}
-
-		@Override
-		public String toString() {
-			return new String("Set start from " + from + " to " + to);
-		}
+	@Override
+	public String toString() {
+		return new String("Set start from " + from + " to " + to);
 	}
-
 }
