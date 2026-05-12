@@ -27,10 +27,11 @@ import net.sf.jannot.event.FeatureEvent;
  */
 public class Feature implements Comparable<Feature>, Located {
 
-	// either location or singleLocation are to be set.
-	private Location[] location = null;
-	// FIXME why not put singleLocation in the location list?
-	private Location singleLocation = null;
+	private List<Location> locs = new ArrayList<>();
+//	// either location or singleLocation are to be set.
+//	private Location[] location = null;
+//	// FIXME why not put singleLocation in the location list?
+//	private Location singleLocation = null;
 
 	private byte[] phase = null;
 
@@ -136,18 +137,17 @@ public class Feature implements Comparable<Feature>, Located {
 		if (locations.size() == 1) {
 			setLocation(locations.iterator().next());
 		} else {
-			singleLocation = null;
+
 			SortedSet<Location> set = new TreeSet<Location>();
 			for (Location l : locations) {
 				set.add(l);
 			}
-			location = new Location[set.size()];
-			int idx = 0;
+			locs.clear();
 			for (Location l : set) {
-				location[idx++] = l;
+				locs.add(l);
 
 			}
-			for (Location x : this.location) {
+			for (Location x : locs) {
 				x.setParent(this);
 			}
 			updatePhase();
@@ -160,26 +160,27 @@ public class Feature implements Comparable<Feature>, Located {
 	 * @param l the single {@link Location} of this feature.
 	 */
 	public void setLocation(Location l) {
-		location = null;
+		locs.clear();
+		locs.add(l);
 		phase = null;
-		singleLocation = l;
 		fStart = l.start();
 		fEnd = l.end();
-		singleLocation.setParent(this);
+		l.setParent(this);
 	}
 
 	public void setLocation(Location[] l) {
 		if (l.length == 1) {
 			setLocation(l[0]);
 		} else {
-			singleLocation = null;
-			this.location = l;
-			for (Location tmp : this.location) {
+			locs.clear();
+			for (Location loc : l) {
+				locs.add(loc);
+			}
+			for (Location tmp : locs) {
 				tmp.setParent(this);
 			}
 
 			updatePhase();
-
 		}
 
 	}
@@ -202,7 +203,7 @@ public class Feature implements Comparable<Feature>, Located {
 	public ChangeEvent setStrand(Strand s) {
 		ChangeEvent ce = new ChangeStrandEvent(this, this.strand, s);
 		ce.doChange();
-		if (location != null) {
+		if (!locs.isEmpty()) {
 			updatePhase();
 		}
 		return ce;
@@ -254,7 +255,7 @@ public class Feature implements Comparable<Feature>, Located {
 	 * beginning at 1.
 	 */
 	void updatePhase() {
-		if (singleLocation == null && location == null) {
+		if (locs.isEmpty()) {
 			return;
 		}
 
@@ -307,18 +308,7 @@ public class Feature implements Comparable<Feature>, Located {
 	 *         {@link #singleLocation}, or mew Location[0] if both are null
 	 */
 	public Location[] location() {
-		if (location == null) {
-			assert singleLocation != null;
-			// bug? we just asserted it's not null
-			if (singleLocation == null) {
-				return new Location[0];
-			} else {
-				return new Location[] { singleLocation };
-			}
-		} else {
-			return location;
-		}
-
+		return locs.toArray(new Location[0]);
 	}
 
 	public int length() {
@@ -433,7 +423,7 @@ public class Feature implements Comparable<Feature>, Located {
 
 	public int getFrame() {
 		int frame;
-		if (location == null) {
+		if (locs.isEmpty()) {
 			if (strand == Strand.REVERSE) {
 				frame = fEnd % 3;
 			} else {
@@ -441,46 +431,26 @@ public class Feature implements Comparable<Feature>, Located {
 			}
 		} else {
 			if (strand == Strand.REVERSE) {
-				frame = (location[location.length - 1].end()) % 3;
+				frame = (locs.get(locs.size() - 1).end()) % 3;
 			} else {
-				frame = (location[0].start()) % 3;
+				frame = (locs.get(0).start()) % 3;
 			}
 		}
 		return frame == 0 ? 3 : frame;
 
 	}
 
+	/**
+	 * 
+	 * @param idx the location index number
+	 * @return the phase of locs[idx]. The phase seems the proteine index 0,1,2.
+	 *         Returns 0 if locs is empty
+	 */
 	public int getPhase(int idx) {
-		if (location == null) {
+		if (locs.isEmpty()) {
 			return 0;
-		} else {
-			return phase[idx];
 		}
-
-	}
-
-	class ChangeStrandEvent extends FeatureEvent {
-		private Strand from, to;
-
-		public ChangeStrandEvent(Feature f, Strand from, Strand to) {
-			super(f, "Change strand from " + from.symbol() + " to "
-					+ to.symbol());
-			this.from = from;
-			this.to = to;
-		}
-
-		@Override
-		public void doChange() {
-			super.getFeature().strand = to;
-
-		}
-
-		@Override
-		public void undoChange() {
-			super.getFeature().strand = from;
-
-		}
-
+		return phase[idx];
 	}
 
 	/**
@@ -519,18 +489,10 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	/**
-	 * @param l
+	 * @param l the location to add
 	 */
 	public void addLocation(Location l) {
-		List<Location> arr = new ArrayList<Location>();
-		if (singleLocation != null) {
-			arr.add(singleLocation);
-		}
-		if (location != null) {
-			for (Location ll : location) {
-				arr.add(ll);
-			}
-		}
+		List<Location> arr = new ArrayList<Location>(locs);
 		arr.add(l);
 		setLocation(arr);
 	}
@@ -539,18 +501,39 @@ public class Feature implements Comparable<Feature>, Located {
 	 * @param rf
 	 */
 	public void removeLocation(Location rf) {
-		List<Location> arr = new ArrayList<Location>();
-		if (singleLocation != null) {
+		if (locs.size() <= 1) {
 			throw new RuntimeException("Can not remove the last location!!!");
 		}
-		if (location != null) {
-			for (Location ll : location) {
-				if (!ll.equals(rf)) {
-					arr.add(ll);
-				}
-			}
-		}
+		List<Location> arr = new ArrayList<Location>(locs);
+		locs.remove(rf);
 		setLocation(arr);
+
+	}
+
+	/**
+	 * inner class to make a strand change undo-able.
+	 */
+	class ChangeStrandEvent extends FeatureEvent {
+		private Strand from, to;
+
+		public ChangeStrandEvent(Feature f, Strand from, Strand to) {
+			super(f, "Change strand from " + from.symbol() + " to "
+					+ to.symbol());
+			this.from = from;
+			this.to = to;
+		}
+
+		@Override
+		public void doChange() {
+			super.getFeature().strand = to;
+
+		}
+
+		@Override
+		public void undoChange() {
+			super.getFeature().strand = from;
+
+		}
 
 	}
 
