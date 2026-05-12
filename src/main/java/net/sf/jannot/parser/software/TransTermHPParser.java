@@ -51,10 +51,10 @@ public class TransTermHPParser extends Parser {
 			}
 			if (line.startsWith("TERM")) {
 				String[] arr = line.split("[ \t\n\f\r]+");
-				Feature f = new Feature(new Location(Integer.parseInt(arr[2]),
-						Integer.parseInt(arr[4])));
-				f.setType(t);
-				f.setStrand(Strand.fromSymbol(arr[5].charAt(0)));
+				Feature f = new Feature(
+						new Location(Integer.parseInt(arr[2]),
+								Integer.parseInt(arr[4])),
+						t, Strand.fromSymbol(arr[5].charAt(0)));
 				f.addQualifier("source", "TransTermHP");
 				f.addQualifier("location", loc(arr[6].charAt(0)));
 				f.setScore(Integer.parseInt(arr[7]) / 100.0);

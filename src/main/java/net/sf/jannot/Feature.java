@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -48,17 +50,19 @@ public class Feature implements Comparable<Feature>, Located {
 //	private int fStart = -1;
 //	private int fEnd = -1;
 
-	public Feature(Set<Location> location) {
+	public Feature(Set<Location> location, Type type, Strand strand) {
 		if (location == null || location.size() == 0) {
 			throw new NullPointerException(
 					"location must contain at least 1 element");
 		}
 
 		setLocation(location);
+		setType(type);
+		setStrand(strand);
 	}
 
-	public Feature(Location location) {
-		setLocation(Arrays.asList(location));
+	public Feature(Location location, Type type, Strand strand) {
+		this(new HashSet<>(Arrays.asList(location)), type, strand);
 	}
 
 	/**
@@ -112,8 +116,30 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	@Override
-	public boolean equals(Object f) {
-		return this == f;
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(phase);
+		result = prime * result + Objects.hash(locs, qualifiers, strand, type);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Feature other = (Feature) obj;
+		return Objects.equals(locs, other.locs)
+				&& Arrays.equals(phase, other.phase)
+				&& Objects.equals(qualifiers, other.qualifiers)
+				&& strand == other.strand && Objects.equals(type, other.type);
 	}
 
 	public Type type() {
@@ -353,13 +379,11 @@ public class Feature implements Comparable<Feature>, Located {
 		for (Location l : this.location()) {
 			loc.add(l.copy());
 		}
-		Feature f = new Feature(loc);
-		f.setStrand(this.strand());
+		Feature f = new Feature(loc, type(), strand());
 
 		for (String key : qualifiers.keySet()) {
 			f.addQualifier(key, qualifiers.get(key));
 		}
-		f.type = this.type();
 		return f;
 	}
 

@@ -141,11 +141,8 @@ public class GenbankParser extends Parser {
 			}
 
 			String[] arr = line.trim().split(" [ ]+");
-			lastFeature = new Feature(ParserTools.parseLocation(arr[1]));
-			lastFeature.setType(Type.get(arr[0]));
-			lastFeature.setStrand(ParserTools.getStrand(arr[1]));
-			// System.out.println(arr[1]+"\t"+e.annotation.noFeatures());
-
+			lastFeature = new Feature(ParserTools.parseLocation(arr[1]),
+					Type.get(arr[0]), ParserTools.getStrand(arr[1]));
 		}
 
 	}

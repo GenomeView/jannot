@@ -48,16 +48,27 @@ public class BEDTools {
 			}
 		}
 
-		final Feature f;
-		SortedSet<Location> tmp = getLocations(arr);
-		if (tmp.size() > 0) {
-			f = new Feature(tmp);
-		} else {
-			f = new Feature(getPseudoGeneLocations(arr));
-			f.setType(Type.get("pseudoGene"));
+		/* Optional strand */
+		Strand str = Strand.UNKNOWN;
+		if (arr.length > 5) {
+			char strand = arr[5].charAt(0);
+			switch (strand) {
+			case '-':
+				str = (Strand.REVERSE);
+				break;
+			case '+':
+				str = (Strand.FORWARD);
+				break;
+			// case '.', '?': Strand.UNKNOWN);
+			}
 		}
 
-		f.setType(type);
+		SortedSet<Location> tmp = getLocations(arr);
+		if (tmp.isEmpty()) {
+			tmp = getPseudoGeneLocations(arr);
+		}
+		final Feature f = new Feature(tmp, type, str);
+
 		/* Chromosome */
 		f.addQualifier("chrom", arr[0]);
 
@@ -83,22 +94,6 @@ public class BEDTools {
 			f.setScore(Double.parseDouble(arr[4]));
 		}
 
-		/* Optional strand */
-		if (arr.length > 5) {
-			char strand = arr[5].charAt(0);
-			switch (strand) {
-			case '-':
-				f.setStrand(Strand.REVERSE);
-				break;
-			case '+':
-				f.setStrand(Strand.FORWARD);
-				break;
-			case '.':
-			case '?':
-				f.setStrand(Strand.UNKNOWN);
-				break;
-			}
-		}
 		/* Optional color */
 		if (arr.length > 8) {
 			f.addQualifier("color", arr[8]);

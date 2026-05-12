@@ -64,13 +64,11 @@ public class SIPHTParser extends Parser {
 				getLog().log(Level.INFO, "putative: " + Arrays.toString(arr));
 				int start = Integer.parseInt(arr[8]);
 				int end = Integer.parseInt(arr[9]);
-				Feature f = new Feature(new Location(start, end));
-				f.setType(t);
-				if (arr[10].equals("<<<")) {
-					f.setStrand(Strand.REVERSE);
-				} else {
-					f.setStrand(Strand.FORWARD);
-				}
+
+				Strand str = arr[10].equals("<<<") ? Strand.REVERSE
+						: Strand.FORWARD;
+
+				Feature f = new Feature(new Location(start, end), t, str);
 				for (int i = 0; i < arr.length; i++) {
 					if (!header.get(i).equals("|")) {
 						f.addQualifier(header.get(i), arr[i]);

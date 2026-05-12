@@ -41,10 +41,10 @@ public class GeneMarkParser extends Parser {
 				continue;
 			}
 			String[] arr = line.replace('<', ' ').trim().split("[ \t]+");
-			Feature f = new Feature(new Location(Integer.parseInt(arr[2]),
-					Integer.parseInt(arr[3])));
-			f.setStrand(Strand.fromSymbol(arr[1].charAt(0)));
-			f.setType(t);
+			final Location loc = new Location(Integer.parseInt(arr[2]),
+					Integer.parseInt(arr[3]));
+			Feature f = new Feature(loc, t,
+					Strand.fromSymbol(arr[1].charAt(0)));
 			f.addQualifier("source", "GeneMark");
 			f.addQualifier("Gene", arr[0]);
 			fa.add(f);

@@ -48,13 +48,12 @@ public class FindPeaksParser extends Parser {
 			Entry e = set.getOrCreateEntry(arr[1]);
 			int start = Integer.parseInt(arr[2]);
 			int end = Integer.parseInt(arr[3]);
-			Feature f = new Feature(new Location(start, end));
-			f.setType(t);
+			Feature f = new Feature(new Location(start, end), t,
+					Strand.UNKNOWN);
 			f.addQualifier("max_coord", arr[4]);
 			f.addQualifier("Name", "Peak " + arr[0]);
 			// f.addQualifier("t-score", arr[5]);
 			f.setScore(Double.parseDouble(arr[5]));
-			f.setStrand(Strand.UNKNOWN);
 			MemoryFeatureAnnotation fa = e.getMemoryAnnotation(t);
 			fa.add(f);
 

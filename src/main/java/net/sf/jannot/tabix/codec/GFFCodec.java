@@ -33,43 +33,38 @@ public class GFFCodec extends Codec<Feature> {
 		this.wrapper = wrapper;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.tabix.codec.Codec#parse(java.lang.String)
-	 */
 	@Override
 	public Feature parse(TabixLine line) {
 		Feature f = lru.get(line);
-		if (f != null)
+		if (f != null) {
 			return f;
-		else {
+		} else {
 
 			try {
 				Location l = new Location(line.getInt(3), line.getInt(4));
 				SortedSet<Location> tmp = new TreeSet<Location>();
 				tmp.add(l);
-				f = new Feature(tmp);
-				f.setLocation(tmp);
+
+				Strand str = Strand.UNKNOWN;
 				char strand = line.get(6).charAt(0);
 				switch (strand) {
 				case '-':
-					f.setStrand(Strand.REVERSE);
+					str = (Strand.REVERSE);
 					break;
 				case '+':
-					f.setStrand(Strand.FORWARD);
+					str = (Strand.FORWARD);
 					break;
-				case '.':
-				case '?':
-					f.setStrand(Strand.UNKNOWN);
-					break;
+				// case '.' '?' and default:
 				}
+
+				f = new Feature(tmp, Type.get(line.get(2)), str);
+//				f.setLocation(tmp);
 				f.addQualifier("source", line.get(1));
-				f.setType(Type.get(line.get(2)));
 				String five = line.get(5);
 				if (!(five.length() == 1 && five.charAt(0) == '.')
-						&& five.length() != 0)
+						&& five.length() != 0) {
 					f.setScore(Double.parseDouble(five));
+				}
 				if (line.length() > 8) {
 					String[] attributes = line.get(8).split(";");
 					for (String s : attributes) {
@@ -79,8 +74,9 @@ public class GFFCodec extends Codec<Feature> {
 							for (String v : values) {
 								f.addQualifier(pair[0], v);
 							}
-						} else
+						} else {
 							f.addQualifier("note", pair[0]);
+						}
 					}
 				}
 				return f;

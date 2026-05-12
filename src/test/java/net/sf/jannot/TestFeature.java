@@ -26,14 +26,14 @@ public class TestFeature {
 	@Test
 	public void testFeatures() {
 
-		Feature f = new Feature(new Location(1, 100));
+		Feature f = new Feature(new Location(1, 100), null, Strand.FORWARD);
 		f.copy();
 
 	}
 
 	@Test
 	public void testFeatureSetLocation() {
-		Feature f = new Feature(new Location(1, 10));
+		Feature f = new Feature(new Location(1, 10), null, Strand.FORWARD);
 		Assert.assertEquals(1, f.start());
 		Assert.assertEquals(10, f.end());
 
@@ -73,7 +73,7 @@ public class TestFeature {
 
 	@Test
 	public void testQualifier() {
-		Feature f = new Feature(new Location(1, 100));
+		Feature f = new Feature(new Location(1, 100), null, Strand.FORWARD);
 
 		assertTrue(f.getQualifiersKeys().size() == 0);
 

@@ -41,20 +41,20 @@ public class PTTParser extends Parser {
 				String[] loc = arr[0].trim().split("\\.\\.");
 				Location l = new Location(Integer.parseInt(loc[0]),
 						Integer.parseInt(loc[1]));
-				Feature f = new Feature(l);
+
+				Strand str = Strand.UNKNOWN;
 				char strand = arr[1].charAt(0);
 				switch (strand) {
 				case '-':
-					f.setStrand(Strand.REVERSE);
+					str = (Strand.REVERSE);
 					break;
 				case '+':
-					f.setStrand(Strand.FORWARD);
+					str = (Strand.FORWARD);
 					break;
-				case '.':
-				case '?':
-					f.setStrand(Strand.UNKNOWN);
-					break;
+				// case '.' '?': UNKNOWN);
 				}
+
+				Feature f = new Feature(l, t, str);
 				f.addQualifier("length", arr[2]);
 				f.addQualifier("PID", arr[3]);
 				f.addQualifier("Gene", arr[4]);
@@ -62,8 +62,6 @@ public class PTTParser extends Parser {
 				f.addQualifier("Code", arr[6]);
 				f.addQualifier("COG", arr[7]);
 				f.addQualifier("Product", arr[8]);
-
-				f.setType(t);
 
 				// set.getEntry().annotation.add(f);
 				MemoryFeatureAnnotation fa = set.iterator().next()

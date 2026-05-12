@@ -72,23 +72,21 @@ public class GTFParser extends Parser {
 					parentMap.get(parent).addLocation(l);
 
 				} else {/* Add as a new feature */
-					Feature f = new Feature(l);
+					Strand str = Strand.UNKNOWN;
 					char strand = arr[6].charAt(0);
 					switch (strand) {
 					case '-':
-						f.setStrand(Strand.REVERSE);
+						str = (Strand.REVERSE);
 						break;
 					case '+':
-						f.setStrand(Strand.FORWARD);
+						str = (Strand.FORWARD);
 						break;
-					case '.':
-					case '?':
-						f.setStrand(Strand.UNKNOWN);
-						break;
+					// case '.', '?': UNKNOWN
 					}
-					// f.addQualifier(new Qualifier("seqid", arr[0]));
+
+					Feature f = new Feature(l, Type.get(arr[2]), str);
+
 					f.addQualifier("source", arr[1]);
-					f.setType(Type.get(arr[2]));
 					if (!(arr[5].length() == 1 && arr[5].charAt(0) == '.')
 							&& arr[5].length() != 0) {
 						f.setScore(Double.parseDouble(arr[5]));
@@ -97,24 +95,9 @@ public class GTFParser extends Parser {
 							.entrySet()) {
 						f.addQualifier(me.getKey(), me.getValue());
 					}
-					// String[] attributes = arr[8].split(";");
-					// for (String s : attributes) {
-					// String[] pair = s.trim().split("=");
-					// if (pair.length == 2) {
-					// String[] values = pair[1].split(",");
-					// for (String v : values) {
-					// f.addQualifier(new Qualifier(pair[0], v));
-					// }
-					// } else
-					// f.addQualifier(new Qualifier("note", pair[0]));
-					// }
 					if (parent != null) {
 						parentMap.put(parent, f);
 					}
-					// String id = f.singleQualifierValue("id");
-					// assert(id!=null);
-					// idMap.put(id, f);
-					// set.getOrCreateEntry(arr[0]).annotation.add(f);
 					MemoryFeatureAnnotation fa = set.getOrCreateEntry(arr[0])
 							.getMemoryAnnotation(f.type());
 					fa.add(f);

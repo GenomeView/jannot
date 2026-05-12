@@ -170,12 +170,11 @@ public class DAS extends DataSource {
 						+ stackName + "; actual=" + name);
 			}
 			if (name.equalsIgnoreCase("feature")) {
-				Feature f = new Feature(new Location(start, end));
-				f.setType(Type.get(typeID));
+				Feature f = new Feature(new Location(start, end),
+						Type.get(typeID), Strand.fromSymbol(strand));
 				f.addQualifier("source", methodID);
 				f.addQualifier("name", featureID);
 				f.setScore(score);
-				f.setStrand(Strand.fromSymbol(strand));
 				list.add(f);
 
 			}

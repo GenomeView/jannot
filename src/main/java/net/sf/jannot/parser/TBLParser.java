@@ -63,14 +63,10 @@ public class TBLParser extends Parser {
 
 						int s = Integer.parseInt(arr[0]);
 						int t = Integer.parseInt(arr[1]);
-						currentF = new Feature(new Location(s, t));
-						if (s > t) {
-							currentF.setStrand(Strand.REVERSE);
-						} else {
-							currentF.setStrand(Strand.FORWARD);
-						}
-						currentF.setType(Type.get(arr[2]));
-						// current.annotation.add(currentF);
+						Strand str = s > t ? Strand.REVERSE : Strand.FORWARD;
+
+						currentF = new Feature(new Location(s, t),
+								Type.get(arr[2]), str);
 						MemoryFeatureAnnotation fa = current
 								.getMemoryAnnotation(currentF.type());
 						fa.add(currentF);

@@ -122,11 +122,11 @@ public class EMBLParser extends Parser {
 	private void constructFeature(Entry entry) {
 		if (featureBuffer.size() > 0) {
 			boolean buildingLocation = true;
-			String type = featureBuffer.get(0).substring(5, 21).trim();
-			StringBuffer location = new StringBuffer();
-			Vector<StringBuffer> qualifiers = new Vector<StringBuffer>();
+			final String type = featureBuffer.get(0).substring(5, 21).trim();
+			final StringBuffer location = new StringBuffer();
+			final Vector<StringBuffer> qualifiers = new Vector<StringBuffer>();
 			for (int i = 0; i < featureBuffer.size(); i++) {
-				String lc = featureBuffer.get(i).substring(21).trim();
+				final String lc = featureBuffer.get(i).substring(21).trim();
 				boolean slash = lc.startsWith("/");
 				if (slash) {
 					buildingLocation = false;
@@ -144,15 +144,12 @@ public class EMBLParser extends Parser {
 			}
 			featureBuffer.clear();
 			try {
-				SortedSet<Location> l = ParserTools
+				final SortedSet<Location> l = ParserTools
 						.parseLocation(location.toString());
-				Strand s = ParserTools.getStrand(location.toString());
+				final Strand s = ParserTools.getStrand(location.toString());
 
-				Feature f = new Feature(l);
+				Feature f = new Feature(l, Type.get(type), s);
 				addQualifiers(qualifiers, f);
-				f.setStrand(s);
-
-				f.setType(Type.get(type));
 				MemoryFeatureAnnotation fa = entry
 						.getMemoryAnnotation(f.type());
 				fa.add(f);

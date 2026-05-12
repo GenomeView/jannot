@@ -53,16 +53,12 @@ public class TRNAscanParser extends Parser {
 			Entry e = set.getOrCreateEntry(arr[0]);
 			int start = Integer.parseInt(arr[2]);
 			int end = Integer.parseInt(arr[3]);
-			Feature f = new Feature(new Location(start, end));
-			f.setType(t);
+			Strand str = start > end ? Strand.REVERSE : Strand.FORWARD;
+
+			Feature f = new Feature(new Location(start, end), t, str);
 			f.addQualifier("type", arr[4]);
 			f.addQualifier("anti-codon", arr[5]);
 			f.setScore(Double.parseDouble(arr[8]));
-			if (start > end) {
-				f.setStrand(Strand.REVERSE);
-			} else {
-				f.setStrand(Strand.FORWARD);
-			}
 			MemoryFeatureAnnotation fa = e.getMemoryAnnotation(t);
 			fa.add(f);
 

@@ -14,6 +14,7 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
+import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import tudelft.utilities.logging.Reporter;
 
@@ -110,7 +111,8 @@ public class VCFParser extends Parser {
 					// end=pos+refLength;
 				}
 
-				final Feature f = new Feature(new Location(start, end));
+				final Feature f = new Feature(new Location(start, end),
+						Type.get(variation.toString()), Strand.UNKNOWN);
 				f.setQualifier("id", id);
 				f.setQualifier("ref", ref);
 				f.setQualifier("alt", alt);
@@ -155,7 +157,6 @@ public class VCFParser extends Parser {
 				}
 
 				f.addQualifier("delta", "" + delta);
-				f.setType(Type.get(variation.toString()));
 				annot.add(f);
 
 			}

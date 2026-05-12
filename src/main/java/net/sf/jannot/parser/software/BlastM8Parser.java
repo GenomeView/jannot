@@ -42,10 +42,8 @@ public class BlastM8Parser extends Parser {
 				end = tmp;
 				s = Strand.REVERSE;
 			}
-			Feature f = new Feature(new Location(start, end));
-			f.setType(t);
+			Feature f = new Feature(new Location(start, end), t, s);
 			f.setScore(Double.parseDouble(arr[10]));
-			f.setStrand(s);
 			f.addQualifier("subject id", arr[1]);
 			f.addQualifier("% identity", arr[2]);
 			// f.addQualifier(new Qualifier("% positives", arr[3]));
