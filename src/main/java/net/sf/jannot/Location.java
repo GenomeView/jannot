@@ -23,12 +23,6 @@ public class Location implements Comparable<Location> {
 	 */
 	protected Feature parent = null;
 
-	@Override
-	public String toString() {
-		return (fuzzyStart ? "<" : "") + start + ".." + (fuzzyEnd ? ">" : "")
-				+ end;
-	}
-
 	/**
 	 * The main constructor
 	 * 
@@ -63,6 +57,16 @@ public class Location implements Comparable<Location> {
 		this(x, y, false, false);
 	}
 
+	@Override
+	public String toString() {
+		return (fuzzyStart ? "<" : "") + start + ".." + (fuzzyEnd ? ">" : "")
+				+ end;
+	}
+
+	/**
+	 * 
+	 * @return the start, which is the low side of the range
+	 */
 	public final int start() {
 		return start;
 	}
@@ -72,6 +76,11 @@ public class Location implements Comparable<Location> {
 		e.doChange();
 		return e;
 	}
+
+	/**
+	 * 
+	 * @return the end, which is the high side of the range
+	 */
 
 	public final int end() {
 		return end;
@@ -149,14 +158,20 @@ public class Location implements Comparable<Location> {
 		return pos >= start && pos <= end;
 	}
 
-	public boolean overlaps(int lStart, int lEnd) {
-		if (start >= lStart && start <= lEnd) {
+	/**
+	 * 
+	 * @param lStart start of other range
+	 * @param lEnd   end of other range
+	 * @return true if this and other overlap - some locations are in both
+	 *         ranges.
+	 */
+	public boolean overlaps(Location other) {
+		// our start or end is inside the other
+		if (other.contains(start) || other.contains(end)) {
 			return true;
 		}
-		if (end >= lStart && end <= lEnd) {
-			return true;
-		}
-		if (lStart >= start && lEnd <= end) {
+		// we completely cover the other
+		if (other.start >= start && other.end <= end) {
 			return true;
 		}
 		return false;

@@ -23,25 +23,23 @@ public class LocatedListIterator<T extends Located> implements Iterator<T> {
 	/**
 	 * create an Iterator for the Array array.
 	 * 
-	 * @param array
-	 *            java.lang.Object
+	 * @param array    java.lang.Object
 	 * @param location
 	 * 
-	 * @throws UnsupportedOperationException
-	 *             if array is not an Array
+	 * @throws UnsupportedOperationException if array is not an Array
 	 */
 	public LocatedListIterator(List<T> array, Location location) {
 		this.array = array;
 		this.location = location;
-		this.index=0;
+		this.index = 0;
 		returned = 0;
-		if (location == null)
+		if (location == null) {
 			size = array.size();
-		else {
-			for(int i=0;i<array.size();i++){
-				Located f=array.get(i);
-				if (location.overlaps(f.start(),f.end())) {
-					//System.out.println(l+"\t"+location);
+		} else {
+			for (int i = 0; i < array.size(); i++) {
+				Located f = array.get(i);
+				if (location.overlaps(new Location(f.start(), f.end()))) {
+					// System.out.println(l+"\t"+location);
 					size++;
 				}
 			}
@@ -56,6 +54,7 @@ public class LocatedListIterator<T extends Located> implements Iterator<T> {
 	 * 
 	 * @return <tt>true</tt> if the iterator has more elements.
 	 */
+	@Override
 	public boolean hasNext() {
 		return (returned < size);
 	}
@@ -65,24 +64,25 @@ public class LocatedListIterator<T extends Located> implements Iterator<T> {
 	 * 
 	 * @return the next element in the iteration.
 	 * 
-	 * @throws NoSuchElementException
-	 *             iteration has no more elements.
+	 * @throws NoSuchElementException iteration has no more elements.
 	 */
+	@Override
 	public synchronized T next() throws NoSuchElementException {
 		if (location == null) {
 			return array.get(returned++);
 		} else {
 			try {
-				Located f=array.get(index);
-				//while (!array.get(index).getLocation().overlaps(location)) {
-				while(!location.overlaps(f.start(), f.end())){
+				Located f = array.get(index);
+				// while (!array.get(index).getLocation().overlaps(location)) {
+				while (!location.overlaps(new Location(f.start(), f.end()))) {
 					index++;
-				f=array.get(index);
+					f = array.get(index);
 				}
 				returned++;
 				return array.get(index++);
 			} catch (Exception e) {
-				System.err.println(index+"\t"+array.size() + "\t" + size + "\t" + returned);
+				System.err.println(index + "\t" + array.size() + "\t" + size
+						+ "\t" + returned);
 				throw new NoSuchElementException();
 			}
 		}
@@ -96,10 +96,10 @@ public class LocatedListIterator<T extends Located> implements Iterator<T> {
 	 * underlying collection is modified while the iteration is in progress in
 	 * any way other than by calling this method.
 	 * 
-	 * @throws UnsupportedOperationException
-	 *             if the <tt>remove</tt> operation is not supported by this
-	 *             Iterator.
+	 * @throws UnsupportedOperationException if the <tt>remove</tt> operation is
+	 *                                       not supported by this Iterator.
 	 */
+	@Override
 	public void remove() {
 		throw new UnsupportedOperationException();
 	}

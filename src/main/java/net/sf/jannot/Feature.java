@@ -44,6 +44,9 @@ public class Feature implements Comparable<Feature>, Located {
 	private boolean scoreBuffer = false; // true if score was already calculated
 	private double score = Double.NaN;
 
+	private int fStart = -1;
+	private int fEnd = -1;
+
 	public Feature(Set<Location> location) {
 		if (location == null || location.size() == 0) {
 			throw new NullPointerException(
@@ -182,12 +185,12 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	public boolean overlaps(Location otherLoc) {
-		return otherLoc.overlaps(fStart, fEnd);
+		return otherLoc.overlaps(otherLoc);
 	}
 
 	public boolean overlaps(Feature otherFeat) {
 		Location thisLoc = new Location(fStart, fEnd);
-		return thisLoc.overlaps(otherFeat.fStart, otherFeat.fEnd);
+		return thisLoc.overlaps(new Location(otherFeat.fStart, otherFeat.fEnd));
 	}
 
 	/**
@@ -244,9 +247,6 @@ public class Feature implements Comparable<Feature>, Located {
 		return ce;
 
 	}
-
-	private int fStart = -1;
-	private int fEnd = -1;
 
 	/**
 	 * Phase is not the same thing as Frame. Phase is the number of bases to
