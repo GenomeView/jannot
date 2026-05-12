@@ -92,4 +92,12 @@ public class LocationTest {
 	public void toStringTest() {
 		assertEquals("0..10", loc1.toString());
 	}
+
+	@Test
+	public void compareTest() {
+		assertEquals(1, loc2.compareTo(loc1));
+		assertEquals(0, loc2.compareTo(loc2));
+		assertEquals(-1, loc1.compareTo(loc2));
+		assertEquals(1, loc1.compareTo(new Location(0, 5)));
+	}
 }
