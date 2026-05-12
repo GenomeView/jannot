@@ -27,11 +27,11 @@ import org.junit.Test;
 import net.sf.jannot.Data;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
-import net.sf.jannot.SyntenicData;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.jannot.syntenic.SyntenicData;
 import support.DataManager;
 import tudelft.utilities.logging.Reporter;
 

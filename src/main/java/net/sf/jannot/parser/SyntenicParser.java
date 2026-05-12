@@ -15,8 +15,8 @@ import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.StringKey;
-import net.sf.jannot.SyntenicBlock;
-import net.sf.jannot.SyntenicData;
+import net.sf.jannot.syntenic.SyntenicBlock;
+import net.sf.jannot.syntenic.SyntenicData;
 import tudelft.utilities.logging.Reporter;
 
 /**

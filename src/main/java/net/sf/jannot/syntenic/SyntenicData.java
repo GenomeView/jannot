@@ -1,4 +1,4 @@
-package net.sf.jannot;
+package net.sf.jannot.syntenic;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import net.sf.jannot.Data;
+import net.sf.jannot.Location;
 import tudelft.utilities.logging.Reporter;
 
 /**

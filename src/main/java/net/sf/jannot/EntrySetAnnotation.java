@@ -6,6 +6,7 @@ package net.sf.jannot;
 import java.util.Iterator;
 
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
+import net.sf.jannot.syntenic.SyntenicAnnotation;
 
 /**
  * Interface for annotation associated with an EntrySet of type T.

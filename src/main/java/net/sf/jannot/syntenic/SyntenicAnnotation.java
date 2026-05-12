@@ -1,13 +1,17 @@
 /**
  * %HEADER%
  */
-package net.sf.jannot;
+package net.sf.jannot.syntenic;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import net.sf.jannot.Entry;
+import net.sf.jannot.EntrySetAnnotation;
+import net.sf.jannot.Location;
 
 /**
  * 

@@ -1,7 +1,11 @@
 /**
  * %HEADER%
  */
-package net.sf.jannot;
+package net.sf.jannot.syntenic;
+
+import net.sf.jannot.Entry;
+import net.sf.jannot.Location;
+import net.sf.jannot.Strand;
 
 /**
  * Synthenic block provides a syntenic mapping between two locations in 2
@@ -92,13 +96,16 @@ public class SyntenicBlock {
 	 *         match ref+target
 	 */
 	public SyntenicBlock match(String ref, String target) {
-		if (refEntry.equals(ref) && targetEntry.equals(target))
+		if (refEntry.equals(ref) && targetEntry.equals(target)) {
 			return this;
-		if (targetEntry.equals(ref) && refEntry.equals(target))
+		}
+		if (targetEntry.equals(ref) && refEntry.equals(target)) {
 			return flip();
+		}
 		return null;
 	}
 
+	@Override
 	public String toString() {
 		return "Syntenic[" + refLoc + "," + refEntry + "," + refStrand + ","
 				+ targetLoc + "," + targetEntry + "," + targetStrand + "]";
