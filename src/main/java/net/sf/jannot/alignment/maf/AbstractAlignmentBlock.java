@@ -31,12 +31,12 @@ public abstract class AbstractAlignmentBlock
 
 	@Override
 	public int start() {
-		return loc.start;
+		return loc.start();
 	}
 
 	@Override
 	public int end() {
-		return loc.end;
+		return loc.end();
 	}
 
 	public int length() {

@@ -58,12 +58,15 @@ public class SequenceTools {
 	 */
 	private static String nextCodon(Iterator<Character> it) {
 		char[] tmp = new char[] { 'n', 'n', 'n' };
-		if (it.hasNext())
+		if (it.hasNext()) {
 			tmp[0] = it.next();
-		if (it.hasNext())
+		}
+		if (it.hasNext()) {
 			tmp[1] = it.next();
-		if (it.hasNext())
+		}
+		if (it.hasNext()) {
 			tmp[2] = it.next();
+		}
 		return new String(tmp);
 	}
 
@@ -74,7 +77,7 @@ public class SequenceTools {
 
 		for (int j = 0; j < arr.length; j++) {
 			StringBuffer x = new StringBuffer();
-			Iterable<Character> cc = seq.get(arr[j].start, arr[j].end + 1);
+			Iterable<Character> cc = seq.get(arr[j].start(), arr[j].end() + 1);
 			for (Character c : cc) {
 				out.append(c);
 				x.append(c);
@@ -84,9 +87,10 @@ public class SequenceTools {
 
 		}
 		Sequence sq = new MemorySequence(out, seq.getLog());
-		if (feat.strand() == Strand.REVERSE)
+		if (feat.strand() == Strand.REVERSE) {
 			sq = SequenceTools
 					.reverseComplement(new MemorySequence(out, seq.getLog()));
+		}
 
 		return sq;
 	}

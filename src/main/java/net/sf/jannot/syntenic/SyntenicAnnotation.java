@@ -32,9 +32,6 @@ public class SyntenicAnnotation extends EntrySetAnnotation<SyntenicBlock> {
 	public void add(SyntenicBlock t) {
 		syntenicBlocks.add(t);
 		targets.add(t.target());
-//		setChanged();
-//		notifyObservers();
-
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import net.sf.jannot.Data;
@@ -29,8 +30,8 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	 * @param referencename the name of the reference. U
 	 */
 	public SyntenicData(List<SyntenicBlock> d, Reporter log) {
-		this.log = log;
-		this.data.addAll(d);
+		this.log = Objects.requireNonNull(log);
+		this.data.addAll(Objects.requireNonNull(d));
 		for (SyntenicBlock b : data) {
 			extendRange(b.reference(), b.refLocation());
 			extendRange(b.target(), b.targetLocation());

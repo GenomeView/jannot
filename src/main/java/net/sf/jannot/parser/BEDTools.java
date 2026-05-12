@@ -131,16 +131,19 @@ public class BEDTools {
 
 			for (int i = 0; i < count; i++) {
 				int start = Integer.parseInt(arrStart[i].trim())
-						+ chromLoc.start;
+						+ chromLoc.start();
 				int end = Integer.parseInt(arrSize[i].trim()) + start - 1;
 				Location loc = new Location(start, end);
-				if (loc.start < codingLoc.start && loc.end > codingLoc.start) {
-					loc.setStart(codingLoc.start);
+				if (loc.start() < codingLoc.start()
+						&& loc.end() > codingLoc.start()) {
+					loc.setStart(codingLoc.start());
 				}
-				if (loc.start < codingLoc.end && loc.end > codingLoc.end) {
-					loc.setEnd(codingLoc.end);
+				if (loc.start() < codingLoc.end()
+						&& loc.end() > codingLoc.end()) {
+					loc.setEnd(codingLoc.end());
 				}
-				if (loc.start >= codingLoc.start && loc.end <= codingLoc.end) {
+				if (loc.start() >= codingLoc.start()
+						&& loc.end() <= codingLoc.end()) {
 					tmp.add(loc);
 				}
 
@@ -164,7 +167,7 @@ public class BEDTools {
 		final String[] arrStart = arr[11].split(",");
 
 		for (int i = 0; i < count; i++) {
-			int start = Integer.parseInt(arrStart[i].trim()) + chromLoc.start;
+			int start = Integer.parseInt(arrStart[i].trim()) + chromLoc.start();
 			int end = Integer.parseInt(arrSize[i].trim()) + start - 1;
 			tmp.add(new Location(start, end));
 		}

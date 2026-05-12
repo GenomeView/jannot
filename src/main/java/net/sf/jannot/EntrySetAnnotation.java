@@ -9,7 +9,7 @@ import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.syntenic.SyntenicAnnotation;
 
 /**
- * Interface for annotation associated with an EntrySet of type T.
+ * Interface for annotation associated with an {@link EntrySet} of type T.
  * 
  * @author Thomas Abeel
  * 
@@ -50,17 +50,6 @@ public abstract class EntrySetAnnotation<T> implements Iterable<T> {
 	public Iterable<T> get(Entry e, Location l, int limit) {
 		return get(e, l);
 	}
-
-//	public void addAll(EntrySetAnnotation<T> ts){
-//		addAll(ts.getAll(e))
-//	}
-//	
-//	public void addAll(Iterable<T> list){
-//		for(T t:list)
-//			this.list.add(t);
-//		setChanged();
-//		notifyObservers();
-//	}
 
 	public abstract Iterable<T> getAll(Entry e);
 

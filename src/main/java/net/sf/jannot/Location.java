@@ -11,16 +11,9 @@ import net.sf.jannot.event.ChangeEvent;
  */
 public class Location implements Comparable<Location> {
 
-	/**
-	 * These fields are public for efficient getter access. If you want to set
-	 * these fields, please use the proper setters.
-	 */
-	// FIXME apparently these should not be public.
-	public int start, end;
-
-	private boolean fuzzyEnd;
-
-	private boolean fuzzyStart;
+	private int start, end; // FIXME mutable
+	private final boolean fuzzyStart;
+	private final boolean fuzzyEnd;
 
 	/*
 	 * A location can belong to a feature, but the feature is responsible for
@@ -29,19 +22,6 @@ public class Location implements Comparable<Location> {
 	 * This change is not recorded using a ChangeEvent.
 	 */
 	private Feature parent = null;
-
-	/**
-	 * Parses a location from a String. Inverse of the toString method
-	 * 
-	 * @param s string of the form "a..b". If a starts with "<" the start is
-	 *          fuzzy If b ends with ">" the end is fuzzy
-	 * @return Location made from the string
-	 */
-	public static Location fromString(String s) {
-		String[] arr = s.replace('<', ' ').replace('>', ' ').trim().split("..");
-		return new Location(Integer.parseInt(arr[0]), Integer.parseInt(arr[1]),
-				s.startsWith("<"), s.endsWith(">"));
-	}
 
 	@Override
 	public String toString() {
@@ -57,9 +37,9 @@ public class Location implements Comparable<Location> {
 	 * @param end        the other endpoint of the interval. Can be negative. If
 	 *                   smaller than start, end is used as start
 	 * @param fuzzyStart true iff start is fuzzy. NOTE this has no meaning
-	 *                   anywhere.
+	 *                   anywhere excpet for {@link #toString()}
 	 * @param fuzzyEnd   true iff end is fuzzy. NOTE this has no meaning
-	 *                   anywhere.
+	 *                   anywhere except for {@link #toString()}
 	 */
 	public Location(int start, int end, boolean fuzzyStart, boolean fuzzyEnd) {
 		if (end > start) {
@@ -111,8 +91,9 @@ public class Location implements Comparable<Location> {
 	@Override
 	public int compareTo(Location arg0) {
 		int comp = new Integer(start).compareTo(arg0.start());
-		if (comp == 0)
+		if (comp == 0) {
 			comp = new Integer(this.end).compareTo(arg0.end());
+		}
 
 		return comp;
 	}
@@ -130,21 +111,28 @@ public class Location implements Comparable<Location> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Location other = (Location) obj;
-		if (end != other.end)
+		if (end != other.end) {
 			return false;
-		if (fuzzyEnd != other.fuzzyEnd)
+		}
+		if (fuzzyEnd != other.fuzzyEnd) {
 			return false;
-		if (fuzzyStart != other.fuzzyStart)
+		}
+		if (fuzzyStart != other.fuzzyStart) {
 			return false;
-		if (start != other.start)
+		}
+		if (start != other.start) {
 			return false;
+		}
 		return true;
 	}
 
@@ -162,10 +150,12 @@ public class Location implements Comparable<Location> {
 	}
 
 	public boolean overlaps(int lStart, int lEnd) {
-		if (start >= lStart && start <= lEnd)
+		if (start >= lStart && start <= lEnd) {
 			return true;
-		if (end >= lStart && end <= lEnd)
+		}
+		if (end >= lStart && end <= lEnd) {
 			return true;
+		}
 		if (lStart >= start && lEnd <= end) {
 			return true;
 		}
@@ -227,8 +217,9 @@ public class Location implements Comparable<Location> {
 		@Override
 		public void doChange() {
 			l.end = to;
-			if (parent != null)
+			if (parent != null) {
 				parent.updatePhase();
+			}
 
 		}
 
@@ -236,8 +227,9 @@ public class Location implements Comparable<Location> {
 		public void undoChange() {
 			assert (l.end == to);
 			l.end = from;
-			if (parent != null)
+			if (parent != null) {
 				parent.updatePhase();
+			}
 
 		}
 
@@ -265,8 +257,9 @@ public class Location implements Comparable<Location> {
 		@Override
 		public void doChange() {
 			l.start = to;
-			if (parent != null)
+			if (parent != null) {
 				parent.updatePhase();
+			}
 
 		}
 
@@ -274,8 +267,9 @@ public class Location implements Comparable<Location> {
 		public void undoChange() {
 			assert (l.start == to);
 			l.start = from;
-			if (parent != null)
+			if (parent != null) {
 				parent.updatePhase();
+			}
 		}
 
 		@Override
