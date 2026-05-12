@@ -32,6 +32,9 @@ public class Feature implements Comparable<Feature>, Located {
 
 	private final Map<String, String> qualifiers = new HashMap<String, String>();
 
+	// the contour of all locs
+	private Location location;
+
 	private byte[] phase = null;
 
 	private Type type;
@@ -42,8 +45,8 @@ public class Feature implements Comparable<Feature>, Located {
 	private boolean scoreBuffer = false; // true if cached score is valid
 	private double score = Double.NaN; // cached value
 
-	private int fStart = -1;
-	private int fEnd = -1;
+//	private int fStart = -1;
+//	private int fEnd = -1;
 
 	public Feature(Set<Location> location) {
 		if (location == null || location.size() == 0) {
@@ -160,8 +163,7 @@ public class Feature implements Comparable<Feature>, Located {
 		locs.clear();
 		locs.add(l);
 		phase = null;
-		fStart = l.start();
-		fEnd = l.end();
+		this.location = l.copy();
 		l.setParent(this);
 	}
 
@@ -187,8 +189,7 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	public boolean overlaps(Feature otherFeat) {
-		Location thisLoc = new Location(fStart, fEnd);
-		return thisLoc.overlaps(new Location(otherFeat.fStart, otherFeat.fEnd));
+		return location.overlaps(otherFeat.location);
 	}
 
 	/**
@@ -260,21 +261,15 @@ public class Feature implements Comparable<Feature>, Located {
 
 		phase = new byte[locs.size()];
 
-		// update fStart, fEnd
-		int fStart = Integer.MAX_VALUE;
-		int fEnd = 0;
-
-		for (Location l : locs) {
-			if (l.start() < fStart) {
-				fStart = l.start();
-			}
-			if (l.end() > fEnd) {
-				fEnd = l.end();
+		/** update {@link #location()} */
+		if (locs.isEmpty()) {
+			location = new Location(0, Integer.MAX_VALUE);
+		} else {
+			location = locs.get(0);
+			for (Location l : locs) {
+				location = location.extend(l);
 			}
 		}
-		this.fStart = fStart;
-		this.fEnd = fEnd;
-
 		int currentPhase = 0;
 		if (strand == Strand.FORWARD) {
 			for (int i = 0; i < locs.size(); i++) {
@@ -310,22 +305,16 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	public int length() {
-		return fEnd - fStart + 1;
+		return location.length();
 	}
 
 	@Override
 	public int compareTo(Feature o) {
-
-		int comp = new Integer(fStart).compareTo(o.fStart);
-		if (comp == 0) {
-			comp = new Integer(fEnd).compareTo(o.fEnd);
-		}
-
-		if (comp == 0) {
-			return new Integer(hashCode()).compareTo(o.hashCode());
-		} else {
+		int comp = location.compareTo(o.location);
+		if (comp != 0) {
 			return comp;
 		}
+		return new Integer(hashCode()).compareTo(o.hashCode());
 	}
 
 	public Strand strand() {
@@ -413,9 +402,9 @@ public class Feature implements Comparable<Feature>, Located {
 	@Override
 	public String toString() {
 		if (type != null) {
-			return type.toString() + " [" + new Location(fStart, fEnd) + "]";
+			return type.toString() + " [" + location + "]";
 		} else {
-			return "[" + new Location(fStart, fEnd).toString() + "]";
+			return "[" + location.toString() + "]";
 		}
 	}
 
@@ -423,9 +412,9 @@ public class Feature implements Comparable<Feature>, Located {
 		int frame;
 		if (locs.isEmpty()) {
 			if (strand == Strand.REVERSE) {
-				frame = fEnd % 3;
+				frame = location.end() % 3;
 			} else {
-				frame = fStart % 3;
+				frame = location.start() % 3;
 			}
 		} else {
 			if (strand == Strand.REVERSE) {
@@ -452,7 +441,7 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	/**
-	 * @return
+	 * @return the colour or color qualifier or null if no such qualifier
 	 */
 	public String getColor() {
 		String notes = this.qualifier("colour");
@@ -463,7 +452,7 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	/**
-	 * 
+	 * remove all qualifiers
 	 */
 	public void clearQualifiers() {
 		qualifiers.clear();
@@ -472,12 +461,12 @@ public class Feature implements Comparable<Feature>, Located {
 
 	@Override
 	public int start() {
-		return fStart;
+		return location.start();
 	}
 
 	@Override
 	public int end() {
-		return fEnd;
+		return location.end();
 	}
 
 	public void addLocations(Collection<Location> locs) {
