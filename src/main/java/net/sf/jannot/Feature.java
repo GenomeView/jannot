@@ -18,20 +18,19 @@ import net.sf.jannot.event.FeatureEvent;
 
 /**
  * 
- * Features are set of characteristics which describe a genome. Lines of a .gff
- * file are example of feature. e.g. start and end position of a coding region.
- * 
- * TODO improve this documentation
+ * Features is a Map/dictionary attached to one or more locations in a sequence.
+ * The map is stored in {@link #qualifiers}. An example entry is "Name":
+ * "inosine-5'-monophosphate dehydrogenase (guaB)" Both key and value are stored
+ * as String. Typically features are stored in a gff file, separate from the
+ * sequence
  * 
  * @author Thomas Abeel
  */
 public class Feature implements Comparable<Feature>, Located {
 
-	private List<Location> locs = new ArrayList<>();
-//	// either location or singleLocation are to be set.
-//	private Location[] location = null;
-//	// FIXME why not put singleLocation in the location list?
-//	private Location singleLocation = null;
+	private final List<Location> locs = new ArrayList<>();
+
+	private final Map<String, String> qualifiers = new HashMap<String, String>();
 
 	private byte[] phase = null;
 
@@ -39,11 +38,9 @@ public class Feature implements Comparable<Feature>, Located {
 
 	private Strand strand = Strand.UNKNOWN;
 
-	private Map<String, String> qualifiers = new HashMap<String, String>();
-
 	// cache
-	private boolean scoreBuffer = false; // true if score was already calculated
-	private double score = Double.NaN;
+	private boolean scoreBuffer = false; // true if cached score is valid
+	private double score = Double.NaN; // cached value
 
 	private int fStart = -1;
 	private int fEnd = -1;
@@ -250,6 +247,8 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	/**
+	 * Called when there are possible multiple locations for this feature.
+	 * 
 	 * Phase is not the same thing as Frame. Phase is the number of bases to
 	 * skip before reading in-frame, while frame is the actual frame identifier
 	 * beginning at 1.
@@ -259,14 +258,13 @@ public class Feature implements Comparable<Feature>, Located {
 			return;
 		}
 
-		Location[] tmpLoc = location();
+		phase = new byte[locs.size()];
 
-		phase = new byte[tmpLoc.length];
-
+		// update fStart, fEnd
 		int fStart = Integer.MAX_VALUE;
 		int fEnd = 0;
 
-		for (Location l : tmpLoc) {
+		for (Location l : locs) {
 			if (l.start() < fStart) {
 				fStart = l.start();
 			}
@@ -279,23 +277,23 @@ public class Feature implements Comparable<Feature>, Located {
 
 		int currentPhase = 0;
 		if (strand == Strand.FORWARD) {
-			for (int i = 0; i < tmpLoc.length; i++) {
+			for (int i = 0; i < locs.size(); i++) {
 				phase[i] = (byte) currentPhase;
-				currentPhase = (tmpLoc[i].length() - currentPhase);
+				currentPhase = (locs.get(i).length() - currentPhase);
 				currentPhase %= 3;
 				currentPhase = 3 - currentPhase;
 				currentPhase %= 3;
 			}
 		} else if (strand == Strand.REVERSE) {
-			for (int i = tmpLoc.length - 1; i >= 0; i--) {
+			for (int i = locs.size() - 1; i >= 0; i--) {
 				phase[i] = (byte) currentPhase;
-				currentPhase = (tmpLoc[i].length() - currentPhase);
+				currentPhase = (locs.get(i).length() - currentPhase);
 				currentPhase %= 3;
 				currentPhase = 3 - currentPhase;
 				currentPhase %= 3;
 			}
 		} else {
-			for (int i = 0; i < tmpLoc.length; i++) {
+			for (int i = 0; i < locs.size(); i++) {
 				phase[i] = 0;
 			}
 		}
