@@ -145,6 +145,10 @@ public class Location implements Comparable<Location> {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @return the extent of this location, so end-start+1
+	 */
 	public int length() {
 		return end - start + 1;
 	}

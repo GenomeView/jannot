@@ -30,7 +30,7 @@ import net.sf.jannot.event.FeatureEvent;
  */
 public class Feature implements Comparable<Feature>, Located {
 
-	/** the {@link Location}s that this feature associates with */
+	/** the {@link Location}s that this feature associates with. never empty */
 	private final List<Location> locs = new ArrayList<>();
 
 	/*** The qualifiers for this feature */
@@ -184,9 +184,7 @@ public class Feature implements Comparable<Feature>, Located {
 	public ChangeEvent setStrand(Strand s) {
 		ChangeEvent ce = new ChangeStrandEvent(this, this.strand, s);
 		ce.doChange();
-		if (!locs.isEmpty()) {
-			updatePhase();
-		}
+		updatePhase();
 		return ce;
 
 	}
@@ -199,27 +197,22 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	/**
-	 * Called when there are possible multiple locations for this feature.
-	 * 
+	 * computes {@link #phase} and {@link #location}.
+	 * <p>
 	 * Phase is not the same thing as Frame. Phase is the number of bases to
 	 * skip before reading in-frame, while frame is the actual frame identifier
 	 * beginning at 1.
+	 * <p>
+	 * FIXME what is "in-frame"? What is frame? What is 'actual frame
+	 * identifier'?
 	 */
 	void updatePhase() {
-		if (locs.isEmpty()) {
-			return;
-		}
-
 		phase = new byte[locs.size()];
 
-		/** update {@link #location()} */
-		if (locs.isEmpty()) {
-			location = new Location(0, Integer.MAX_VALUE);
-		} else {
-			location = locs.get(0);
-			for (Location l : locs) {
-				location = location.extend(l);
-			}
+		/** update {@link #location} */
+		location = locs.get(0);
+		for (Location l : locs) {
+			location = location.extend(l);
 		}
 		int currentPhase = 0;
 		if (strand == Strand.FORWARD) {
@@ -248,13 +241,16 @@ public class Feature implements Comparable<Feature>, Located {
 
 	/**
 	 * 
-	 * @return list,either {@link #location} list, or list containing
-	 *         {@link #singleLocation}, or mew Location[0] if both are null
+	 * @return copy of the {@link #locs} that this feature is associated with
 	 */
 	public Location[] location() {
 		return locs.toArray(new Location[0]);
 	}
 
+	/**
+	 * 
+	 * @return the total extent of this feature, covering all {@link #locs}
+	 */
 	public int length() {
 		return location.length();
 	}
@@ -265,6 +261,7 @@ public class Feature implements Comparable<Feature>, Located {
 		if (comp != 0) {
 			return comp;
 		}
+		// fallback, a bit arbitrary based on the memory location...
 		return new Integer(hashCode()).compareTo(o.hashCode());
 	}
 
