@@ -184,49 +184,6 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	/**
-	 * computes {@link #phase} and {@link #location}.
-	 * <p>
-	 * Phase is not the same thing as Frame. Phase is the number of bases to
-	 * skip before reading in-frame, while frame is the actual frame identifier
-	 * beginning at 1.
-	 * <p>
-	 * FIXME what is "in-frame"? What is frame? What is 'actual frame
-	 * identifier'?
-	 */
-	void updatePhase() {
-		phase = new byte[locs.size()];
-
-		/** update {@link #location} */
-		location = locs.get(0);
-		for (Location l : locs) {
-			location = location.extend(l);
-		}
-		int currentPhase = 0;
-		if (strand == Strand.FORWARD) {
-			for (int i = 0; i < locs.size(); i++) {
-				phase[i] = (byte) currentPhase;
-				currentPhase = (locs.get(i).length() - currentPhase);
-				currentPhase %= 3;
-				currentPhase = 3 - currentPhase;
-				currentPhase %= 3;
-			}
-		} else if (strand == Strand.REVERSE) {
-			for (int i = locs.size() - 1; i >= 0; i--) {
-				phase[i] = (byte) currentPhase;
-				currentPhase = (locs.get(i).length() - currentPhase);
-				currentPhase %= 3;
-				currentPhase = 3 - currentPhase;
-				currentPhase %= 3;
-			}
-		} else {
-			for (int i = 0; i < locs.size(); i++) {
-				phase[i] = 0;
-			}
-		}
-
-	}
-
-	/**
 	 * 
 	 * @return copy of the {@link #locs} that this feature is associated with
 	 */
@@ -301,30 +258,28 @@ public class Feature implements Comparable<Feature>, Located {
 
 	/**
 	 * 
-	 * @return the value in the "score" qualifier.
+	 * @return the value in the "score" qualifier. Score is kept in qualifiers
+	 *         but cached
 	 */
 	public double getScore() {
-		// FIXME what if qualifiers were modified?
 		if (scoreBuffer) {
 			return score;
-		} else {
-			String val = qualifier("score");
-			if (val == null) {
-				return 0;
-			} else {
-				scoreBuffer = true;
-				double tmpScore = 0;
-				try {
-					// bug? score may be a list
-					tmpScore = Double.parseDouble(val);
-				} catch (Exception e) {
-					// FIXME maybe log something? Maybe not?
-					// why are we not parsing score head-on?
-				}
-				score = tmpScore;
-				return score;
-			}
 		}
+		String val = qualifier("score");
+		if (val == null) {
+			return 0;
+		}
+		scoreBuffer = true;
+		double tmpScore = 0;
+		try {
+			tmpScore = Double.parseDouble(val);
+		} catch (Exception e) {
+			// FIXME maybe log something? Maybe not?
+			// why are we not parsing score head-on?
+		}
+		score = tmpScore;
+		return score;
+
 	}
 
 	@Override
@@ -334,25 +289,6 @@ public class Feature implements Comparable<Feature>, Located {
 		} else {
 			return "[" + location.toString() + "]";
 		}
-	}
-
-	public int getFrame() {
-		int frame;
-		if (locs.isEmpty()) {
-			if (strand == Strand.REVERSE) {
-				frame = location.end() % 3;
-			} else {
-				frame = location.start() % 3;
-			}
-		} else {
-			if (strand == Strand.REVERSE) {
-				frame = (locs.get(locs.size() - 1).end()) % 3;
-			} else {
-				frame = (locs.get(0).start()) % 3;
-			}
-		}
-		return frame == 0 ? 3 : frame;
-
 	}
 
 	/**
@@ -397,12 +333,6 @@ public class Feature implements Comparable<Feature>, Located {
 		return location.end();
 	}
 
-	public void addLocations(Collection<Location> locs) {
-		for (Location l : locs) {
-			addLocation(l);
-		}
-	}
-
 	/**
 	 * @param l the location to add
 	 */
@@ -425,6 +355,49 @@ public class Feature implements Comparable<Feature>, Located {
 
 	}
 
+	/**
+	 * computes {@link #phase} and {@link #location}. Apparently this is also
+	 * called externally
+	 * <p>
+	 * Phase is not the same thing as Frame. Phase is the number of bases to
+	 * skip before reading in-frame, while frame is the actual frame identifier
+	 * beginning at 1.
+	 * <p>
+	 * FIXME what is "in-frame"? What is frame? What is 'actual frame
+	 * identifier'?
+	 */
+	protected void updatePhase() {
+		phase = new byte[locs.size()];
+
+		/** update {@link #location} */
+		location = locs.get(0);
+		for (Location l : locs) {
+			location = location.extend(l);
+		}
+		int currentPhase = 0;
+		if (strand == Strand.FORWARD) {
+			for (int i = 0; i < locs.size(); i++) {
+				phase[i] = (byte) currentPhase;
+				currentPhase = (locs.get(i).length() - currentPhase);
+				currentPhase %= 3;
+				currentPhase = 3 - currentPhase;
+				currentPhase %= 3;
+			}
+		} else if (strand == Strand.REVERSE) {
+			for (int i = locs.size() - 1; i >= 0; i--) {
+				phase[i] = (byte) currentPhase;
+				currentPhase = (locs.get(i).length() - currentPhase);
+				currentPhase %= 3;
+				currentPhase = 3 - currentPhase;
+				currentPhase %= 3;
+			}
+		} else {
+			for (int i = 0; i < locs.size(); i++) {
+				phase[i] = 0;
+			}
+		}
+
+	}
 }
 
 /**

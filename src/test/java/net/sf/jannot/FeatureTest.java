@@ -18,7 +18,13 @@ import org.junit.Test;
  */
 public class FeatureTest {
 
+	private final static Location loc0 = new Location(0, 18);
 	private final static Location loc1 = new Location(10, 20);
+	private final static Location loc2 = new Location(10, 15);
+
+	final Feature f0 = new Feature(loc0, null, Strand.UNKNOWN);
+	final Feature f1 = new Feature(loc1, null, Strand.UNKNOWN);
+	final Feature f2 = new Feature(loc2, null, Strand.UNKNOWN);
 
 	@Test
 	public void smoke() {
@@ -27,10 +33,19 @@ public class FeatureTest {
 
 	@Test
 	public void testConstructorsEqual() {
-		Feature f1 = new Feature(loc1, null, Strand.UNKNOWN);
 		Feature f2 = new Feature(new HashSet<>(Arrays.asList(loc1)), null,
 				Strand.UNKNOWN);
 		assertEquals(f1, f2);
+	}
+
+	@Test
+	public void testCompare() {
+		assertEquals(1, f1.compareTo(f0));
+		assertEquals(-1, f0.compareTo(f1));
+		assertEquals(0, f0.compareTo(f0));
+
+		Feature merged = new Feature(loc0.extend(loc1), null, Strand.UNKNOWN);
+		assertEquals(1, merged.compareTo(f0));
 	}
 
 	@Test
