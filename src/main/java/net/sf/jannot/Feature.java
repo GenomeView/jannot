@@ -36,24 +36,25 @@ public class Feature implements Comparable<Feature>, Located {
 	/*** The qualifiers for this feature */
 	private final Map<String, String> qualifiers = new HashMap<String, String>();
 
-	/** computed contour of {@link #locs} */
-	private Location location;
-
+	/** computed phase of each {@link #locs} */
 	private byte[] phase = null;
 
 	Type type;
 
+	// set initially, so that ChangeEvent can 'undo' any change
 	Strand strand = Strand.UNKNOWN;
 
-	// cache
+	// cached values
 	private boolean scoreBuffer = false; // true if cached score is valid
 	private double score = Double.NaN; // cached value
+	/** computed contour of {@link #locs} */
+	private Location location;
 
 	/**
 	 * 
-	 * @param locations a set of {@link Location}s.
+	 * @param locations a non-empty set of {@link Location}s.
 	 * @param type      the {@link Type} of the feature
-	 * @param strand    the {@link Strand} of the feature.
+	 * @param strand    the non-null {@link Strand} of the feature.
 	 */
 	public Feature(Set<Location> locations, Type type, Strand strand) {
 		setLocation(locations);
@@ -69,23 +70,21 @@ public class Feature implements Comparable<Feature>, Located {
 	}
 
 	/**
-	 * Add a new qualifier to this Feature. The key,value pair will override the
-	 * existing one
+	 * Add a new qualifier to this Feature. If a value already exists for key,
+	 * the value will be extended with "," and the given value.
 	 * 
-	 * Exception: If key ="score", the score key will be extended with ","+value
-	 * (and then also cached score is reset)
+	 * Exception: If key ="score", the score value will replace the old value
 	 * 
 	 * All line breaks in value will be removed before storage in
 	 * {@link #qualifiers}.
 	 * 
-	 * @param key   of the qualifier key
-	 * @param value some string
+	 * @param non-null key of the qualifier key
+	 * @param value    some string, or null
 	 */
 	public void addQualifier(String key, String value) {
 		if (value != null) {
 			assert key != null;
 			key = key.intern();
-
 		}
 		/* Remove line breaks in value */
 		if (value != null) {
@@ -158,19 +157,6 @@ public class Feature implements Comparable<Feature>, Located {
 		updatePhase();
 	}
 
-	/**
-	 * sets multiple locations for this
-	 * 
-	 * @param l list of {@link Location}s for this
-	 */
-	public void setLocation(Location[] l) {
-		setLocation(Arrays.asList(l));
-	}
-
-	public boolean overlaps(Location otherLoc) {
-		return otherLoc.overlaps(otherLoc);
-	}
-
 	public boolean overlaps(Feature otherFeat) {
 		return location.overlaps(otherFeat.location);
 	}
@@ -182,6 +168,7 @@ public class Feature implements Comparable<Feature>, Located {
 	 * @return a {@link ChangeEvent}
 	 */
 	public ChangeEvent setStrand(Strand s) {
+		Objects.requireNonNull(s);
 		ChangeEvent ce = new ChangeStrandEvent(this, this.strand, s);
 		ce.doChange();
 		updatePhase();

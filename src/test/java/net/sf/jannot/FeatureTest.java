@@ -33,12 +33,11 @@ public class FeatureTest {
 		assertEquals(f1, f2);
 	}
 
-//	@Ignore // test not working
-//	@Test
-//	public void testEmptyCopy(){
-//		Feature f=new Feature();
-//		Feature g=f.copy();
-//	}
+	@Test
+	public void testEmptyCopy() {
+		Feature f = new Feature(loc1, null, Strand.UNKNOWN);
+		Feature g = f.copy();
+	}
 
 	@Test
 	public void testFeatures() {
@@ -58,12 +57,11 @@ public class FeatureTest {
 		Assert.assertEquals(5, f.start());
 		Assert.assertEquals(15, f.end());
 
-		f.setLocation(new Location[] { new Location(3, 13) });
+		f.setLocation(Arrays.asList(new Location(3, 13)));
 		Assert.assertEquals(3, f.start());
 		Assert.assertEquals(13, f.end());
 
-		f.setLocation(
-				new Location[] { new Location(4, 8), new Location(12, 16) });
+		f.setLocation(Arrays.asList(new Location(4, 8), new Location(12, 16)));
 		Assert.assertEquals(4, f.start());
 		Assert.assertEquals(16, f.end());
 
