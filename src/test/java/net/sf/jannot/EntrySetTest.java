@@ -13,11 +13,11 @@ import net.sf.jannot.exception.ReadFailedException;
  * @author Thomas Abeel
  *
  */
-public class TestEntrySet {
+public class EntrySetTest {
 
 	private final Global global;
 
-	public TestEntrySet() throws IOException, ReadFailedException {
+	public EntrySetTest() throws IOException, ReadFailedException {
 
 		global = new Global();
 	}

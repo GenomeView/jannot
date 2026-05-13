@@ -14,12 +14,12 @@ import tudelft.utilities.logging.Reporter;
  * @author Thomas Abeel
  *
  */
-public class TestNameService {
+public class NameServiceTest {
 
 	private final Reporter log;
 	private NameService ns;
 
-	public TestNameService() throws ReadFailedException, IOException {
+	public NameServiceTest() throws ReadFailedException, IOException {
 		Global global = new Global();
 		log = global.getLog();
 		ns = global.getNameService();

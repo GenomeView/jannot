@@ -16,7 +16,7 @@ import org.junit.Test;
  * @author Thomas Abeel
  * 
  */
-public class TestFeature {
+public class FeatureTest {
 
 	private final static Location loc1 = new Location(10, 20);
 
