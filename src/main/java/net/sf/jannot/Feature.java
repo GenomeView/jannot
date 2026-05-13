@@ -30,37 +30,40 @@ import net.sf.jannot.event.FeatureEvent;
  */
 public class Feature implements Comparable<Feature>, Located {
 
+	/** the {@link Location}s that this feature associates with */
 	private final List<Location> locs = new ArrayList<>();
 
+	/*** The qualifiers for this feature */
 	private final Map<String, String> qualifiers = new HashMap<String, String>();
 
-	// the contour of all locs
+	/** computed contour of {@link #locs} */
 	private Location location;
 
 	private byte[] phase = null;
 
-	private Type type;
+	Type type;
 
-	private Strand strand = Strand.UNKNOWN;
+	Strand strand = Strand.UNKNOWN;
 
 	// cache
 	private boolean scoreBuffer = false; // true if cached score is valid
 	private double score = Double.NaN; // cached value
 
-//	private int fStart = -1;
-//	private int fEnd = -1;
-
-	public Feature(Set<Location> location, Type type, Strand strand) {
-		if (location == null || location.size() == 0) {
-			throw new NullPointerException(
-					"location must contain at least 1 element");
-		}
-
-		setLocation(location);
+	/**
+	 * 
+	 * @param locations a set of {@link Location}s.
+	 * @param type      the {@link Type} of the feature
+	 * @param strand    the {@link Strand} of the feature.
+	 */
+	public Feature(Set<Location> locations, Type type, Strand strand) {
+		setLocation(locations);
 		setType(type);
 		setStrand(strand);
 	}
 
+	/**
+	 * Convenience constructor, see {@link #Feature(Set, Type, Strand)}
+	 */
 	public Feature(Location location, Type type, Strand strand) {
 		this(new HashSet<>(Arrays.asList(location)), type, strand);
 	}
@@ -70,13 +73,13 @@ public class Feature implements Comparable<Feature>, Located {
 	 * existing one
 	 * 
 	 * Exception: If key ="score", the score key will be extended with ","+value
-	 * and then also scoreBuffer is set false.
+	 * (and then also cached score is reset)
 	 * 
 	 * All line breaks in value will be removed before storage in
 	 * {@link #qualifiers}.
 	 * 
-	 * @param key   of the qualifier
-	 * @param value value
+	 * @param key   of the qualifier key
+	 * @param value some string
 	 */
 	public void addQualifier(String key, String value) {
 		if (value != null) {
@@ -98,20 +101,6 @@ public class Feature implements Comparable<Feature>, Located {
 		if (key.equals("score")) {
 			scoreBuffer = false;
 		}
-
-	}
-
-	/**
-	 * same as {@link #addQualifier(String, String)}
-	 * 
-	 * @param key   of the qualifier
-	 * @param value value
-	 */
-	public void setQualifier(String key, String value) {
-		if (key != null) {
-			qualifiers.remove(key);
-		}
-		addQualifier(key, value);
 
 	}
 
@@ -152,62 +141,30 @@ public class Feature implements Comparable<Feature>, Located {
 	 *                  location.
 	 */
 	public void setLocation(Collection<Location> locations) {
-		if (locations == null || locations.size() == 0) {
+		if (Objects.requireNonNull(locations).isEmpty()) {
 			throw new IllegalArgumentException(
 					"at least 1 location required for feature");
 		}
-		// FIXME we'd like to check but some implementations of Collection
-		// don't support contains(null)
-		// if (locations.contains(null))
-		// throw new IllegalArgumentException("null location in locations");
-		if (locations.size() == 1) {
-			setLocation(locations.iterator().next());
-		} else {
-
-			SortedSet<Location> set = new TreeSet<Location>();
-			for (Location l : locations) {
-				set.add(l);
-			}
-			locs.clear();
-			for (Location l : set) {
-				locs.add(l);
-
-			}
-			for (Location x : locs) {
-				x.setParent(this);
-			}
-			updatePhase();
+		// sort the locations
+		final SortedSet<Location> set = new TreeSet<Location>();
+		for (Location l : locations) {
+			set.add(Objects.requireNonNull(l));
 		}
+		locs.clear();
+		for (Location l : set) {
+			locs.add(l);
+			l.setParent(this);
+		}
+		updatePhase();
 	}
 
 	/**
-	 * Sets a singlelocation.
+	 * sets multiple locations for this
 	 * 
-	 * @param l the single {@link Location} of this feature.
+	 * @param l list of {@link Location}s for this
 	 */
-	public void setLocation(Location l) {
-		locs.clear();
-		locs.add(l);
-		phase = null;
-		this.location = l.copy();
-		l.setParent(this);
-	}
-
 	public void setLocation(Location[] l) {
-		if (l.length == 1) {
-			setLocation(l[0]);
-		} else {
-			locs.clear();
-			for (Location loc : l) {
-				locs.add(loc);
-			}
-			for (Location tmp : locs) {
-				tmp.setParent(this);
-			}
-
-			updatePhase();
-		}
-
+		setLocation(Arrays.asList(l));
 	}
 
 	public boolean overlaps(Location otherLoc) {
@@ -231,38 +188,6 @@ public class Feature implements Comparable<Feature>, Located {
 			updatePhase();
 		}
 		return ce;
-
-	}
-
-	class ChangeTypeEvent extends FeatureEvent {
-		private Type prev, next;
-
-		public final Type getPrev() {
-			return prev;
-		}
-
-		public final Type getNext() {
-			return next;
-		}
-
-		public ChangeTypeEvent(Feature f, Type prev, Type next) {
-			super(f, "set type to " + next);
-			this.next = next;
-			this.prev = prev;
-		}
-
-		@Override
-		public void doChange() {
-			type = next;
-
-		}
-
-		@Override
-		public void undoChange() {
-			assert (type == next);
-			type = prev;
-
-		}
 
 	}
 
@@ -347,10 +272,6 @@ public class Feature implements Comparable<Feature>, Located {
 		return strand;
 	}
 
-	public void removeQualifier(String key) {
-		qualifiers.remove(key);
-	}
-
 	/**
 	 * @param key indexing the qualifiers
 	 * @return qualifiers.get(key) or null if no such key
@@ -387,10 +308,9 @@ public class Feature implements Comparable<Feature>, Located {
 		return f;
 	}
 
-	// private double bufferedScore = Double.NaN;
 	@Deprecated
 	public void setScore(double score) {
-		setQualifier("score", "" + score);
+		addQualifier("score", "" + score);
 		scoreBuffer = false;
 
 	}
@@ -521,30 +441,65 @@ public class Feature implements Comparable<Feature>, Located {
 
 	}
 
-	/**
-	 * inner class to make a strand change undo-able.
-	 */
-	class ChangeStrandEvent extends FeatureEvent {
-		private Strand from, to;
+}
 
-		public ChangeStrandEvent(Feature f, Strand from, Strand to) {
-			super(f, "Change strand from " + from.symbol() + " to "
-					+ to.symbol());
-			this.from = from;
-			this.to = to;
-		}
+/**
+ * {@link ChangeEvent} storing a {@link Strand} change undo-able.
+ */
+class ChangeStrandEvent extends FeatureEvent {
+	private Strand from, to;
 
-		@Override
-		public void doChange() {
-			super.getFeature().strand = to;
+	public ChangeStrandEvent(Feature f, Strand from, Strand to) {
+		super(f, "Change strand from " + from.symbol() + " to " + to.symbol());
+		this.from = from;
+		this.to = to;
+	}
 
-		}
+	@Override
+	public void doChange() {
+		super.getFeature().strand = to;
 
-		@Override
-		public void undoChange() {
-			super.getFeature().strand = from;
+	}
 
-		}
+	@Override
+	public void undoChange() {
+		super.getFeature().strand = from;
+
+	}
+
+}
+
+/**
+ * {@link ChangeEvent} storing a {@link Type} change
+ */
+class ChangeTypeEvent extends FeatureEvent {
+	private Type prev, next;
+	private Feature feature;
+
+	public final Type getPrev() {
+		return prev;
+	}
+
+	public final Type getNext() {
+		return next;
+	}
+
+	public ChangeTypeEvent(Feature f, Type prev, Type next) {
+		super(f, "set type to " + next);
+		this.next = next;
+		this.prev = prev;
+	}
+
+	@Override
+	public void doChange() {
+		getFeature().type = next;
+
+	}
+
+	@Override
+	public void undoChange() {
+		assert (getFeature().type == next);
+		getFeature().type = prev;
 
 	}
 

@@ -113,10 +113,10 @@ public class VCFParser extends Parser {
 
 				final Feature f = new Feature(new Location(start, end),
 						Type.get(variation.toString()), Strand.UNKNOWN);
-				f.setQualifier("id", id);
-				f.setQualifier("ref", ref);
-				f.setQualifier("alt", alt);
-				f.setQualifier("score", "" + score);
+				f.addQualifier("id", id);
+				f.addQualifier("ref", ref);
+				f.addQualifier("alt", alt);
+				f.addQualifier("score", "" + score);
 
 				/*
 				 * Add winglets for large events

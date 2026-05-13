@@ -239,10 +239,10 @@ public class GFF3Parser extends Parser {
 		Set<String> quals = feat.getQualifiersKeys();
 		if (!quals.contains("ID")) {
 			if (quals.contains("Parent")) {
-				feat.setQualifier("ID", "Child_of_" + feat.qualifier("Parent"));
+				feat.addQualifier("ID", "Child_of_" + feat.qualifier("Parent"));
 			} else {
 				String rand = String.format("%08d", randomID++);
-				feat.setQualifier("ID", "Random_ID_" + rand);
+				feat.addQualifier("ID", "Random_ID_" + rand);
 			}
 		}
 	}

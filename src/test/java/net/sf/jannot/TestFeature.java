@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -37,7 +38,7 @@ public class TestFeature {
 		Assert.assertEquals(1, f.start());
 		Assert.assertEquals(10, f.end());
 
-		f.setLocation(new Location(5, 15));
+		f.setLocation(Arrays.asList(new Location(5, 15)));
 		Assert.assertEquals(5, f.start());
 		Assert.assertEquals(15, f.end());
 
@@ -84,10 +85,6 @@ public class TestFeature {
 		f.addQualifier("protein", "more");
 		assertTrue(f.getQualifiersKeys().size() == 1);
 		assertEquals("test,more", f.qualifier("protein"));
-
-		f.removeQualifier("protein");
-		assertTrue(f.getQualifiersKeys().size() == 0);
-		assertEquals(null, f.qualifier("protein"));
 
 	}
 
