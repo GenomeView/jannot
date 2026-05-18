@@ -16,6 +16,12 @@
  */
 package net.sf.jannot.parser;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,10 +43,12 @@ import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
+import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.nameservice.NameService;
 import support.DataManager;
 
 /**
@@ -53,8 +62,15 @@ public class TestBEDParser {
 	private final DistributingReporter log;
 
 	public TestBEDParser() throws IOException, ReadFailedException {
-		this.global = new Global();
-		this.log = global.getLog();
+		log = mock(DistributingReporter.class);
+		global = new Global(log, new JavaLogInterceptor(log),
+				new NameService(log));
+	}
+
+	@After
+	public void after() {
+		verify(log, times(0)).log(eq(Level.WARNING), anyString());
+		verify(log, times(0)).log(eq(Level.SEVERE), anyString());
 	}
 
 	@Test
