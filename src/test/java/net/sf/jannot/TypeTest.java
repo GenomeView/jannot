@@ -23,6 +23,19 @@ public class TypeTest {
 		addSomeTypes();
 		factory.moveDown(factory.get("2"));
 		assertValues(1, 3, 2, 4);
+		// 4 is already at bottom, does nothing
+		factory.moveDown(factory.get("4"));
+		assertValues(1, 3, 2, 4);
+	}
+
+	@Test
+	public void moveUpTest() {
+		addSomeTypes();
+		factory.moveUp(factory.get("2"));
+		assertValues(2, 1, 3, 4);
+		// moving 2 up again should not do anything
+		factory.moveUp(factory.get("2"));
+		assertValues(2, 1, 3, 4);
 	}
 
 	private void assertValues(int... vals) {
