@@ -16,14 +16,24 @@
  */
 package net.sf.jannot.parser;
 
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
+import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
@@ -33,8 +43,8 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.nameservice.NameService;
 import support.DataManager;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -43,12 +53,18 @@ import tudelft.utilities.logging.Reporter;
  */
 public class TestVCFParser {
 
-	private final Reporter log;
+	private final DistributingReporter log;
 	private final Global global;
 
 	public TestVCFParser() throws ReadFailedException, IOException {
-		global = new Global();
-		log = global.getLog();
+		log = mock(DistributingReporter.class);
+		global = new Global(log, null, new NameService(log));
+	}
+
+	@After
+	public void after() {
+		verify(log, times(0)).log(eq(Level.WARNING), anyString());
+		verify(log, times(0)).log(eq(Level.SEVERE), anyString());
 	}
 
 	@Test
@@ -66,17 +82,19 @@ public class TestVCFParser {
 		Assert.assertEquals(1, count);
 		Data d = es.firstEntry().get(global.typeFactory().get("tiny.vcf"));
 		for (DataKey dk : es.firstEntry()) {
-			System.out.println("Datakey=" + dk);
+			assertNotNull(dk);
 
 		}
 		Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
 		MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
 
 		for (Feature feat : mfa.get()) {
-			System.out.println(feat);
+			// System.out.println(feat);
+			// FIXME test something??
+			assertNotNull(feat);
 		}
 
-		Assert.assertNotNull(d);
+		assertNotNull(d);
 
 	}
 
@@ -86,7 +104,6 @@ public class TestVCFParser {
 		File f = DataManager.file("regular.vcf");
 		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
 		EntrySet es = ds.read(new EntrySet(global));
-		// System.out.println(es.firstEntry());
 		Assert.assertEquals("gi|395136682|gb|CP003248.1|",
 				es.firstEntry().getID());
 		int count = 0;
@@ -96,14 +113,13 @@ public class TestVCFParser {
 		Assert.assertEquals(1, count);
 		Data d = es.firstEntry().get(global.typeFactory().get("regular.vcf"));
 		for (DataKey dk : es.firstEntry()) {
-			System.out.println("Datakey=" + dk);
-
+			assertNotNull(dk);
 		}
 		Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
 		MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
 
 		for (Feature feat : mfa.get()) {
-			System.out.println(feat + "\t" + feat.type());
+			assertNotNull(feat.type());
 		}
 
 		Assert.assertNotNull(d);
