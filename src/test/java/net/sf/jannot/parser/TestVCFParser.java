@@ -89,8 +89,6 @@ public class TestVCFParser {
 		MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
 
 		for (Feature feat : mfa.get()) {
-			// System.out.println(feat);
-			// FIXME test something??
 			assertNotNull(feat);
 		}
 

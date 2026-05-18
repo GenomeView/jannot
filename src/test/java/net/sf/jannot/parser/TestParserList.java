@@ -1,19 +1,39 @@
 package net.sf.jannot.parser;
 
-import java.io.IOException;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+import java.io.IOException;
+import java.util.logging.Level;
+
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Global;
+import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.exception.ReadFailedException;
+import net.sf.nameservice.NameService;
 
 public class TestParserList {
 
 	private final Global global;
+	private final DistributingReporter log;
 
-	public TestParserList() throws IOException, ReadFailedException {
-		global = new Global();
+	public TestParserList() throws ReadFailedException, IOException {
+		log = mock(DistributingReporter.class);
+		global = new Global(log, new JavaLogInterceptor(log),
+				new NameService(log));
+	}
+
+	@After
+	public void after() {
+		verify(log, times(0)).log(eq(Level.WARNING), anyString());
+		verify(log, times(0)).log(eq(Level.SEVERE), anyString());
 	}
 
 	@Test

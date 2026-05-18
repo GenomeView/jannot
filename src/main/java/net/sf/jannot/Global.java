@@ -18,6 +18,24 @@ import tudelft.utilities.logging.Reporter;
  * debug, test and mock them.
  * <p>
  * Normally only 1 instance is used everywhere.
+ * <p>
+ * For testing, typically the logger is mocked and afterwards tested for WARNING
+ * or SEVERE, like
+ * <p>
+ * <code>
+ * 		log = mock(DistributingReporter.class);<br>
+ *		global = new Global(log, new JavaLogInterceptor(log),<br>
+ *				new NameService(log));<br>
+ *  </code>
+ * <p>
+ * and then
+ * <p>
+ * <code>
+ * @After public void after() {<br>
+ * verify(log, times(0)).log(eq(Level.WARNING), anyString());<br>
+ * verify(log, times(0)).log(eq(Level.SEVERE), anyString());<br>
+ * }
+</code>
  */
 public class Global {
 	private final DistributingReporter log;

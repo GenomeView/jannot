@@ -17,19 +17,28 @@
 package net.sf.jannot.parser;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Global;
+import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.parser.software.BlastM8Parser;
+import net.sf.nameservice.NameService;
 import support.DataManager;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -39,11 +48,18 @@ import tudelft.utilities.logging.Reporter;
 public class TestParserDetection {
 	private static final String PAF = "YJM1447_vs_R64.paf";
 	private final Global global;
-	private final Reporter log;
+	private final DistributingReporter log;
 
-	public TestParserDetection() throws IOException, ReadFailedException {
-		global = new Global();
-		log = global.getLog();
+	public TestParserDetection() throws ReadFailedException, IOException {
+		log = mock(DistributingReporter.class);
+		global = new Global(log, new JavaLogInterceptor(log),
+				new NameService(log));
+	}
+
+	@After
+	public void after() {
+		verify(log, times(0)).log(eq(Level.WARNING), anyString());
+		verify(log, times(0)).log(eq(Level.SEVERE), anyString());
 	}
 
 	@Test
