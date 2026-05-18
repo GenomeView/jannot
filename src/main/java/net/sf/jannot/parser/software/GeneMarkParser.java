@@ -32,7 +32,7 @@ public class GeneMarkParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		Type t = Type.get("CDS_pred");
+		Type t = getGlobal().typeFactory().get("CDS_pred");
 		MemoryFeatureAnnotation fa = set.iterator().next()
 				.getMemoryAnnotation(t);
 		for (String line : new LineIterator(is)) {

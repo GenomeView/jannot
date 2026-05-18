@@ -3,8 +3,8 @@
  */
 package net.sf.jannot.wiggle;
 
+import net.sf.jannot.Global;
 import net.sf.jannot.utils.ArrayIterable;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -17,14 +17,16 @@ public class FloatArrayWiggle extends AbstractWiggle {
 	private float min = Float.POSITIVE_INFINITY;
 	private float max = Float.NEGATIVE_INFINITY;
 
-	public FloatArrayWiggle(float[] arr, Reporter log) {
-		super(log);
+	public FloatArrayWiggle(float[] arr, Global global) {
+		super(global);
 		this.buffer = arr;
 		for (float f : arr) {
-			if (f > max)
+			if (f > max) {
 				max = f;
-			if (f < min)
+			}
+			if (f < min) {
 				min = f;
+			}
 		}
 		super.init(this);
 
@@ -32,14 +34,17 @@ public class FloatArrayWiggle extends AbstractWiggle {
 
 	@Override
 	public float[] getRawRange(int start, int end) {
-		if (start >= buffer.length)
+		if (start >= buffer.length) {
 			return new float[0];
+		}
 		float[] out = new float[end - start];
 		int len = out.length;
-		if (start + len > buffer.length)
+		if (start + len > buffer.length) {
 			len = buffer.length - start;
-		if (start < 0)
+		}
+		if (start < 0) {
 			start = 0;
+		}
 		System.arraycopy(buffer, start, out, 0, len);
 		return out;
 	}

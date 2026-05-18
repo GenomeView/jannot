@@ -11,9 +11,9 @@ import java.util.logging.Level;
 
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.util.CloseableIterator;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.SAMDataSource;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -36,8 +36,8 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 	private SAMDataSource source;
 	private int maxLenght = 0;
 
-	public BAMreads(SAMDataSource source, String key, Reporter log) {
-		super(log);
+	public BAMreads(SAMDataSource source, String key, Global global) {
+		super(global);
 		this.source = source;
 		// returned reader is already silent. Changing default here is indirect.
 		// SamReaderFactory.setDefaultValidationStringency(ValidationStringency.SILENT);
@@ -104,7 +104,7 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 			int end = r.end() + 500;
 			CloseableIterator<SAMRecord> it = cqr.query(key, start, end, false);
 			if (cqr == null || key == null) {
-				getLog().log(Level.WARNING,
+				global().getLog().log(Level.WARNING,
 						"NullPointerDetected: key=" + key + "\tcqr=" + cqr);
 			}
 			while (it.hasNext()) {
@@ -150,7 +150,8 @@ public class BAMreads extends ReadGroup implements Iterable<SAMRecord> {
 					}
 
 				} catch (RuntimeException ex) {
-					getLog().log(Level.WARNING, "failure in qFast", ex);
+					global().getLog().log(Level.WARNING, "failure in qFast",
+							ex);
 
 				}
 			}

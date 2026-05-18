@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
-import net.sf.jannot.Type;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
@@ -49,8 +48,9 @@ public class TestGFFParser {
 		DataSource ds = DataSourceFactory
 				.create(new Locator(f, global.getLog()), global);
 		EntrySet es = ds.read(new EntrySet(global));
-		double score = es.firstEntry().getMemoryAnnotation(Type.get("gene"))
-				.get(0).getScore();
+		double score = es.firstEntry()
+				.getMemoryAnnotation(global.typeFactory().get("gene")).get(0)
+				.getScore();
 		Assert.assertEquals(0, score, 0.0001);
 	}
 

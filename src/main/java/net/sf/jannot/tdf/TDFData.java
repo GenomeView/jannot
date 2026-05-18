@@ -14,6 +14,7 @@ import org.broad.igv.tdf.TDFTile;
 import org.broad.igv.track.WindowFunction;
 
 import net.sf.jannot.Data;
+import net.sf.jannot.Global;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.pileup.PileNormalization;
 import net.sf.jannot.pileup.PileTools;
@@ -36,16 +37,17 @@ public class TDFData implements Data<Pile>, PileNormalization {
 	private int maxZoom;
 	private TrackType trackType;
 
-	private final Reporter log;
+	private final Global global;
 
 	/**
 	 * @param chr
 	 * @param tr
 	 */
-	public TDFData(String chr, TDFReader tr, Reporter log) {
+	public TDFData(String chr, TDFReader tr, Global global) {
 		this.chr = chr;
 		this.tr = tr;
-		this.log = log;
+		this.global = global;
+		Reporter log = global.getLog();
 		trackType = TrackType.OTHER;
 		try {
 			TrackType.valueOf(tr.getTrackType());
@@ -68,6 +70,7 @@ public class TDFData implements Data<Pile>, PileNormalization {
 		return trackType;
 	}
 
+	@Override
 	public String label() {
 		String out = tr.getLocator().replace('\\', '/');
 		return out.substring(out.lastIndexOf('/') + 1);
@@ -91,11 +94,13 @@ public class TDFData implements Data<Pile>, PileNormalization {
 		if (size < 0) {
 			TDFDataset data = tr.getDataset(chr, 0, wf);
 			this.size = data.getTileWidth();
-			log.log(Level.INFO, "Setting TDF data size to " + this.size);
+			global.getLog().log(Level.INFO,
+					"Setting TDF data size to " + this.size);
 
 		}
-		if (end < 0)
+		if (end < 0) {
 			end = size;
+		}
 		int tmpSize = size;
 		int zoom = 0;
 		while (tmpSize / 2 > (end - start + 1)) {
@@ -115,8 +120,9 @@ public class TDFData implements Data<Pile>, PileNormalization {
 				float[] arr = new float[tft.noValues()];
 				for (int j = 0; j < tft.noValues(); j++) {
 					arr[j] = tft.getValue(j, i);
-					if (Float.isNaN(arr[j]) || Float.isInfinite(arr[j]))
+					if (Float.isNaN(arr[j]) || Float.isInfinite(arr[j])) {
 						arr[j] = 0;
+					}
 				}
 				int s = tft.getStartPosition(i);
 				int e = tft.getEndPosition(i);
@@ -156,8 +162,8 @@ public class TDFData implements Data<Pile>, PileNormalization {
 	}
 
 	@Override
-	public Reporter getLog() {
-		return log;
+	public Global global() {
+		return global;
 	}
 
 }

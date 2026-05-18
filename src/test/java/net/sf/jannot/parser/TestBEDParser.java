@@ -36,7 +36,6 @@ import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
-import net.sf.jannot.Type;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
@@ -50,8 +49,8 @@ import support.DataManager;
  */
 public class TestBEDParser {
 
-	private Global global;
-	private DistributingReporter log;
+	private final Global global;
+	private final DistributingReporter log;
 
 	public TestBEDParser() throws IOException, ReadFailedException {
 		this.global = new Global();
@@ -70,7 +69,7 @@ public class TestBEDParser {
 			count++;
 		}
 		Assert.assertEquals(1, count);
-		Data d = es.firstEntry().get(Type.get("ItemRGBDemo"));
+		Data d = es.firstEntry().get(global.typeFactory().get("ItemRGBDemo"));
 		for (DataKey dk : es.firstEntry()) {
 			System.out.println("Datakey=" + dk);
 		}
@@ -90,7 +89,7 @@ public class TestBEDParser {
 			count++;
 		}
 		Assert.assertEquals(1, count);
-		Data d = es.firstEntry().get(Type.get("barebed.bed"));
+		Data d = es.firstEntry().get(global.typeFactory().get("barebed.bed"));
 		for (DataKey dk : es.firstEntry()) {
 			System.out.println("Datakey=" + dk);
 		}

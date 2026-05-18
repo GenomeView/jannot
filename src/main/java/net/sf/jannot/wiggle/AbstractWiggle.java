@@ -5,8 +5,8 @@ package net.sf.jannot.wiggle;
 
 import java.io.IOException;
 
+import net.sf.jannot.Global;
 import net.sf.jannot.utils.ArrayIterable;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -15,22 +15,18 @@ import tudelft.utilities.logging.Reporter;
  */
 public abstract class AbstractWiggle implements Graph, Query {
 
-	private final Reporter log;
+	private final Global global;
 
 	private FloatCache buffer5 = null;
 
 	private int lastStart = -1, lastEnd = -1, lastRes = -1;
 	private float[] last = null;
 
-	public AbstractWiggle(Reporter log) {
-		this.log = log;
+	public AbstractWiggle(Global global) {
+		this.global = global;
 	}
 
 	@Override
-	public Reporter getLog() {
-		return log;
-	}
-
 	public String label() {
 		return "wiggle";
 	}
@@ -38,10 +34,13 @@ public abstract class AbstractWiggle implements Graph, Query {
 	@Override
 	public float[] get(int start, int end, int resolutionIndex)
 			throws IOException {
-		if (buffer5 == null)
+		if (buffer5 == null) {
 			throw new IOException("Wiggle needs to be initialized");
-		if (lastStart == start && lastEnd == end && lastRes == resolutionIndex)
+		}
+		if (lastStart == start && lastEnd == end
+				&& lastRes == resolutionIndex) {
 			return last;
+		}
 		if (resolutionIndex < 5) {
 			last = getRawRange(start, end);
 
@@ -58,16 +57,23 @@ public abstract class AbstractWiggle implements Graph, Query {
 
 	}
 
+	@Override
+	public Global global() {
+		return global;
+	}
+
 	private float[] merge(float[] ds) {
 		float[] out = new float[(ds.length + 1) / 2];
 		double max = 0;
 		for (int i = 0; i < ds.length - 1; i += 2) {
 			out[i / 2] = (ds[i] + ds[i + 1]) / 2;
-			if (out[i / 2] > max)
+			if (out[i / 2] > max) {
 				max = out[i / 2];
+			}
 		}
-		if (ds.length % 2 == 1)
+		if (ds.length % 2 == 1) {
 			out[out.length - 1] = ds[ds.length - 1];
+		}
 		// for (int i = 0; i < out.length; i++)
 		// out[i] /= max;
 		return out;

@@ -5,8 +5,6 @@ package net.sf.jannot;
 
 import java.util.ArrayList;
 
-import tudelft.utilities.logging.Reporter;
-
 /**
  * Data that is stored in memory in a list of a particular type
  */
@@ -14,14 +12,15 @@ import tudelft.utilities.logging.Reporter;
 public abstract class MemoryListData<T> extends ArrayList<T>
 		implements Data<T> {
 
-	private final Reporter log;
+	private final Global global;
 
-	public MemoryListData(Reporter log) {
-		this.log = log;
+	public MemoryListData(Global global) {
+		this.global = global;
 	}
 
-	public Reporter getLog() {
-		return log;
+	@Override
+	public Global global() {
+		return global;
 	}
 
 	public void addAll(MemoryListData<T> t) {
@@ -30,8 +29,9 @@ public abstract class MemoryListData<T> extends ArrayList<T>
 	}
 
 	public void addAll(Iterable<T> list) {
-		for (T t : list)
+		for (T t : list) {
 			this.add(t);
+		}
 	}
 
 	@Override

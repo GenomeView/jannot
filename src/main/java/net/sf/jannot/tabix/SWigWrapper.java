@@ -6,23 +6,23 @@ package net.sf.jannot.tabix;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import net.sf.jannot.Global;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.pileup.PileNormalization;
 import net.sf.jannot.tabix.codec.SWigCodec;
-import tudelft.utilities.logging.Reporter;
 
 public class SWigWrapper extends TabixWrapper<Pile>
 		implements PileNormalization {
 
 	SWigWrapper(String key, IndexedFeatureFile data, TabIndex idx,
-			Reporter log) {
-		super(key, data, idx, log);
+			Global global) {
+		super(key, data, idx, global);
 	}
 
 	@Override
 	public Iterable<Pile> get(int start, int end) throws IOException {
 		try {
-			return new SWigCodec(data.query(key, start, end), data.getLog());
+			return new SWigCodec(data.query(key, start, end), global());
 		} catch (URISyntaxException e) {
 			throw new IOException("Can't get SWigCodec", e);
 		}

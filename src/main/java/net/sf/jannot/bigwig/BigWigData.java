@@ -15,10 +15,10 @@ import org.broad.igv.bbfile.ZoomDataRecord;
 import org.broad.igv.bbfile.ZoomLevelIterator;
 
 import net.sf.jannot.Data;
+import net.sf.jannot.Global;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.pileup.PileNormalization;
 import net.sf.jannot.pileup.PileTools;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -34,15 +34,15 @@ public class BigWigData implements Data<Pile>, PileNormalization {
 
 	private int[] zoomReductionLevels = null;
 
-	private final Reporter log;
+	private final Global log;
 
 	/**
 	 * @param chr
 	 * @param tr
-	 * @param log
+	 * @param global the {@link Global} vars
 	 */
-	public BigWigData(String chr, BBFileReader tr, Reporter log) {
-		this.log = log;
+	public BigWigData(String chr, BBFileReader tr, Global global) {
+		this.log = global;
 		this.chr = chr;
 		this.tr = tr;
 
@@ -50,7 +50,7 @@ public class BigWigData implements Data<Pile>, PileNormalization {
 		zoomReductionLevels[0] = 5;
 		for (BBZoomLevelHeader header : tr.getZoomLevels()
 				.getZoomLevelHeaders()) {
-			log.log(Level.INFO, "$$" + header.getZoomLevel() + "\t"
+			global.getLog().log(Level.INFO, "$$" + header.getZoomLevel() + "\t"
 					+ header.getReductionLevel());
 			zoomReductionLevels[header.getZoomLevel()] = header
 					.getReductionLevel();
@@ -58,15 +58,17 @@ public class BigWigData implements Data<Pile>, PileNormalization {
 		RPChromosomeRegion b = tr.getChromosomeBounds(tr.getChromosomeID(chr),
 				tr.getChromosomeID(chr));
 		size = b.getEndBase();
-		log.log(Level.INFO,
+		global.getLog().log(Level.INFO,
 				chr + "  " + b.getStartBase() + "  " + b.getEndBase());
 
 	}
 
-	public Reporter getLog() {
+	@Override
+	public Global global() {
 		return log;
 	}
 
+	@Override
 	public String label() {
 		String out = tr.getLocator().toString().replace('\\', '/');
 		return out.substring(out.lastIndexOf('/') + 1);
@@ -76,17 +78,20 @@ public class BigWigData implements Data<Pile>, PileNormalization {
 	@Override
 	public Iterable<Pile> get(int start, int end) {
 		int idx = 0;
-		while ((end - start + 1) / 400 > zoomReductionLevels[idx])
+		while ((end - start + 1) / 400 > zoomReductionLevels[idx]) {
 			idx++;
-		if (idx > 0)
+		}
+		if (idx > 0) {
 			idx--;
+		}
 
 		ArrayList<Pile> out = new ArrayList<Pile>();
 
-		if (idx > 0)
+		if (idx > 0) {
 			fillZoom(out, start, end, idx);
-		else
+		} else {
 			fillWig(out, start, end);
+		}
 
 		return out;
 

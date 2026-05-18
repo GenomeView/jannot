@@ -13,7 +13,6 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Global;
 import net.sf.jannot.MemoryFeatureAnnotation;
-import net.sf.jannot.Type;
 import net.sf.jannot.refseq.MemorySequence;
 import tudelft.utilities.logging.Reporter;
 
@@ -142,7 +141,8 @@ public class GenbankParser extends Parser {
 
 			String[] arr = line.trim().split(" [ ]+");
 			lastFeature = new Feature(ParserTools.parseLocation(arr[1]),
-					Type.get(arr[0]), ParserTools.getStrand(arr[1]));
+					getGlobal().typeFactory().get(arr[0]),
+					ParserTools.getStrand(arr[1]));
 		}
 
 	}

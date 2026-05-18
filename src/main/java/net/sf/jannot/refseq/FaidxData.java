@@ -4,8 +4,8 @@
 package net.sf.jannot.refseq;
 
 import htsjdk.samtools.seekablestream.SeekableStream;
+import net.sf.jannot.Global;
 import net.sf.jannot.refseq.FaidxIndex.IndexEntry;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -21,11 +21,11 @@ public class FaidxData extends Sequence {
 	 * @param index
 	 * @param content
 	 * @param name
-	 * @param log     the {@link Reporter} to user for the data
+	 * @param global     the {@link Global} to user for the data
 	 */
 	public FaidxData(FaidxIndex index, SeekableStream content, String name,
-			Reporter log) {
-		super(log);
+			Global global) {
+		super(global);
 		this.data = content;
 		this.idx = index.get(name);
 

@@ -11,7 +11,6 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
-import net.sf.jannot.Type;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -45,6 +44,10 @@ public abstract class Parser {
 		return global.getLog();
 	}
 
+	/**
+	 * 
+	 * @return the shared instance of {@link Global}
+	 */
 	public Global getGlobal() {
 		return global;
 	}
@@ -86,7 +89,7 @@ public abstract class Parser {
 	 *               required.
 	 */
 	public void write(OutputStream os, Entry entry) throws IOException {
-		write(os, entry, Type.values());
+		write(os, entry, global.typeFactory().values());
 	}
 
 	public void write(OutputStream os, Entry entry, DataKey[] dk)

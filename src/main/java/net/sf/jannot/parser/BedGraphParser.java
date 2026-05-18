@@ -13,14 +13,13 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.wiggle.FloatArrayWiggle;
-import tudelft.utilities.logging.Reporter;
 
 public class BedGraphParser extends Parser {
 
 	/**
 	 * @param global
 	 * @param dataKey
-	 * @param log     the {@link Reporter} to log issues to.
+	 * @param global  the {@link Global} vars.
 	 */
 	public BedGraphParser(DataKey datakey, Global global) {
 		super(datakey, global);
@@ -53,8 +52,8 @@ public class BedGraphParser extends Parser {
 				last = arr[0];
 
 				if (e != null) {
-					e.add(dataKey,
-							new FloatArrayWiggle(values.elements(), getLog()));
+					e.add(dataKey, new FloatArrayWiggle(values.elements(),
+							getGlobal()));
 					getLog().log(Level.INFO,
 							"Adding: " + e + "\t" + values.size());
 					values = new FloatArrayList();

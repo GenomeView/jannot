@@ -4,8 +4,8 @@
 package net.sf.jannot.alignment.maf;
 
 import net.sf.jannot.Data;
+import net.sf.jannot.Global;
 import net.sf.jannot.MemoryListData;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -16,10 +16,10 @@ public class MAFMemoryMultipleAlignment extends AbstractMAFMultipleAlignment {
 	private MemoryListData<AbstractAlignmentBlock> delegate;
 
 	@SuppressWarnings("serial")
-	public MAFMemoryMultipleAlignment(Reporter log) {
-		super(log);
+	public MAFMemoryMultipleAlignment(Global global) {
+		super(global);
 		final Data<AbstractAlignmentBlock> _self = this;
-		delegate = new MemoryListData<AbstractAlignmentBlock>(log) {
+		delegate = new MemoryListData<AbstractAlignmentBlock>(global) {
 			@Override
 			public String label() {
 				return _self.label();

@@ -3,10 +3,10 @@
  */
 package net.sf.jannot.tabix.codec;
 
+import net.sf.jannot.Global;
 import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.ReadDetailPile;
 import net.sf.jannot.tabix.TabixLine;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -17,8 +17,8 @@ public class PileupCodec extends Codec<DoublePile> {
 	/**
 	 * @param in
 	 */
-	public PileupCodec(Iterable<TabixLine> in, Reporter log) {
-		super(in, 15000, log);
+	public PileupCodec(Iterable<TabixLine> in, Global global) {
+		super(in, 15000, global);
 	}
 
 	/*
@@ -29,9 +29,9 @@ public class PileupCodec extends Codec<DoublePile> {
 	@Override
 	public DoublePile parse(TabixLine line) {
 		DoublePile f = lru.get(line);
-		if (f != null)
+		if (f != null) {
 			return f;
-		else {
+		} else {
 			int pos = line.getInt(1);
 //			int coverage = line.getInt(3);
 			byte[] reads = line.get(4).getBytes();

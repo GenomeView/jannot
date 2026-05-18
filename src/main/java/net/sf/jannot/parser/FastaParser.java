@@ -63,24 +63,22 @@ public class FastaParser extends Parser {
 				seq.add(current);
 				description.add(line.substring(1).trim());
 
-				// current.description.setPrimaryAccessionNumber(line.substring(1).split("
-				// ")[0].split("\t")[0]);
-
 			} else {
 				current.append(line);
 			}
 		}
 		if (!forceEntries && likelyMultipleAlign(seq)) {
-			AlignmentAnnotation alignAnnot = new AlignmentAnnotation(getLog());
+			AlignmentAnnotation alignAnnot = new AlignmentAnnotation(
+					getGlobal());
 			Entry ref = set.getOrCreateEntry(names.get(0));
 
 			if (ref != null) {
 				List<Alignment> alist = new ArrayList<Alignment>();
 				ReferenceSequence rs = new ReferenceSequence(seq.get(0),
-						getLog());
+						getGlobal());
 				for (int i = 0; i < seq.size(); i++) {
 					Alignment align = new Alignment(names.get(i),
-							new MemorySequence(seq.get(i), getLog()), rs);
+							new MemorySequence(seq.get(i), getGlobal()), rs);
 					alist.add(align);
 				}
 				alignAnnot.addAll((Iterable<Alignment>) alist);
@@ -89,7 +87,7 @@ public class FastaParser extends Parser {
 		} else {
 			for (int i = 0; i < seq.size(); i++) {
 				Entry e = set.getOrCreateEntry(names.get(i));
-				e.setSequence(new MemorySequence(seq.get(i), getLog()));
+				e.setSequence(new MemorySequence(seq.get(i), getGlobal()));
 			}
 		}
 

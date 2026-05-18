@@ -6,8 +6,8 @@ package net.sf.jannot.wiggle;
 import java.io.IOException;
 import java.util.Iterator;
 
+import net.sf.jannot.Global;
 import net.sf.jannot.picard.BinaryBlob;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -27,8 +27,8 @@ public class DiskArrayWiggle extends AbstractWiggle implements Iterable<Float> {
 	private BinaryBlob blob = null;
 	private int size;
 
-	public DiskArrayWiggle(int size, Reporter log) throws IOException {
-		super(log);
+	public DiskArrayWiggle(int size, Global global) throws IOException {
+		super(global);
 		this.size = size;
 		blob = new BinaryBlob(size * 4);
 
@@ -40,16 +40,20 @@ public class DiskArrayWiggle extends AbstractWiggle implements Iterable<Float> {
 
 	@Override
 	public float[] getRawRange(int start, int end) throws IOException {
-		if (start >= size)
+		if (start >= size) {
 			return new float[0];
+		}
 		float[] out = new float[end - start];
 		int len = out.length;
-		if (start + len > size)
+		if (start + len > size) {
 			len = size - start;
-		if (start < 0)
+		}
+		if (start < 0) {
 			start = 0;
-		for (int i = start; i < end; i++)
+		}
+		for (int i = start; i < end; i++) {
 			out[i - start] = blob.getFloat(i * 4);
+		}
 		return out;
 	}
 

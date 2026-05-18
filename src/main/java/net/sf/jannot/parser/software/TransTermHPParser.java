@@ -43,7 +43,7 @@ public class TransTermHPParser extends Parser {
 	public EntrySet parse(InputStream is, EntrySet set) {
 		LineIterator it = new LineIterator(is);
 		String id = null;
-		Type t = Type.get("TransTermHP");
+		Type t = getGlobal().typeFactory().get("TransTermHP");
 		for (String line : it) {
 			line = line.trim();
 			if (line.startsWith("SEQUENCE")) {

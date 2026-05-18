@@ -4,7 +4,7 @@
 package net.sf.jannot.refseq;
 
 import net.sf.jannot.Data;
-import tudelft.utilities.logging.Reporter;
+import net.sf.jannot.Global;
 
 /**
  * a Data set with {@link Character}s
@@ -14,15 +14,15 @@ import tudelft.utilities.logging.Reporter;
  */
 public abstract class Sequence implements Data<Character> {
 
-	private final Reporter log;
+	private final Global global;
 
-	public Sequence(Reporter log) {
-		this.log = log;
+	public Sequence(Global global) {
+		this.global = global;
 	}
 
 	@Override
-	public Reporter getLog() {
-		return log;
+	public Global global() {
+		return global;
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public abstract class Sequence implements Data<Character> {
 	 * @return
 	 */
 	public Sequence subsequence(int start, int end) {
-		return new SubSequence(this, start, end, getLog());
+		return new SubSequence(this, start, end, global());
 	}
 
 	/**

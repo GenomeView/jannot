@@ -30,7 +30,7 @@ public class BlastM8Parser extends Parser {
 	public EntrySet parse(InputStream is, EntrySet set) {
 		LineIterator it = new LineIterator(is);
 		it.setSkipComments(true);
-		Type t = Type.get("NCBI Blast hit");
+		Type t = getGlobal().typeFactory().get("NCBI Blast hit");
 		for (String line : it) {
 			String[] arr = line.split("\t");
 			int start = Integer.parseInt(arr[6]);

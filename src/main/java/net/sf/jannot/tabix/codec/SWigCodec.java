@@ -3,10 +3,10 @@
  */
 package net.sf.jannot.tabix.codec;
 
+import net.sf.jannot.Global;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.pileup.PileTools;
 import net.sf.jannot.tabix.TabixLine;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -17,16 +17,16 @@ public class SWigCodec extends Codec<Pile> {
 	/**
 	 * @param in
 	 */
-	public SWigCodec(Iterable<TabixLine> in, Reporter log) {
-		super(in, 15000, log);
+	public SWigCodec(Iterable<TabixLine> in, Global global) {
+		super(in, 15000, global);
 	}
 
 	@Override
 	public Pile parse(TabixLine line) {
 		Pile f = lru.get(line);
-		if (f != null)
+		if (f != null) {
 			return f;
-		else {
+		} else {
 			int pos = line.getInt(1);
 			int fcoverage = line.getInt(2);
 			int rcoverage = line.getInt(3);

@@ -4,6 +4,7 @@
 package net.sf.jannot.source;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
@@ -26,11 +27,8 @@ public abstract class DataSource implements Comparable<DataSource> {
 	 * @param global the {@link Global}. Must not be null
 	 */
 	protected DataSource(Locator l, Global global) {
-		if (global == null) {
-			throw new NullPointerException("log must be not null");
-		}
+		this.global = Objects.requireNonNull(global);
 		this.locator = l;
-		this.global = global;
 	}
 
 	@Override

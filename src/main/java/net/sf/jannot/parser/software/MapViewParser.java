@@ -33,7 +33,7 @@ public class MapViewParser extends Parser {
 			Entry entry = set.getOrCreateEntry(arr[1]);
 
 			if (!entry.contains(dataKey)) {
-				entry.add(dataKey, new MemoryReadSet(getLog()));
+				entry.add(dataKey, new MemoryReadSet(getGlobal()));
 			}
 			if (!arr[14].matches(".*[nN].*")) {
 				MemoryReadSet mrs = (MemoryReadSet) entry.get(dataKey);
@@ -45,7 +45,6 @@ public class MapViewParser extends Parser {
 		if (count > 0) {
 			getLog().log(Level.WARNING, "Discarded: " + count
 					+ " short reads because of ambiguity");
-//		set.setMute(false);
 		}
 
 		return set;

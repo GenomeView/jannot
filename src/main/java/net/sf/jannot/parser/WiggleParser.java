@@ -70,7 +70,7 @@ public class WiggleParser extends Parser {
 						if (kv[0].equals("chrom")) {
 							e = set.getOrCreateEntry(kv[1].trim());
 							daw = new TroveArrayWiggle(e.getMaximumLength(),
-									getLog());
+									getGlobal());
 
 						}
 
@@ -99,7 +99,7 @@ public class WiggleParser extends Parser {
 						if (kv[0].equals("chrom")) {
 							e = set.getOrCreateEntry(kv[1].trim());
 							daw = new TroveArrayWiggle(e.getMaximumLength(),
-									getLog());
+									getGlobal());
 						}
 					}
 				} else if (variable) {

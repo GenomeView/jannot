@@ -33,7 +33,7 @@ public class PTTParser extends Parser {
 		LineIterator it = new LineIterator(is);
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
-		Type t = Type.get("protein");
+		Type t = getGlobal().typeFactory().get("protein");
 		for (String line : it) {
 			String[] arr = line.trim().split("\t");
 			try {

@@ -22,7 +22,6 @@ import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
-import net.sf.jannot.Type;
 import net.sf.jannot.refseq.MemorySequence;
 
 /**
@@ -72,7 +71,6 @@ public class EMBLParser extends Parser {
 					processLine(line, entry);
 				} else {
 					String cline = condense(line);
-					// assert(cline.length()==60);
 					seqBuffer.append(cline);
 				}
 
@@ -83,10 +81,6 @@ public class EMBLParser extends Parser {
 		/* output last feature of the file */
 		constructFeature(entry);
 		storeSequence(entry, seqBuffer);
-		// /* Light mode, never encountered an ID line */
-		// if (entry.getID().equals("defaultEMBLentry")) {
-		// set.add(entry);
-		// }
 
 		return set;
 	}
@@ -94,7 +88,7 @@ public class EMBLParser extends Parser {
 	private void storeSequence(Entry entry, StringBuffer seqBuffer) {
 		if (entry != null && seqBuffer.length() > 0) {
 			entry.setSequence(
-					new MemorySequence(seqBuffer.toString(), getLog()));
+					new MemorySequence(seqBuffer.toString(), getGlobal()));
 		}
 		seqBuffer.setLength(0);
 
@@ -148,7 +142,8 @@ public class EMBLParser extends Parser {
 						.parseLocation(location.toString());
 				final Strand s = ParserTools.getStrand(location.toString());
 
-				Feature f = new Feature(l, Type.get(type), s);
+				Feature f = new Feature(l, getGlobal().typeFactory().get(type),
+						s);
 				addQualifiers(qualifiers, f);
 				MemoryFeatureAnnotation fa = entry
 						.getMemoryAnnotation(f.type());
@@ -164,7 +159,6 @@ public class EMBLParser extends Parser {
 	}
 
 	private void addQualifiers(Vector<StringBuffer> qualifiers, Feature f) {
-		// List<Qualifier> out = new Vector<Qualifier>();
 		for (StringBuffer s : qualifiers) {
 			String[] arr = s.toString().split("=");
 			try {
@@ -176,7 +170,6 @@ public class EMBLParser extends Parser {
 
 			}
 		}
-		// return out;
 	}
 
 	private String stripQuotes(String trim) {
@@ -239,7 +232,6 @@ public class EMBLParser extends Parser {
 	}
 
 	private Entry createNewEntry(String idLine, EntrySet set) {
-		// Entry out = new Entry(source);
 		String[] arr = idLine.substring(5).split(";");
 		if (arr.length != 7) {
 			String emergencyID = arr[0].split("\\s+")[0].trim();
@@ -251,11 +243,6 @@ public class EMBLParser extends Parser {
 		}
 		Entry out = set.getOrCreateEntry(arr[0].trim());
 		out.description.put("seqversion", arr[1].substring(3).trim());
-		// if (!arr[2].trim().equals("linear"))
-		// throw new
-		// UnsupportedException("Only linear sequences are supported! Found
-		// "
-		// + arr[2]);
 		out.description.put("moleculeType", arr[3].trim());
 		out.description.put("dataClass", arr[4].trim());
 		out.description.put("taxDivision", arr[5].trim());
@@ -271,7 +258,6 @@ public class EMBLParser extends Parser {
 	public void write(OutputStream os, Entry e, DataKey[] dks) {
 
 		PrintWriter out = new PrintWriter(new OutputStreamWriter(os));
-		// if (source == null || source.equals(e.defaultSource)) {
 		/* ID line */
 		out.println("ID" + spacer + e.getID() + "; SV "
 				+ e.description.get("seqversion") + "; linear; "
@@ -320,18 +306,9 @@ public class EMBLParser extends Parser {
 			out.println("KW" + spacer + e.description.get("kw"));
 			out.println("XX");
 		}
-		// }
 		/* Feature header */
 		out.println("FH   Key             Location/Qualifiers");
 		out.println("FH");
-		// for (Type t : Type.values()) {
-		// for (Feature f : e.annotation.getByType(t)) {
-		// if (source == null | f.getSource().equals(source))
-		// out.println(line(f));
-		//
-		// }
-		//
-		// }
 		for (DataKey data : dks) {
 			if (e.get(data) instanceof FeatureAnnotation) {
 				MemoryFeatureAnnotation fa = e.getMemoryAnnotation(data);
@@ -343,7 +320,6 @@ public class EMBLParser extends Parser {
 		}
 		out.println("XX");
 		if (storeSequence) {
-			// if (source == null || source.equals(e.defaultSource)) {
 			out.println("SQ   Sequence " + e.sequence().size()
 					+ " BP ; 0 A; 0 C; 0 G; 0 T; 0 other;");
 			char[] line = new char[80];
@@ -351,7 +327,6 @@ public class EMBLParser extends Parser {
 				line[i] = ' ';
 			}
 			int pos = 0;
-			// for (int i = 1; i <= e.sequence().size(); i++) {
 			int idx = 1;
 			for (char c : e.sequence().get()) {
 				line[pos++] = c;// e.sequence().getNucleotide(i);

@@ -16,7 +16,6 @@ import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
-import net.sf.jannot.Type;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.mafix.IndexedMAF;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
@@ -80,11 +79,10 @@ public class IndexedMAFDataSource extends DataSource {
 		}
 
 		try {
-			IndexedMAF maf = new IndexedMAF(content, iis, getLog());
+			IndexedMAF maf = new IndexedMAF(content, iis, getGlobal());
 			// System.out.println("Reading MAF: ");
 
 			for (String name : maf.getNames()) {
-				// System.out.println("Adding individual chroms: "+name);
 				String[] nameParts = name.split("\\.");
 
 				// the chromosome name is probably the last part
@@ -99,10 +97,8 @@ public class IndexedMAFDataSource extends DataSource {
 				} else {
 					e = set.getOrCreateEntry(name);
 				}
-				IndexedMAF idxMaf = new IndexedMAF(name, maf, getLog());
-				// System.out.println("Adding MAF:
-				// "+content+"\t"+idxMaf+"\t"+idxMaf.getClass());
-				e.add(Type.get(data.toString()), idxMaf);
+				IndexedMAF idxMaf = new IndexedMAF(name, maf, getGlobal());
+				e.add(global.typeFactory().get(data.toString()), idxMaf);
 			}
 
 		} catch (Exception ex) {

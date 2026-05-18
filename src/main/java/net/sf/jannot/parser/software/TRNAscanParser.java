@@ -47,7 +47,7 @@ public class TRNAscanParser extends Parser {
 		it.next();
 		it.next();
 		it.next();
-		Type t = Type.get("tRNA");
+		Type t = getGlobal().typeFactory().get("tRNA");
 		for (String line : it) {
 			String[] arr = line.split("[ \t]+");
 			Entry e = set.getOrCreateEntry(arr[0]);

@@ -86,10 +86,10 @@ public class SequenceTools {
 			// System.out.println("exon: "+x.toString());
 
 		}
-		Sequence sq = new MemorySequence(out, seq.getLog());
+		Sequence sq = new MemorySequence(out, seq.global());
 		if (feat.strand() == Strand.REVERSE) {
 			sq = SequenceTools
-					.reverseComplement(new MemorySequence(out, seq.getLog()));
+					.reverseComplement(new MemorySequence(out, seq.global()));
 		}
 
 		return sq;
@@ -107,7 +107,7 @@ public class SequenceTools {
 			buffer.append(SequenceTools.complement(c));
 		}
 		buffer.reverse();
-		return new MemorySequence(buffer, sequence.getLog());
+		return new MemorySequence(buffer, sequence.global());
 	}
 
 }

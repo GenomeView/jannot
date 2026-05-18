@@ -36,12 +36,12 @@ public class VCFParser extends Parser {
 	 * @param global  the {@link Reporter} to log issues to
 	 */
 	VCFParser(String fileName, Global global) {
-		super(getType(fileName), global);
+		super(getType(fileName, global), global);
 	}
 
-	private static Type getType(String fileName) {
+	private static Type getType(String fileName, Global global) {
 		String[] arr = fileName.replace('\\', '/').split("/");
-		return Type.get(arr[arr.length - 1]);
+		return global.typeFactory().get(arr[arr.length - 1]);
 
 	}
 
@@ -112,7 +112,8 @@ public class VCFParser extends Parser {
 				}
 
 				final Feature f = new Feature(new Location(start, end),
-						Type.get(variation.toString()), Strand.UNKNOWN);
+						getGlobal().typeFactory().get(variation.toString()),
+						Strand.UNKNOWN);
 				f.addQualifier("id", id);
 				f.addQualifier("ref", ref);
 				f.addQualifier("alt", alt);

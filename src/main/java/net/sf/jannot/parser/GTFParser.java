@@ -24,7 +24,6 @@ import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
-import net.sf.jannot.Type;
 
 /**
  * 
@@ -84,7 +83,8 @@ public class GTFParser extends Parser {
 					// case '.', '?': UNKNOWN
 					}
 
-					Feature f = new Feature(l, Type.get(arr[2]), str);
+					Feature f = new Feature(l,
+							getGlobal().typeFactory().get(arr[2]), str);
 
 					f.addQualifier("source", arr[1]);
 					if (!(arr[5].length() == 1 && arr[5].charAt(0) == '.')

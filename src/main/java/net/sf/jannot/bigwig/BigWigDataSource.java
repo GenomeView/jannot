@@ -69,7 +69,7 @@ public class BigWigDataSource extends DataSource {
 			chrs.add(s);
 			Entry e = set.getOrCreateEntry(s);
 			e.add(new StringKey(tr.getLocator().toString()),
-					new BigWigData(s, tr, getLog()));
+					new BigWigData(s, tr, getGlobal()));
 		}
 		return set;
 	}

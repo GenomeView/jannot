@@ -7,8 +7,8 @@ import java.io.IOException;
 
 import net.sf.jannot.Data;
 import net.sf.jannot.DensityEstimate;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * abstract wrapper for density-like data like {@link FeatureWrapper},
@@ -22,20 +22,22 @@ public abstract class TabixWrapper<T> implements Data<T>, DensityEstimate {
 	protected final String key;
 	protected final IndexedFeatureFile data;
 	protected final TabIndex idx;
-	private final Reporter log;
+	private final Global global;
 
 	TabixWrapper(String key, IndexedFeatureFile data, TabIndex idx,
-			Reporter log) {
-		this.log = log;
+			Global global) {
+		this.global = global;
 		this.data = data;
 		this.key = key;
 		this.idx = idx;
 	}
 
-	public Reporter getLog() {
-		return log;
+	@Override
+	public Global global() {
+		return global;
 	}
 
+	@Override
 	public String label() {
 		String s = data.source();
 		int bIndx = s.lastIndexOf('\\');
@@ -45,6 +47,7 @@ public abstract class TabixWrapper<T> implements Data<T>, DensityEstimate {
 
 	}
 
+	@Override
 	public boolean canSave() {
 		return false;
 	}
@@ -68,10 +71,12 @@ public abstract class TabixWrapper<T> implements Data<T>, DensityEstimate {
 		long min = Long.MAX_VALUE;
 		for (int i = 0; i < idx.linIndex[tid].size(); i++) {
 			long val = idx.linIndex[tid].get(i) >> 16;
-			if (val > 0 && val < min)
+			if (val > 0 && val < min) {
 				min = val;
-			if (val > max)
+			}
+			if (val > max) {
 				max = val;
+			}
 		}
 
 		double fraction = l.length() / (double) getMaximumCoordinate();

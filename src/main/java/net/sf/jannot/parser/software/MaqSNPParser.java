@@ -43,7 +43,7 @@ public class MaqSNPParser extends Parser {
 		LineIterator it = new LineIterator(is);
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
-		Type t = Type.get("SNP");
+		Type t = getGlobal().typeFactory().get("SNP");
 
 		for (String line : it) {
 			String[] arr = line.split("\t");

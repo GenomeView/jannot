@@ -62,14 +62,13 @@ public class ALNParser extends Parser {
 			ReferenceSequence rs = new ReferenceSequence(
 					(MemorySequence) list.get(0).sequence());
 			for (int i = 0; i < list.size(); i++) {
-				// System.out.println(list.get(i).getID());
 				Alignment align = new Alignment(list.get(i).getID(),
 						(MemorySequence) list.get(i).sequence(), rs);
 				alist.add(align);
 				getLog().log(Level.INFO, "adding alignment: " + align);
 			}
-			// ref.alignment.addAll(alist);
-			AlignmentAnnotation alignAnnot = new AlignmentAnnotation(getLog());
+			AlignmentAnnotation alignAnnot = new AlignmentAnnotation(
+					getGlobal());
 			ref.add(dataKey, alignAnnot);
 			alignAnnot.addAll((Iterable<Alignment>) alist);
 

@@ -10,11 +10,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 
+import net.sf.jannot.Global;
 import net.sf.jannot.Strand;
 import net.sf.jannot.picard.LineBlockCompressedInputStream;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.utils.SequenceTools;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -24,27 +24,24 @@ import tudelft.utilities.logging.Reporter;
  */
 public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 
-	private long offsetStart;
+	private final long offsetStart;
 
-	private LineBlockCompressedInputStream zr;
+	private final LineBlockCompressedInputStream zr;
 
-	private ArrayList<AbstractAlignmentSequence> list = new ArrayList<AbstractAlignmentSequence>();
+	private final ArrayList<AbstractAlignmentSequence> list = new ArrayList<AbstractAlignmentSequence>();
 
-	private final Reporter log;
+	private final Global global;
 
 	public LazyAlignmentBlock(long offsetStart,
 			LineBlockCompressedInputStream zr, int start, int end,
-			Reporter log) {
+			Global global) {
 		super(start, end);
 		this.offsetStart = offsetStart;
 		this.zr = zr;
-		this.log = log;
+		this.global = global;
 	}
 
-	public Reporter getLog() {
-		return log;
-	}
-
+	@Override
 	public void add(AbstractAlignmentSequence as) {
 		list.add(as);
 	}
@@ -56,8 +53,9 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 	 * gaps in the alignment sequences
 	 */
 	public synchronized void lazyLoad() {
-		if (list.size() == 0 || lazyLoading)
+		if (list.size() == 0 || lazyLoading) {
 			return;
+		}
 		lazyLoading = true;
 
 		// make a mapping id -> alignment sequence
@@ -69,9 +67,7 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 		try {
 			zr.seek(offsetStart);
 			String line = zr.readLine();
-			// System.err.println("Processing block");
 			while (!line.startsWith("#") && !line.isEmpty()) {
-				// System.err.println("\t" + line);
 				String[] cols = line.split("\\s+");
 				if (cols.length == 7) {
 					String type = cols[0];
@@ -81,9 +77,8 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 								.get(id);
 
 						if (alSeq != null) {
-//							System.err.println("Loading sequence for: " + id);
 							MemorySequence seq = new MemorySequence(cols[6],
-									getLog());
+									global);
 							alSeq.noNucleotides = Integer.parseInt(cols[3]);
 							int startNuc = Integer.parseInt(cols[2]);
 							int totalLength = Integer.parseInt(cols[5]);
@@ -101,7 +96,8 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 
 //							list.add(alSeq);
 						} else {
-							log.log(Level.WARNING, "LAS is not in map: " + id);
+							global.getLog().log(Level.WARNING,
+									"LAS is not in map: " + id);
 						}
 					}
 				}
@@ -109,38 +105,21 @@ public class LazyAlignmentBlock extends AbstractAlignmentBlock {
 			}
 
 		} catch (NumberFormatException | IOException e) {
-			log.log(Level.WARNING, "lazy load failed", e);
+			global.getLog().log(Level.WARNING, "lazy load failed", e);
 		}
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Iterable#iterator()
-	 */
 	@Override
 	public Iterator<AbstractAlignmentSequence> iterator() {
 		return list.iterator();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.jannot.alignment.maf.AbstractAlignmentBlock#getAlignmentSequence
-	 * (int)
-	 */
 	@Override
 	public AbstractAlignmentSequence getAlignmentSequence(int i) {
 		return list.get(i);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.alignment.maf.AbstractAlignmentBlock#size()
-	 */
 	@Override
 	public int size() {
 		return list.size();

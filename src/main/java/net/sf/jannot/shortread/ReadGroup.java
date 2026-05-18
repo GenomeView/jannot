@@ -5,7 +5,7 @@ package net.sf.jannot.shortread;
 
 import htsjdk.samtools.SAMRecord;
 import net.sf.jannot.Data;
-import tudelft.utilities.logging.Reporter;
+import net.sf.jannot.Global;
 
 /**
  * 
@@ -14,10 +14,10 @@ import tudelft.utilities.logging.Reporter;
  */
 public abstract class ReadGroup implements Data<SAMRecord> {
 
-	private final Reporter log;
+	private final Global global;
 
-	public ReadGroup(Reporter log) {
-		this.log = log;
+	public ReadGroup(Global global) {
+		this.global = global;
 	}
 
 	/**
@@ -48,6 +48,7 @@ public abstract class ReadGroup implements Data<SAMRecord> {
 	 */
 	public abstract int getPairLength();
 
+	@Override
 	public boolean canSave() {
 		return false;
 	}
@@ -58,7 +59,8 @@ public abstract class ReadGroup implements Data<SAMRecord> {
 	 */
 	public abstract SAMRecord getFirstRead(SAMRecord second);
 
-	public Reporter getLog() {
-		return log;
+	@Override
+	public Global global() {
+		return global;
 	}
 }

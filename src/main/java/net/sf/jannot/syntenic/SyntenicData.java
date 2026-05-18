@@ -10,8 +10,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import net.sf.jannot.Data;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * Contains Syntenic Data which is just a set of {@link SyntenicBlock}s. Work in
@@ -22,15 +22,15 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	private final List<SyntenicBlock> data = new ArrayList<>();
 	// the range (Location) of the IDs found in data. LinkedHashMap to fix order
 	private final Map<String, Location> range = new LinkedHashMap<>();
-	private final Reporter log;
+	private final Global global;
 
 	/**
 	 * 
 	 * @param d             the data. List to fix the order for visualization
 	 * @param referencename the name of the reference. U
 	 */
-	public SyntenicData(List<SyntenicBlock> d, Reporter log) {
-		this.log = Objects.requireNonNull(log);
+	public SyntenicData(List<SyntenicBlock> d, Global global) {
+		this.global = Objects.requireNonNull(global);
 		this.data.addAll(Objects.requireNonNull(d));
 		for (SyntenicBlock b : data) {
 			extendRange(b.reference(), b.refLocation());
@@ -39,8 +39,8 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	}
 
 	@Override
-	public Reporter getLog() {
-		return log;
+	public Global global() {
+		return global;
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class SyntenicData implements Data<SyntenicBlock> {
 	public SyntenicData get(String name) {
 		return new SyntenicData(data.stream().filter(
 				d -> d.reference().equals(name) | d.target().equals(name))
-				.collect(Collectors.toList()), log);
+				.collect(Collectors.toList()), global);
 	}
 
 	/**

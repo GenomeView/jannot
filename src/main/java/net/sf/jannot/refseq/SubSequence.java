@@ -3,7 +3,7 @@
  */
 package net.sf.jannot.refseq;
 
-import tudelft.utilities.logging.Reporter;
+import net.sf.jannot.Global;
 
 /**
  * @author Thomas Abeel
@@ -19,8 +19,8 @@ public class SubSequence extends Sequence {
 	 * @param start
 	 * @param end
 	 */
-	public SubSequence(Sequence s, int start, int end, Reporter log) {
-		super(log);
+	public SubSequence(Sequence s, int start, int end, Global global) {
+		super(global);
 		this.seq = s;
 		this.start = start;
 		this.end = end;

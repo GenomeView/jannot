@@ -17,7 +17,6 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.StringKey;
-import net.sf.jannot.Type;
 import net.sf.jannot.picard.LineBlockCompressedInputStream;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
@@ -530,21 +529,21 @@ public class IndexedFeatureFile extends DataSource {
 			/* This should be done better, but for now I have no idea how */
 			if (data.isPileup()) {
 				e.add(new StringKey(data.toString()),
-						new PileupWrapper(name, this, idx, getLog()));
+						new PileupWrapper(name, this, idx, getGlobal()));
 			} else if (data.toString().toLowerCase().contains(".swig")
 					|| data.toString().toLowerCase().contains(".tab")
 					|| data.toString().toLowerCase().contains(".tsv")) {
 				e.add(new StringKey(data.toString()),
-						new SWigWrapper(name, this, idx, getLog()));
+						new SWigWrapper(name, this, idx, getGlobal()));
 			} else if (data.toString().toLowerCase().contains(".bed")) {
-				e.add(Type.get(data.toString()),
-						new BEDWrapper(name, this, idx, getLog()));
+				e.add(getGlobal().typeFactory().get(data.toString()),
+						new BEDWrapper(name, this, idx, getGlobal()));
 			} else if (data.toString().toLowerCase().contains(".gff")) {
-				e.add(Type.get(data.toString()),
-						new GFFWrapper(name, this, idx, getLog()));
+				e.add(getGlobal().typeFactory().get(data.toString()),
+						new GFFWrapper(name, this, idx, getGlobal()));
 			} else if (data.isVCF()) {
-				e.add(Type.get(data.toString()),
-						new VCFWrapper(name, this, idx, getLog()));
+				e.add(getGlobal().typeFactory().get(data.toString()),
+						new VCFWrapper(name, this, idx, getGlobal()));
 			} else {
 				global.getLog().log(Level.SEVERE,
 						"Don't now how to read this file, can't figure out the type: "

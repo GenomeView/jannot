@@ -73,7 +73,7 @@ public class TDFDataSource extends DataSource {
 		for (String chr : chrs) {
 			Entry e = set.getOrCreateEntry(chr);
 			e.add(new StringKey(tr.getLocator()),
-					new TDFData(chr, tr, getLog()));
+					new TDFData(chr, tr, getGlobal()));
 
 		}
 

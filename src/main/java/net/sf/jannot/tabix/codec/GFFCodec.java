@@ -8,12 +8,11 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 
 import net.sf.jannot.Feature;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
-import net.sf.jannot.Type;
 import net.sf.jannot.tabix.FeatureWrapper;
 import net.sf.jannot.tabix.TabixLine;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -28,8 +27,8 @@ public class GFFCodec extends Codec<Feature> {
 	 * @param in
 	 */
 	public GFFCodec(FeatureWrapper wrapper, Iterable<TabixLine> in,
-			Reporter log) {
-		super(in, 1024, log);
+			Global global) {
+		super(in, 1024, global);
 		this.wrapper = wrapper;
 	}
 
@@ -57,7 +56,8 @@ public class GFFCodec extends Codec<Feature> {
 				// case '.' '?' and default:
 				}
 
-				f = new Feature(tmp, Type.get(line.get(2)), str);
+				f = new Feature(tmp, global.typeFactory().get(line.get(2)),
+						str);
 //				f.setLocation(tmp);
 				f.addQualifier("source", line.get(1));
 				String five = line.get(5);

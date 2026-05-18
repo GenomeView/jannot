@@ -38,7 +38,7 @@ public class SIPHTParser extends Parser {
 		LineIterator it = new LineIterator(is);
 		it.setSkipBlanks(true);
 		String id = null;
-		Type t = Type.get("SIPHT");
+		Type t = getGlobal().typeFactory().get("SIPHT");
 		int count = 0;
 		while (it.hasNext() && count < 1) {
 			if (it.next().startsWith("~")) {

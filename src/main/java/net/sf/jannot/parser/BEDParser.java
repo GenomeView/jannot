@@ -53,13 +53,14 @@ public class BEDParser extends Parser {
 				getLog().log(Level.INFO, BEDTools.parseTrack(line).toString());
 				getLog().log(Level.INFO, "NAME: " + name);
 				if (name != null) {
-					type = Type.get(name);
+					type = getGlobal().typeFactory().get(name);
 				}
 				continue;
 			} else if (line.startsWith("browser")) {
 				continue;
 			}
-			Feature f = BEDTools.parseLine(line, type, defaultType);
+			Feature f = BEDTools.parseLine(line, type, defaultType,
+					getGlobal().typeFactory());
 			MemoryFeatureAnnotation fa = set
 					.getOrCreateEntry(f.qualifier("chrom"))
 					.getMemoryAnnotation(f.type());// (FeatureAnnotation)

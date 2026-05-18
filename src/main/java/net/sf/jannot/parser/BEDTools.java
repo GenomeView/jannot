@@ -16,6 +16,7 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
+import net.sf.jannot.TypeFactory;
 
 /**
  * @author Thomas Abeel
@@ -33,17 +34,17 @@ public class BEDTools {
 	 * @return
 	 */
 	public static Feature parseLine(final String line, Type type,
-			final String defaultType) {
+			final String defaultType, final TypeFactory tf) {
 		/* Any other lines */
 		final String[] arr = line.split("\t");
 		if (type == null) {
 			if (defaultType != null) {
-				type = Type.get(defaultType);
+				type = tf.get(defaultType);
 			} else {
 				if (arr.length == 12) {
-					type = Type.get("CDS");
+					type = tf.get("CDS");
 				} else {
-					type = Type.get("BED");
+					type = tf.get("BED");
 				}
 			}
 		}

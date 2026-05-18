@@ -151,7 +151,7 @@ public class SAMDataSource extends DataSource {
 			SAMSequenceRecord org = inputSam.getFileHeader().getSequence(i);
 			Entry e = set.getOrCreateEntry(org.getSequenceName());
 			e.add(getSourceKey(),
-					new BAMreads(this, org.getSequenceName(), getLog()));
+					new BAMreads(this, org.getSequenceName(), getGlobal()));
 
 		}
 		return set;

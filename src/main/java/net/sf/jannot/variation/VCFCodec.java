@@ -3,10 +3,10 @@
  */
 package net.sf.jannot.variation;
 
+import net.sf.jannot.Global;
 import net.sf.jannot.tabix.TabixLine;
 import net.sf.jannot.tabix.VCFWrapper;
 import net.sf.jannot.tabix.codec.Codec;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * @author Thomas Abeel
@@ -19,9 +19,8 @@ public class VCFCodec extends Codec<Variation> {
 	/**
 	 * @param in
 	 */
-	public VCFCodec(VCFWrapper vcfWrapper, Iterable<TabixLine> in,
-			Reporter log) {
-		super(in, 1024, log);
+	public VCFCodec(VCFWrapper vcfWrapper, Iterable<TabixLine> in, Global global) {
+		super(in, 1024, global);
 		this.wrapper = vcfWrapper;
 	}
 

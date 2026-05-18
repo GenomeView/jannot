@@ -89,7 +89,7 @@ public class SyntenicParser extends Parser {
 //			// FIXME set.getOrCreateEntry(arr[4], source);
 
 		}
-		final SyntenicData data = new SyntenicData(blocks, getLog());
+		final SyntenicData data = new SyntenicData(blocks, getGlobal());
 
 		// add this data to ALL relevant Entry's
 		for (String ref : data.getReferences()) {

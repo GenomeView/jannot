@@ -3,12 +3,14 @@
  */
 package net.sf.jannot.utils;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 import junit.framework.Assert;
+import net.sf.jannot.Global;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.refseq.MemorySequence;
-import tudelft.utilities.logging.ReportToLogger;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -17,12 +19,15 @@ import tudelft.utilities.logging.Reporter;
  */
 public class TestSequenceTools {
 
-	private Reporter log = new ReportToLogger(
-			TestSequenceTools.class.getSimpleName());
+	private final Global global;
+
+	public TestSequenceTools() throws IOException, ReadFailedException {
+		global = new Global();
+	}
 
 	@Test
 	public void testReverseComplementSmall() {
-		MemorySequence a = new MemorySequence(log);
+		MemorySequence a = new MemorySequence(global);
 		a.setSequence("AACCGGTTACTGACTG");
 		MemorySequence b = (MemorySequence) SequenceTools.reverseComplement(a);
 		for (int i = 1; i <= 16; i++) {
@@ -35,7 +40,7 @@ public class TestSequenceTools {
 
 	@Test
 	public void testReverseComplementOdd() {
-		MemorySequence a = new MemorySequence(log);
+		MemorySequence a = new MemorySequence(global);
 		a.setSequence("AACCGGTTACTGACT");
 		MemorySequence b = (MemorySequence) SequenceTools.reverseComplement(a);
 		for (int i = 1; i <= 15; i++) {

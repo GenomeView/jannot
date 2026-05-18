@@ -5,9 +5,9 @@ package net.sf.jannot.refseq;
 
 import cern.colt.list.ByteArrayList;
 import net.sf.jannot.AminoAcidMapping;
+import net.sf.jannot.Global;
 import net.sf.jannot.utils.ArrayIterable;
 import net.sf.jannot.utils.SequenceTools;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * A (mutable) sequence (list of chars) in memory
@@ -17,8 +17,8 @@ public class MemorySequence extends Sequence {
 	private DefaultByteArrayList sequence = new DefaultByteArrayList(
 			(byte) 0xff);
 
-	public MemorySequence(Reporter log) {
-		super(log);
+	public MemorySequence(Global global) {
+		super(global);
 	}
 
 	/**
@@ -27,24 +27,25 @@ public class MemorySequence extends Sequence {
 	 * @param sequence sequence to make a copy of
 	 */
 	public MemorySequence(MemorySequence sequence) {
-		super(sequence.getLog());
+		super(sequence.global());
 		this.sequence = sequence.sequence.copy();
 		this.size = sequence.size;
 	}
 
-	public MemorySequence(String string, Reporter log) {
-		this(new StringBuffer(string), log);
+	public MemorySequence(String string, Global global) {
+		this(new StringBuffer(string), global);
 	}
 
-	public MemorySequence(StringBuffer string, Reporter log) {
-		super(log);
+	public MemorySequence(StringBuffer string, Global global) {
+		super(global);
 		setSequence(string);
 	}
 
 	@Deprecated
 	public char getNucleotide(int index) {
-		if (index < 1 || index > size())
+		if (index < 1 || index > size()) {
 			return '_';
+		}
 		return get(index - 1);
 
 	}
@@ -87,12 +88,14 @@ public class MemorySequence extends Sequence {
 
 		@Override
 		public byte get(int index) {
-			if (index >= 0 && index < super.size)
+			if (index >= 0 && index < super.size) {
 				return super.get(index);
-			else
+			} else {
 				return def;
+			}
 		}
 
+		@Override
 		public DefaultByteArrayList copy() {
 			return new DefaultByteArrayList(super.elements, this.def);
 		}
@@ -154,11 +157,13 @@ public class MemorySequence extends Sequence {
 		if (pos % 2 == 1) {
 			coded <<= 4;
 
-		} else
+		} else {
 			mask <<= 4;
+		}
 
-		if (sequence.size() <= pos / 2)
+		if (sequence.size() <= pos / 2) {
 			sequence.setSize(sequence.size() + 1);
+		}
 
 		int current = sequence.get(pos / 2);
 		current &= mask;
@@ -191,6 +196,7 @@ public class MemorySequence extends Sequence {
 		setSequence(new StringBuffer(sequence));
 	}
 
+	@Override
 	public int size() {
 		return size;
 	}

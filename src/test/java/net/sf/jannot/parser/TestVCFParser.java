@@ -29,7 +29,6 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Global;
 import net.sf.jannot.MemoryFeatureAnnotation;
-import net.sf.jannot.Type;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
@@ -65,7 +64,7 @@ public class TestVCFParser {
 			count++;
 		}
 		Assert.assertEquals(1, count);
-		Data d = es.firstEntry().get(Type.get("tiny.vcf"));
+		Data d = es.firstEntry().get(global.typeFactory().get("tiny.vcf"));
 		for (DataKey dk : es.firstEntry()) {
 			System.out.println("Datakey=" + dk);
 
@@ -95,7 +94,7 @@ public class TestVCFParser {
 			count++;
 		}
 		Assert.assertEquals(1, count);
-		Data d = es.firstEntry().get(Type.get("regular.vcf"));
+		Data d = es.firstEntry().get(global.typeFactory().get("regular.vcf"));
 		for (DataKey dk : es.firstEntry()) {
 			System.out.println("Datakey=" + dk);
 

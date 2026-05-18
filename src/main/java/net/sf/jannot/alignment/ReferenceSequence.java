@@ -4,8 +4,8 @@
 
 package net.sf.jannot.alignment;
 
+import net.sf.jannot.Global;
 import net.sf.jannot.refseq.MemorySequence;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * Sequence that can be used as reference for multiple alignments.
@@ -17,8 +17,8 @@ public class ReferenceSequence extends MemorySequence {
 	private int refGapCount;
 	private int[] mapping = null;
 
-	public ReferenceSequence(StringBuffer sequence, Reporter log) {
-		super(sequence, log);
+	public ReferenceSequence(StringBuffer sequence, Global global) {
+		super(sequence, global);
 		calculateMapping();
 	}
 
@@ -90,9 +90,10 @@ public class ReferenceSequence extends MemorySequence {
 			return mapping[mapping.length - 1];
 //			throw new IllegalArgumentException((position-1)+"\t"+mapping.length);
 		}
-		if (mapping[position - 1] == 0)
+		if (mapping[position - 1] == 0) {
 			System.err.println("ref2aln: " + (position - 1) + "\t"
 					+ mapping[position - 1]);
+		}
 		return mapping[position - 1];
 	}
 

@@ -51,21 +51,15 @@ public class BroadSolexa extends Parser {
 					 */
 					String[] arr3 = arr[3].split("\\.");
 					mapStart = Integer.parseInt(arr3[1]);
-//					forward = arr[2].equals("fw");
 
 					entry = set.getOrCreateEntry(arr3[0]);
-//					if(entry.shortReads.getReadGroup(source)==null){
-//						entry.shortReads.add(source, new MemoryReadSet());
-//					}
 					if (entry == null) {
 						throw new ParserError(
 								"There is no reference sequence loaded for this short read: "
 										+ arr[3]);
-						// current.description.setPrimaryAccessionNumber(line.substring(1).split("
-						// ")[0].split("\t")[0]);
 					}
 					if (!entry.contains(dataKey)) {
-						entry.add(dataKey, new MemoryReadSet(getLog()));
+						entry.add(dataKey, new MemoryReadSet(getGlobal()));
 					}
 				} catch (Exception e) {
 					getLog().log(Level.SEVERE, "Failed to parse " + is
@@ -74,15 +68,6 @@ public class BroadSolexa extends Parser {
 				}
 			} else {
 				MemoryReadSet mrs = (MemoryReadSet) entry.get(dataKey);
-				// if(forward)
-				// FIXME mrs.add(new BasicShortRead(line.toCharArray(),
-				// mapStart, forward));
-				// else
-				// FIXME mrs.add(new
-				// BasicShortRead(SequenceTools.reverseComplement(new
-				// MemorySequence(new
-				// StringBuffer(line))).getSequence().toCharArray(), mapStart,
-				// forward));
 			}
 		}
 //		set.setMute(false);

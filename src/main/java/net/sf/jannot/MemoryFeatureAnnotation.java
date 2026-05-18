@@ -3,8 +3,6 @@
  */
 package net.sf.jannot;
 
-import tudelft.utilities.logging.Reporter;
-
 /**
  * 
  * 
@@ -17,8 +15,8 @@ import tudelft.utilities.logging.Reporter;
 public class MemoryFeatureAnnotation extends MemoryListData<Feature>
 		implements FeatureAnnotation {
 
-	public MemoryFeatureAnnotation(Reporter log) {
-		super(log);
+	public MemoryFeatureAnnotation(Global global) {
+		super(global);
 	}
 
 	@Override

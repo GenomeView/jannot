@@ -13,7 +13,6 @@ import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
-import net.sf.jannot.Type;
 
 /**
  * 
@@ -66,7 +65,7 @@ public class TBLParser extends Parser {
 						Strand str = s > t ? Strand.REVERSE : Strand.FORWARD;
 
 						currentF = new Feature(new Location(s, t),
-								Type.get(arr[2]), str);
+								getGlobal().typeFactory().get(arr[2]), str);
 						MemoryFeatureAnnotation fa = current
 								.getMemoryAnnotation(currentF.type());
 						fa.add(currentF);

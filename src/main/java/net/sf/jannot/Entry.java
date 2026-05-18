@@ -110,8 +110,6 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 		if (!data.containsKey(key)) {
 			data.put(key, newData);
-			// if (newData instanceof AlignmentAnnotation)
-			// align = (AlignmentAnnotation) newData;
 		}
 		// else {
 		// FIXME implement for feature data
@@ -162,7 +160,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	 */
 	public MemoryFeatureAnnotation getMemoryAnnotation(DataKey type) {
 		if (!data.containsKey(type)) {
-			this.add(type, new MemoryFeatureAnnotation(global.getLog()));
+			this.add(type, new MemoryFeatureAnnotation(global));
 		}
 		Data<?> tmp = this.get(type);
 		if (tmp instanceof MemoryFeatureAnnotation) {
@@ -179,7 +177,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	 */
 	public Sequence sequence() {
 		if (!data.containsKey(seqKey)) {
-			data.put(seqKey, new MemorySequence(global.getLog()));
+			data.put(seqKey, new MemorySequence(global));
 		}
 		return (Sequence) data.get(seqKey);
 	}

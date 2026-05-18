@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.logging.Level;
 
@@ -27,7 +28,6 @@ import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
-import net.sf.jannot.Type;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.source.DataSource;
 
@@ -113,7 +113,7 @@ public class DAS extends DataSource {
 			SAXException, IOException, URISyntaxException {
 		StringBuffer seq = this.getSequence(ref, ep);
 		Entry out = set.getOrCreateEntry(ref + ":" + ep);
-		out.setSequence(new MemorySequence(seq, getLog()));
+		out.setSequence(new MemorySequence(seq, getGlobal()));
 		getLog().log(Level.INFO, "Ref: " + ref);
 
 		for (String source : this.getDSN().getSources(ref)) {
@@ -126,89 +126,11 @@ public class DAS extends DataSource {
 
 	}
 
-	private static class FeatureParser extends DefaultHandler {
-		private Stack<String> parserStack = new Stack<String>();
-		private String featureID = null;
-		private String typeID = null;
-		private int end;
-		private int start;
-		private String methodID;
-		private char strand;
-		private double score;
-
-		@Override
-		public void characters(char[] ch, int st, int length)
-				throws SAXException {
-			super.characters(ch, st, length);
-			if (parserStack.peek().equalsIgnoreCase("START")) {
-				start = Integer.parseInt(new String(ch, st, length));
-
-			}
-			if (parserStack.peek().equalsIgnoreCase("END")) {
-				end = Integer.parseInt(new String(ch, st, length));
-
-			}
-			if (parserStack.peek().equalsIgnoreCase("orientation")) {
-				strand = ch[st];
-			}
-			if (parserStack.peek().equalsIgnoreCase("score")) {
-				if (length == 1 && ch[st] == '-') {
-					score = 0;
-				} else {
-					score = Double.parseDouble(new String(ch, st, length));
-				}
-			}
-		}
-
-		@Override
-		public void endElement(String uri, String localName, String name)
-				throws SAXException {
-			super.endElement(uri, localName, name);
-			String stackName = parserStack.pop();
-			if (!name.equals(stackName)) {
-				throw new SAXException("Tags do not match: expected="
-						+ stackName + "; actual=" + name);
-			}
-			if (name.equalsIgnoreCase("feature")) {
-				Feature f = new Feature(new Location(start, end),
-						Type.get(typeID), Strand.fromSymbol(strand));
-				f.addQualifier("source", methodID);
-				f.addQualifier("name", featureID);
-				f.setScore(score);
-				list.add(f);
-
-			}
-		}
-
-		@Override
-		public void startElement(String uri, String localName, String name,
-				Attributes attributes) throws SAXException {
-			// TODO Auto-generated method stub
-			super.startElement(uri, localName, name, attributes);
-			parserStack.push(name);
-			if (name.equalsIgnoreCase("feature")) {
-				featureID = attributes.getValue("id");
-
-			}
-			if (name.equalsIgnoreCase("type")) {
-				typeID = attributes.getValue("id");
-
-			}
-			if (name.equalsIgnoreCase("method")) {
-				methodID = attributes.getValue("id");
-
-			}
-		}
-
-		private List<Feature> list = new ArrayList<Feature>();
-
-	}
-
 	private List<Feature> getFeatures(String source, EntryPoint e)
 			throws MalformedURLException, SAXException, IOException,
 			ParserConfigurationException, URISyntaxException {
 		SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-		FeatureParser featp = new FeatureParser();
+		FeatureParser featp = new FeatureParser(global);
 		parser.parse(URIFactory.url(serverPrefix + "/das/" + source
 				+ "/features?segment=" + e.id + ":" + e.start + "," + e.stop)
 				.openStream(), featp);
@@ -320,4 +242,86 @@ class EntryPoint {
 	public String toString() {
 		return id + " [" + start + "," + stop + "]";
 	}
+}
+
+class FeatureParser extends DefaultHandler {
+	private final Global global;
+	private Stack<String> parserStack = new Stack<String>();
+	private String featureID = null;
+	private String typeID = null;
+	private int end;
+	private int start;
+	private String methodID;
+	private char strand;
+	private double score;
+	protected List<Feature> list = new ArrayList<Feature>();
+
+	public FeatureParser(Global global) {
+		this.global = Objects.requireNonNull(global);
+	}
+
+	@Override
+	public void characters(char[] ch, int st, int length) throws SAXException {
+		super.characters(ch, st, length);
+		if (parserStack.peek().equalsIgnoreCase("START")) {
+			start = Integer.parseInt(new String(ch, st, length));
+
+		}
+		if (parserStack.peek().equalsIgnoreCase("END")) {
+			end = Integer.parseInt(new String(ch, st, length));
+
+		}
+		if (parserStack.peek().equalsIgnoreCase("orientation")) {
+			strand = ch[st];
+		}
+		if (parserStack.peek().equalsIgnoreCase("score")) {
+			if (length == 1 && ch[st] == '-') {
+				score = 0;
+			} else {
+				score = Double.parseDouble(new String(ch, st, length));
+			}
+		}
+	}
+
+	@Override
+	public void endElement(String uri, String localName, String name)
+			throws SAXException {
+		super.endElement(uri, localName, name);
+		String stackName = parserStack.pop();
+		if (!name.equals(stackName)) {
+			throw new SAXException("Tags do not match: expected=" + stackName
+					+ "; actual=" + name);
+		}
+		if (name.equalsIgnoreCase("feature")) {
+			Feature f = new Feature(new Location(start, end),
+					global.typeFactory().get(typeID),
+					Strand.fromSymbol(strand));
+			f.addQualifier("source", methodID);
+			f.addQualifier("name", featureID);
+			f.setScore(score);
+			list.add(f);
+
+		}
+	}
+
+	@Override
+	public void startElement(String uri, String localName, String name,
+			Attributes attributes) throws SAXException {
+		// TODO Auto-generated method stub
+		super.startElement(uri, localName, name, attributes);
+		parserStack.push(name);
+		if (name.equalsIgnoreCase("feature")) {
+			featureID = attributes.getValue("id");
+
+		}
+		if (name.equalsIgnoreCase("type")) {
+			typeID = attributes.getValue("id");
+
+		}
+		if (name.equalsIgnoreCase("method")) {
+			methodID = attributes.getValue("id");
+
+		}
+	}
+
 }

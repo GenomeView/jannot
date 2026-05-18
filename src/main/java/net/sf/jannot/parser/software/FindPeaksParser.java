@@ -37,7 +37,7 @@ public class FindPeaksParser extends Parser {
 		it.setSkipComments(true);
 		/* Skip first line */
 		it.next();
-		Type t = Type.get("peak");
+		Type t = getGlobal().typeFactory().get("peak");
 		for (String line : it) {
 			String[] arr = line.split("[ \t]+");
 			if (arr.length < 5) {

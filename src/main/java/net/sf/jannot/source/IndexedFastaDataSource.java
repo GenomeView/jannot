@@ -84,7 +84,7 @@ public class IndexedFastaDataSource extends DataSource {
 		for (String name : index.names()) {
 			Entry e = set.getOrCreateEntry(name);
 			try {
-				e.setSequence(new FaidxData(index, content, name, getLog()));
+				e.setSequence(new FaidxData(index, content, name, getGlobal()));
 			} catch (Exception ex) {
 				getLog().log(Level.SEVERE,
 						"Faidx error, locator=" + data + " index=" + index, ex);

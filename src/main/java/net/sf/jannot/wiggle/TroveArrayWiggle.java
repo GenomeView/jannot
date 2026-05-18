@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 import gnu.trove.map.hash.TIntFloatHashMap;
 import net.sf.jannot.Data;
-import tudelft.utilities.logging.Reporter;
+import net.sf.jannot.Global;
 
 /**
  * 
@@ -31,11 +31,11 @@ public class TroveArrayWiggle extends AbstractWiggle
 	private final TIntFloatHashMap blob = new TIntFloatHashMap();
 	private final int size;
 
-	public TroveArrayWiggle(int size, Reporter log) throws IOException {
-		super(log);
+	public TroveArrayWiggle(int size, Global global) throws IOException {
+		super(global);
 		this.size = size;
-		System.out.println("Mapping: " + size * 4);
-		System.out.println("Mapping successfull!");
+//		System.out.println("Mapping: " + size * 4);
+//		System.out.println("Mapping successfull!");
 
 	}
 
@@ -47,10 +47,12 @@ public class TroveArrayWiggle extends AbstractWiggle
 	 */
 	public void set(int position, float value) {
 
-		if (value > max)
+		if (value > max) {
 			max = value;
-		if (value < min)
+		}
+		if (value < min) {
 			min = value;
+		}
 		// try {
 		blob.put(position, value);
 	}
@@ -64,16 +66,20 @@ public class TroveArrayWiggle extends AbstractWiggle
 	 */
 	@Override
 	public float[] getRawRange(int start, int end) {
-		if (start >= size)
+		if (start >= size) {
 			return new float[0];
+		}
 		float[] out = new float[end - start];
 		int len = out.length;
-		if (start + len > size)
+		if (start + len > size) {
 			len = size - start;
-		if (start < 0)
+		}
+		if (start < 0) {
 			start = 0;
-		for (int i = start; i < end; i++)
+		}
+		for (int i = start; i < end; i++) {
 			out[i - start] = blob.get(i);
+		}
 		return out;
 	}
 

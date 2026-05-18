@@ -4,17 +4,19 @@
 package net.sf.jannot.alignment.mfa;
 
 import be.abeel.util.CountMap;
+import net.sf.jannot.Global;
 import net.sf.jannot.MemoryListData;
-import tudelft.utilities.logging.Reporter;
 
+@SuppressWarnings("serial")
 public class AlignmentAnnotation extends MemoryListData<Alignment> {
 
 	private byte[][] conservation;
 
-	public AlignmentAnnotation(Reporter log) {
-		super(log);
+	public AlignmentAnnotation(Global global) {
+		super(global);
 	}
 
+	@Override
 	public void addAll(Iterable<Alignment> align) {
 		for (Alignment a : align) {
 			super.add(a);
@@ -22,6 +24,7 @@ public class AlignmentAnnotation extends MemoryListData<Alignment> {
 		calculateConservation();
 	}
 
+	@Override
 	public String label() {
 		return "Multiple alignment";
 	}
@@ -37,8 +40,9 @@ public class AlignmentAnnotation extends MemoryListData<Alignment> {
 			cm.clear();
 			for (Alignment a : this) {
 				char nt = Character.toLowerCase(a.getNucleotide(i + 1));
-				if (nt != '-')
+				if (nt != '-') {
 					cm.count(nt);
+				}
 			}
 			conservation[0][i] = cm.get('a').byteValue();
 			conservation[1][i] = cm.get('c').byteValue();
@@ -54,8 +58,9 @@ public class AlignmentAnnotation extends MemoryListData<Alignment> {
 	}
 
 	public int getNucleotideCount(char nt, int position) {
-		if (conservation == null)
+		if (conservation == null) {
 			return 0;
+		}
 		switch (Character.toLowerCase(nt)) {
 		case 'a':
 			return conservation[0][position - 1];
@@ -80,26 +85,30 @@ public class AlignmentAnnotation extends MemoryListData<Alignment> {
 	 * @return
 	 */
 	public double getConservation(int position) {
-		if (conservation == null)// No data loaded in this multiple alignment
+		if (conservation == null) { // No data loaded in this multiple alignment
 			return 0;
+		}
 		if (position <= conservation[0].length && position > 0) {
 
 			double max = conservation[0][position - 1];
 			double sum = max;
 			for (int i = 1; i < conservation.length; i++) {
 				sum += conservation[i][position - 1];
-				if (conservation[i][position - 1] > max)
+				if (conservation[i][position - 1] > max) {
 					max = conservation[i][position - 1];
+				}
 			}
 			return max / sum;
-		} else
+		} else {
 			return 0;
+		}
 
 	}
 
 	public double getFootprint(int position) {
-		if (conservation == null)
+		if (conservation == null) {
 			return 0;
+		}
 		if (position <= conservation[0].length && position > 0) {
 
 			double sum = 0;
@@ -108,8 +117,9 @@ public class AlignmentAnnotation extends MemoryListData<Alignment> {
 
 			}
 			return sum / numAlignments();
-		} else
+		} else {
 			return 0;
+		}
 	}
 
 	@Override

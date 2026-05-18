@@ -60,7 +60,7 @@ public class MauveParser extends Parser {
 					String name = arr[3].substring(arr[3].lastIndexOf('/') + 1)
 							.split("\\.")[0];
 					entry = set.getOrCreateEntry(name);
-					ma = new MAFMemoryMultipleAlignment(getLog());
+					ma = new MAFMemoryMultipleAlignment(getGlobal());
 					entry.add(dataKey, ma);
 				}
 
@@ -107,7 +107,7 @@ public class MauveParser extends Parser {
 
 		String[] prevLocArr = prevArr[1].split(":")[1].split("-");
 
-		MemorySequence seq = new MemorySequence(buffer.toString(), getLog());
+		MemorySequence seq = new MemorySequence(buffer.toString(), getGlobal());
 		AbstractAlignmentSequence s = new MemoryAlignmentSequence(prevArr[3],
 				Integer.parseInt(prevLocArr[0]),
 				Integer.parseInt(prevLocArr[1])

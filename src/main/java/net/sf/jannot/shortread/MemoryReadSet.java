@@ -13,8 +13,8 @@ import java.util.TreeSet;
 import be.abeel.util.FrequencyMap;
 import htsjdk.samtools.SAMRecord;
 import net.sf.jannot.Data;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -23,10 +23,11 @@ import tudelft.utilities.logging.Reporter;
  */
 public class MemoryReadSet extends ReadGroup {
 
-	public MemoryReadSet(Reporter log) {
-		super(log);
+	public MemoryReadSet(Global global) {
+		super(global);
 	}
 
+	@Override
 	public String label() {
 		return "Memory readset";
 	}
@@ -45,11 +46,12 @@ public class MemoryReadSet extends ReadGroup {
 
 	private void addQuiet(SAMRecord g) {
 		set.add(g);
-		if (g.getAlignmentEnd() > maxPos)
+		if (g.getAlignmentEnd() > maxPos) {
 			maxPos = g.getAlignmentEnd();
-		if ((g.getAlignmentEnd() - g.getAlignmentStart() + 1) > maxLength)
+		}
+		if ((g.getAlignmentEnd() - g.getAlignmentStart() + 1) > maxLength) {
 			maxLength = (g.getAlignmentEnd() - g.getAlignmentStart() + 1);
-		/* Keep track of paired reads */
+			/* Keep track of paired reads */
 //		if (g instanceof ShortReadTools) {
 //			ShortReadTools esr = (ShortReadTools) g;
 //			String name = esr.record().getReadName();
@@ -76,6 +78,7 @@ public class MemoryReadSet extends ReadGroup {
 //
 //			}
 //		}
+		}
 
 		// updatePileup(g);
 	}
@@ -176,6 +179,7 @@ public class MemoryReadSet extends ReadGroup {
 //		return first.get(sr.record().getReadName());
 //	}
 
+	@Override
 	public int getPairLength() {
 		return maxPairedLenght;
 

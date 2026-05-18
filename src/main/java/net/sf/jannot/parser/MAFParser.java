@@ -58,7 +58,7 @@ public class MAFParser extends Parser {
 				String[] name = arr[1].split("\\.");
 
 				if (first) {
-					ma = new MAFMemoryMultipleAlignment(getLog());
+					ma = new MAFMemoryMultipleAlignment(getGlobal());
 					if (set.getEntry(name[name.length - 1]) != null) {
 						entry = set.getOrCreateEntry(name[name.length - 1]);
 					} else {
@@ -73,7 +73,7 @@ public class MAFParser extends Parser {
 				}
 
 				// }
-				MemorySequence seq = new MemorySequence(arr[6], getLog());
+				MemorySequence seq = new MemorySequence(arr[6], getGlobal());
 				AbstractAlignmentSequence s = new MemoryAlignmentSequence(
 						arr[1], Integer.parseInt(arr[2]),
 						Integer.parseInt(arr[3]), Integer.parseInt(arr[5]),

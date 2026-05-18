@@ -23,17 +23,15 @@ public class TestSequence {
 
 	private final Global global;
 
-	private final Reporter log;
-
 	public TestSequence() throws IOException, ReadFailedException {
 		this.global = new Global();
-		this.log = global.getLog();
 	}
 
 	@Ignore // urls give access denied
 	@Test
 	public void testFaidx() throws URISyntaxException, MalformedURLException,
 			ReadFailedException, IOException {
+		Reporter log = global.getLog();
 		Locator l = new Locator(
 				"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta",
 				log);
@@ -54,7 +52,7 @@ public class TestSequence {
 
 	@Test
 	public void testSubSequence() {
-		MemorySequence a = new MemorySequence("AGTCG", log);
+		MemorySequence a = new MemorySequence("AGTCG", global);
 
 		assertEquals("GT", a.subsequence(2, 4).stringRepresentation());
 		assertEquals("AGTCG", a.subsequence(1, 6).stringRepresentation());

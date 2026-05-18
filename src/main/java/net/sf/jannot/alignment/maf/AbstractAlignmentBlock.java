@@ -14,8 +14,6 @@ public abstract class AbstractAlignmentBlock
 		implements Comparable<AbstractAlignmentBlock>, Located,
 		Iterable<AbstractAlignmentSequence> {
 	/* Buffers for finding nucleotides */
-	// protected int[] position = null;
-	// private Entry ref = null;
 	private Location loc = new Location(0, 0);
 
 	public AbstractAlignmentBlock(int start, int end) {

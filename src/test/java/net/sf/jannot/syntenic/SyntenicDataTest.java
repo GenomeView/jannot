@@ -6,13 +6,19 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import net.sf.jannot.DistributingReporter;
+import net.sf.jannot.Global;
+import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
-import tudelft.utilities.logging.Reporter;
+import net.sf.nameservice.NameService;
 
 public class SyntenicDataTest {
 
-	private final static Reporter log = mock(Reporter.class);
+	private final static DistributingReporter log = mock(
+			DistributingReporter.class);
+	private final static Global global = new Global(log,
+			mock(JavaLogInterceptor.class), mock(NameService.class));
 
 	private final static String id1 = "id1";
 	private final static String id2 = "id2";
@@ -33,12 +39,14 @@ public class SyntenicDataTest {
 
 	@Test
 	public void testConstruct() {
-		SyntenicData sd = new SyntenicData(Arrays.asList(block1, block2), log);
+		SyntenicData sd = new SyntenicData(Arrays.asList(block1, block2),
+				global);
 	}
 
 	@Test
 	public void testRange() {
-		SyntenicData sd = new SyntenicData(Arrays.asList(block1, block2), log);
+		SyntenicData sd = new SyntenicData(Arrays.asList(block1, block2),
+				global);
 	}
 
 }
