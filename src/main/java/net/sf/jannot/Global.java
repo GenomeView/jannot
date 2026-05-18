@@ -4,12 +4,19 @@ import java.io.IOException;
 
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.nameservice.NameService;
+import tudelft.utilities.logging.Reporter;
 
 /**
- * Class for sharing objects that are needed everywhere. Grouping them here
- * allows to initialize them properly. Avoiding making them static utility
- * classes enables us to debug, test and mock them.
- * 
+ * Class for sharing objects that are needed everywhere.
+ * <p>
+ * This contains the system wide {@link Reporter}, {@link NameService},
+ * {@link TypeFactory}. Also reroutes java system logger to the logger using the
+ * {@link JavaLogInterceptor}.
+ * <p>
+ * Grouping them here allows to initialize them properly and to easily add new
+ * objects as needed. Avoiding making them static utility classes enables us to
+ * debug, test and mock them.
+ * <p>
  * Normally only 1 instance is used everywhere.
  */
 public class Global {
