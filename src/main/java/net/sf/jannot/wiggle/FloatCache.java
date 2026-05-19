@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.BitSet;
 
 /**
+ * This seems a 32-fold compressed version of a {@link Query} with values
+ * containing the average of the original values.
  * 
  * @author Thomas Abeel
  *
@@ -24,9 +26,11 @@ class FloatCache implements Query {
 		this.source = source;
 	}
 
+	@Override
 	public float[] getRawRange(int start, int end) throws IOException {
-		if (start / reductionfactor >= buffer.length)
+		if (start / reductionfactor >= buffer.length) {
 			return new float[0];
+		}
 //		 System.out.println("Buffer5: "+start+"\t"+end);
 		// System.out.println("Buffer5:
 		// "+start/reductionfactor+"\t"+end/reductionfactor);
@@ -37,8 +41,9 @@ class FloatCache implements Query {
 						i * reductionfactor + reductionfactor);
 				double sum = 0;
 
-				for (float f : tmp)
+				for (float f : tmp) {
 					sum += f;
+				}
 
 				buffer[i] = (float) (sum / reductionfactor);
 				// System.out.println("\t"+sum+"\t"+tmp.length+"\t"+buffer[i]);
@@ -48,10 +53,12 @@ class FloatCache implements Query {
 
 		float[] out = new float[(end - start) / reductionfactor];
 		int len = out.length;
-		if (start / reductionfactor + len > buffer.length)
+		if (start / reductionfactor + len > buffer.length) {
 			len = buffer.length - start / reductionfactor;
-		if (start < 0)
+		}
+		if (start < 0) {
 			start = 0;
+		}
 		System.arraycopy(buffer, start / reductionfactor, out, 0, len);
 		// System.out.println(out[0]+"\t"+out[1]+"\t"+out[2]+"\t"+out[3]+"\t"+out[4]+"\t"+out[5]);
 		return out;

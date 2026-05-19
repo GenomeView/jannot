@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.refseq.Sequence;
@@ -135,6 +136,14 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	@Override
 	public Iterator<DataKey> iterator() {
 		return data.keySet().iterator();
+	}
+
+	/**
+	 * 
+	 * @return the keys in the data
+	 */
+	public Set<DataKey> keys() {
+		return data.keySet();
 	}
 
 	/**

@@ -84,6 +84,11 @@ public class EntrySet implements Iterable<Entry> {
 		return entries.first();
 	}
 
+	/**
+	 * 
+	 * @param string a entry name
+	 * @return {@link Entry} with the given name
+	 */
 	public synchronized Entry getEntry(String string) {
 		return mapGet(global.getNameService().getPrimaryName(string));
 

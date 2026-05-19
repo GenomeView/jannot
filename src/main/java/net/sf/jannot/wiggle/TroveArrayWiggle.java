@@ -3,20 +3,15 @@
  */
 package net.sf.jannot.wiggle;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import gnu.trove.map.hash.TIntFloatHashMap;
-import net.sf.jannot.Data;
 import net.sf.jannot.Global;
+import net.sf.jannot.Location;
 
 /**
- * 
- * Make wiggle {@link Data}set
- * 
- * Fill it with setMethod
- * 
- * Initialize with init();
+ * Container for a bunch of wiggle data, either of type variable or of type
+ * fixed.
  * 
  * @author Thomas Abeel
  * 
@@ -24,25 +19,34 @@ import net.sf.jannot.Global;
 public class TroveArrayWiggle extends AbstractWiggle
 		implements Iterable<Float> {
 
+	// extreme values encountered
 	private float min = Float.POSITIVE_INFINITY;
 	private float max = Float.NEGATIVE_INFINITY;
 
-	// the data in blob is mutable
+	// the data in blob. mutable
 	private final TIntFloatHashMap blob = new TIntFloatHashMap();
-	private final int size;
 
-	public TroveArrayWiggle(int size, Global global) throws IOException {
+	// keeps track of total range of positions. null= not set yet
+	private Location range = null;
+
+	/**
+	 * 
+	 * @param size   the final size of the data range. Maybe the size of the
+	 *               sequence that this wiggle is referring to. WARNING this
+	 *               value is final and not enforced. If the actual size is
+	 *               different other methods in here will not work correctly. If
+	 *               the sequence itself is not yet loaded or for some other
+	 *               reason this is 0, odd things will happen. FIXME this seems
+	 *               a bug
+	 * @param global the {@link Global}
+	 */
+	public TroveArrayWiggle(int size, Global global) {
 		super(global);
-		this.size = size;
-//		System.out.println("Mapping: " + size * 4);
-//		System.out.println("Mapping successfull!");
-
 	}
 
 	/**
-	 * Zero based coordinate
 	 * 
-	 * @param position the position to change
+	 * @param position the position to change. Zero based
 	 * @param value    the new value for position
 	 */
 	public void set(int position, float value) {
@@ -53,19 +57,18 @@ public class TroveArrayWiggle extends AbstractWiggle
 		if (value < min) {
 			min = value;
 		}
-		// try {
 		blob.put(position, value);
+		Location l = new Location(position, position);
+		range = range == null ? l : range.extend(l);
 	}
 
 	public void init() {
 		super.init(this);
 	}
 
-	/**
-	 * @return copy of data from start (inclusive) to end (exclusive)
-	 */
 	@Override
 	public float[] getRawRange(int start, int end) {
+		int size = range.length();
 		if (start >= size) {
 			return new float[0];
 		}
@@ -95,14 +98,9 @@ public class TroveArrayWiggle extends AbstractWiggle
 
 	@Override
 	public long size() {
-		return size;// / 4;
+		return range == null ? 0 : range.length();
 	}
 
-	/**
-	 * Get a single value, one based coordinate
-	 * 
-	 * @see net.sf.jannot.wiggle.Graph#value(int)
-	 */
 	@Override
 	public float value(int pos) {
 		return blob.get(pos - 1);

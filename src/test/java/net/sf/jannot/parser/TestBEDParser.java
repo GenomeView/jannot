@@ -16,6 +16,7 @@
  */
 package net.sf.jannot.parser;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -69,8 +70,8 @@ public class TestBEDParser {
 
 	@After
 	public void after() {
-		verify(log, times(0)).log(eq(Level.WARNING), anyString());
-		verify(log, times(0)).log(eq(Level.SEVERE), anyString());
+		verify(log, times(0)).log(eq(Level.WARNING), anyString(), any());
+		verify(log, times(0)).log(eq(Level.SEVERE), anyString(), any());
 	}
 
 	@Test

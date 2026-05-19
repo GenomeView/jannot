@@ -1,5 +1,7 @@
 package net.sf.jannot;
 
+import java.util.Objects;
+
 public class StringKey implements DataKey {
 
 	@Override
@@ -14,11 +16,23 @@ public class StringKey implements DataKey {
 	}
 
 	@Override
-	public boolean equals(Object dkey) {
-		if (!(dkey instanceof StringKey))
-			return false;
-		return ((StringKey) dkey).key.equals(this.key);
+	public int hashCode() {
+		return Objects.hash(key);
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		StringKey other = (StringKey) obj;
+		return Objects.equals(key, other.key);
 	}
 
 	@Override

@@ -171,6 +171,13 @@ public class BEDTools {
 
 	}
 
+	/**
+	 * Parses an input line from a file, containing items KEY=VALUE. The key and
+	 * value can contain quotes (') and double quotes (").
+	 * 
+	 * @param trackLine line to parse
+	 * @return a map key=value pairs where the quotes have been removed.
+	 */
 	public static HashMap<String, String> parseTrack(String trackLine) {
 		HashMap<String, String> out = new HashMap<String, String>();
 
