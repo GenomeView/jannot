@@ -12,10 +12,10 @@ variableStep chrom=anthracis span=150
 20600 15.0
 20900 17.5
 21200 20.0
-21400 17.5
-21600 15.0
-21900 12.5
-22200 10.0
+21400 17.6
+21600 15.1
+21900 12.6
+22200 10.1
 #	200 base wide points graph at every 300 bases, 50 pixel high graph
 #	autoScale off and viewing range set to [0:1000]
 #	priority = 20 positions this as the second graph

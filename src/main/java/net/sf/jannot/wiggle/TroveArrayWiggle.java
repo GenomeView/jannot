@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 import gnu.trove.map.hash.TIntFloatHashMap;
 import net.sf.jannot.Global;
-import net.sf.jannot.Location;
 
 /**
  * Container for a bunch of wiggle data, either of type variable or of type
@@ -26,21 +25,14 @@ public class TroveArrayWiggle extends AbstractWiggle
 	// the data in blob. mutable
 	private final TIntFloatHashMap blob = new TIntFloatHashMap();
 
-	// keeps track of total range of positions. null= not set yet
-	private Location range = null;
+	// keeps track of highest encountered position
+	private int maxposition = 0;
 
 	/**
 	 * 
-	 * @param size   the final size of the data range. Maybe the size of the
-	 *               sequence that this wiggle is referring to. WARNING this
-	 *               value is final and not enforced. If the actual size is
-	 *               different other methods in here will not work correctly. If
-	 *               the sequence itself is not yet loaded or for some other
-	 *               reason this is 0, odd things will happen. FIXME this seems
-	 *               a bug
 	 * @param global the {@link Global}
 	 */
-	public TroveArrayWiggle(int size, Global global) {
+	public TroveArrayWiggle(Global global) {
 		super(global);
 	}
 
@@ -58,8 +50,7 @@ public class TroveArrayWiggle extends AbstractWiggle
 			min = value;
 		}
 		blob.put(position, value);
-		Location l = new Location(position, position);
-		range = range == null ? l : range.extend(l);
+		maxposition = Math.max(maxposition, position);
 	}
 
 	public void init() {
@@ -68,11 +59,13 @@ public class TroveArrayWiggle extends AbstractWiggle
 
 	@Override
 	public float[] getRawRange(int start, int end) {
-		int size = range.length();
-		if (start >= size) {
-			return new float[0];
-		}
+		int size = (int) size();
 		float[] out = new float[end - start];
+
+		if (start >= size) {
+			return out;
+		}
+
 		int len = out.length;
 		if (start + len > size) {
 			len = size - start;
@@ -98,7 +91,7 @@ public class TroveArrayWiggle extends AbstractWiggle
 
 	@Override
 	public long size() {
-		return range == null ? 0 : range.length();
+		return maxposition + 1;
 	}
 
 	@Override

@@ -80,16 +80,7 @@ public abstract class AbstractWiggle implements Graph, Query {
 	}
 
 	@Override
-	public abstract float max();
-
-	@Override
-	public abstract float min();
-
-	@Override
 	public abstract float[] getRawRange(int start, int end) throws IOException;
-
-	@Override
-	public abstract long size();
 
 	public void init(Query source) {
 		buffer5 = new FloatCache(source);

@@ -62,10 +62,47 @@ public class TestWigParser {
 
 		Data<?> fixeddata = entry.get(new StringKey("fixedStep"));
 		TroveArrayWiggle array = (TroveArrayWiggle) fixeddata;
-		assertEquals(9 * 300 + 200, array.size());
+		assertEquals(10000 + 9 * 300 + 200, array.size());
+
+		// check start=10000 step=300 span=200 value=1000
+		for (int n = 0; n < 200; n++) {
+			assertEquals("Wrong value at " + n, 1000f,
+					fixeddata.get(10000 + n, 10001 + n).iterator().next());
+		}
+		for (int n = 200; n < 300; n++) {
+			assertEquals("Wrong value at " + n, 0f,
+					fixeddata.get(10000 + n, 10001 + n).iterator().next());
+		}
+
+		int offset9 = 9 * 300 + 10000;
+		for (int n = 0; n < 200; n++) {
+			assertEquals("Wrong value at " + n, 100f, fixeddata
+					.get(offset9 + n, offset9 + 1 + n).iterator().next());
+		}
+		for (int n = 200; n < 300; n++) {
+			assertEquals("Wrong value at " + n, 0f, fixeddata
+					.get(offset9 + n, offset9 + 1 + n).iterator().next());
+		}
 
 		Data<?> vardata = entry.get(new StringKey("variableStep"));
-		assertEquals(2200 + 150, Streams.of(vardata.get()).count());
+		array = (TroveArrayWiggle) vardata;
+		assertEquals(22350, Streams.of(vardata.get()).count());
+		assertEquals(22350, array.size());
+		// check span=150 value=10
+		for (int n = 0; n < 150; n++) {
+			assertEquals("Wrong value at " + n, 10f,
+					vardata.get(20000 + n, 20001 + n).iterator().next());
+		}
+		// check un-set area between first and second area
+		for (int n = 20150; n < 20300; n++) {
+			assertEquals("Wrong value at " + n, 0f,
+					vardata.get(n, n + 1).iterator().next());
+		}
+		for (int n = 0; n < 150; n++) {
+			assertEquals("Wrong value at " + n, 12.5f,
+					vardata.get(20300 + n, 20301 + n).iterator().next());
+		}
+
 	}
 
 	@Test

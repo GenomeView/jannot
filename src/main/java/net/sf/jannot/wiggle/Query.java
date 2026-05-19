@@ -19,7 +19,8 @@ public interface Query {
 	float[] getRawRange(int start, int end) throws IOException;
 
 	/**
-	 * @return the range of positions covered by this.
+	 * @return the number of elements contained in the data. 1+the maximum
+	 *         position.
 	 */
 	long size();
 }
