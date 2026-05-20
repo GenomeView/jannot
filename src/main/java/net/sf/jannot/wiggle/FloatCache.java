@@ -7,8 +7,9 @@ import java.io.IOException;
 import java.util.BitSet;
 
 /**
- * This seems a 32-fold compressed version of a {@link Query} with values
- * containing the average of the original values.
+ * This contains a 32-fold downsampling of a {@link Query} with values
+ * containing the average of the original values. Samples 0..31 in the original
+ * data are downsampled to sample 0, sample 32..63 downsampled to sample 2, etc.
  * 
  * @author Thomas Abeel
  *
@@ -16,27 +17,33 @@ import java.util.BitSet;
 class FloatCache implements Query {
 
 	private static final int reductionfactor = 32;
+	// cache of already computed values
 	private float[] buffer;
+	// remmeber which buffer values have been computed
 	private BitSet valid = new BitSet();
 	private Query source;
 
+	/**
+	 * 
+	 * @param source the original data to be downsampled
+	 */
 	public FloatCache(Query source) {
 		buffer = new float[1 + (int) (source.size() / reductionfactor)];
-//		System.out.println("Original: " + source.size() + "\t" + buffer.length);
 		this.source = source;
 	}
 
+	/**
+	 * <b>NOTE</b> this lazily computes and caches computed averages in a buffer
+	 * array.
+	 */
 	@Override
 	public float[] getRawRange(int start, int end) throws IOException {
+		float[] out = new float[(end - start) / reductionfactor];
 		if (start / reductionfactor >= buffer.length) {
-			return new float[0];
+			return out;
 		}
-//		 System.out.println("Buffer5: "+start+"\t"+end);
-		// System.out.println("Buffer5:
-		// "+start/reductionfactor+"\t"+end/reductionfactor);
 		for (int i = start / reductionfactor; i < end / reductionfactor; i++) {
 			if (i >= 0 && i < buffer.length && !valid.get(i)) {
-				// System.out.println(i+"\t"+(i*reductionfactor));
 				float[] tmp = source.getRawRange(i * reductionfactor,
 						i * reductionfactor + reductionfactor);
 				double sum = 0;
@@ -46,12 +53,10 @@ class FloatCache implements Query {
 				}
 
 				buffer[i] = (float) (sum / reductionfactor);
-				// System.out.println("\t"+sum+"\t"+tmp.length+"\t"+buffer[i]);
 				valid.set(i);
 			}
 		}
 
-		float[] out = new float[(end - start) / reductionfactor];
 		int len = out.length;
 		if (start / reductionfactor + len > buffer.length) {
 			len = buffer.length - start / reductionfactor;
@@ -60,7 +65,6 @@ class FloatCache implements Query {
 			start = 0;
 		}
 		System.arraycopy(buffer, start / reductionfactor, out, 0, len);
-		// System.out.println(out[0]+"\t"+out[1]+"\t"+out[2]+"\t"+out[3]+"\t"+out[4]+"\t"+out[5]);
 		return out;
 	}
 

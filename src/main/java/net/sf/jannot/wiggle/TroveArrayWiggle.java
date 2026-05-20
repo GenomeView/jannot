@@ -11,7 +11,7 @@ import net.sf.jannot.Global;
 
 /**
  * Container for a bunch of wiggle data, either of type variable or of type
- * fixed. A Map is used to store sparse data more efficiently.
+ * fixed. A Map is used to store sparse data more efficiently. immutable.
  * 
  * @author Thomas Abeel
  * 
@@ -48,7 +48,6 @@ public class TroveArrayWiggle extends AbstractWiggle
 			blob.put(position, value);
 			maxposition = Math.max(maxposition, position);
 		}
-		init();
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public abstract class AbstractWiggle implements Graph, Query {
 
 	private final Global global;
 
-	// buffer with 2^5 downsampled data.
+	// buffer with 2^5=32x downsampled data.
 	private FloatCache buffer5 = null;
 
 	/**
@@ -29,15 +29,8 @@ public abstract class AbstractWiggle implements Graph, Query {
 
 	public AbstractWiggle(Global global) {
 		this.global = global;
-	}
-
-	/**
-	 * This must be called after all data was loaded and before a get() is done.
-	 * This implies this object has at least 3 states : empty, loaded, ready.
-	 */
-	public void init() {
-		buffer5 = new FloatCache(this);
-
+		// buffer5 will be initialized laxily because child
+		// constructor needs to do more work to initialize its data
 	}
 
 	@Override
@@ -49,7 +42,7 @@ public abstract class AbstractWiggle implements Graph, Query {
 	public float[] get(int start, int end, int resolutionIndex)
 			throws IOException {
 		if (buffer5 == null) {
-			throw new IOException("Wiggle needs to be initialized");
+			buffer5 = new FloatCache(this);
 		}
 		if (lastStart == start && lastEnd == end
 				&& lastRes == resolutionIndex) {
@@ -64,7 +57,7 @@ public abstract class AbstractWiggle implements Graph, Query {
 
 		}
 		while (resolutionIndex > 0) {
-			last = merge(last);
+			last = downsample(last);
 			resolutionIndex--;
 		}
 		return last;
@@ -78,17 +71,13 @@ public abstract class AbstractWiggle implements Graph, Query {
 
 	/**
 	 * @param ds a float array
-	 * @return array of half the length of ds (rounded up), with every 2 values
-	 *         from ds averaged.
+	 * @return array downsampled by a factor 2: half the length of ds (rounded
+	 *         up), with every 2 values from ds averaged.
 	 */
-	private float[] merge(float[] ds) {
+	private float[] downsample(float[] ds) {
 		float[] out = new float[(ds.length + 1) / 2];
-//		double max = 0;
 		for (int i = 0; i < ds.length - 1; i += 2) {
 			out[i / 2] = (ds[i] + ds[i + 1]) / 2;
-//			if (out[i / 2] > max) {
-//				max = out[i / 2];
-//			}
 		}
 		if (ds.length % 2 == 1) {
 			out[out.length - 1] = ds[ds.length - 1];

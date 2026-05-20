@@ -38,7 +38,6 @@ public class FloatArrayWiggle extends AbstractWiggle {
 		}
 		this.min = min;
 		this.max = max;
-		super.init();
 
 	}
 
