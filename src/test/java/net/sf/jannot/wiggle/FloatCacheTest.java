@@ -18,15 +18,16 @@ public class FloatCacheTest {
 
 	public FloatCacheTest() {
 		for (int n = 0; n < SIZE; n++) {
-			values.add((float) (10 * Math.sin(n / 10f)));
+			values.add((float) (10 * Math.sin(n / 8f)));
 		}
 		Query data = new Query() {
 
 			@Override
-			public float[] getRawRange(int start, int end) throws IOException {
+			public float[] getRawRange(final int start, final int end)
+					throws IOException {
 				float[] copy = new float[end - start];
-				for (int n = start; n < end; n++) {
-					copy[n] = values.get(n);
+				for (int n = 0; n < end - start; n++) {
+					copy[n] = values.get(start + n);
 				}
 				return copy;
 			}
@@ -48,9 +49,21 @@ public class FloatCacheTest {
 		// cross-computed in Mathematica, using
 		// t = Table[10 Sin[n/10], {n, 0, 1000}];
 		// Mean[Take[t,{1,32}]
-		assertEquals(6.24859, cache.getRawRange(0, 32)[0], 0.001);
+		assertEquals(4.24698, cache.getRawRange(0, 32)[0], 0.001);
 		// and test that cached value also works, assuming
 		// cached value is now retuened.
-		assertEquals(6.24859, cache.getRawRange(0, 32)[0], 0.001);
+		assertEquals(4.24698, cache.getRawRange(0, 32)[0], 0.001);
+	}
+
+	@Test
+	public void testGet3() throws IOException {
+		// cross-computed in Mathematica, using
+		// t = Table[10 Sin[n/10], {n, 0, 1000}];
+		// Mean[Take[t,{1,32}]
+		float[] samples = cache.getRawRange(2 * 32, 5 * 32);
+		assertEquals(3, samples.length);
+		assertEquals(-2.23174, samples[0], 0.001);
+		assertEquals(4.45906, samples[1], 0.001);
+		assertEquals(-3.59754, samples[2], 0.001);
 	}
 }
