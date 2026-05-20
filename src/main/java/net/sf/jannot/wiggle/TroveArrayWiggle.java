@@ -11,7 +11,7 @@ import net.sf.jannot.Global;
 
 /**
  * Container for a bunch of wiggle data, either of type variable or of type
- * fixed.
+ * fixed. A Map is used to store sparse data more efficiently.
  * 
  * @author Thomas Abeel
  * 
