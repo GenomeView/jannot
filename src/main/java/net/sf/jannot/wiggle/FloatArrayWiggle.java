@@ -13,13 +13,21 @@ import net.sf.jannot.utils.ArrayIterable;
  */
 public class FloatArrayWiggle extends AbstractWiggle {
 
-	private float[] buffer;
-	private float min = Float.POSITIVE_INFINITY;
-	private float max = Float.NEGATIVE_INFINITY;
+	private final float[] buffer;
+	private final float min, max;
 
+	/**
+	 * 
+	 * @param arr    the data. WARNING FIXME we take ownership of this array.
+	 * @param global the {@link Global}
+	 */
 	public FloatArrayWiggle(float[] arr, Global global) {
 		super(global);
+
 		this.buffer = arr;
+
+		float min = Float.POSITIVE_INFINITY;
+		float max = Float.NEGATIVE_INFINITY;
 		for (float f : arr) {
 			if (f > max) {
 				max = f;
@@ -28,7 +36,9 @@ public class FloatArrayWiggle extends AbstractWiggle {
 				min = f;
 			}
 		}
-		super.init(this);
+		this.min = min;
+		this.max = max;
+		super.init();
 
 	}
 
@@ -64,11 +74,6 @@ public class FloatArrayWiggle extends AbstractWiggle {
 		return buffer.length;
 	}
 
-	/**
-	 * Get a single value, one based coordinate
-	 * 
-	 * @see net.sf.jannot.wiggle.Graph#value(int)
-	 */
 	@Override
 	public float value(int pos) {
 		return buffer[pos - 1];

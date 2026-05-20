@@ -6,6 +6,7 @@ package net.sf.jannot.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.stream.Stream;
 
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
@@ -14,8 +15,12 @@ import net.sf.jannot.Global;
 import tudelft.utilities.logging.Reporter;
 
 /**
- * Base class for all genome data file parsers.
- * 
+ * Base class for all genome data file parsers. Parser is in fact data binding
+ * library between an {@link Entry} and a {@link Stream}, so it both parses and
+ * dumps {@link Entry}s.
+ * <p>
+ * It's not clear why Parser is here - it's not an object anyone 'needs', it
+ * seems it could have been part of {@link Entry} or {@link EntrySet}.
  */
 public abstract class Parser {
 

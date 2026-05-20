@@ -4,6 +4,7 @@
 package net.sf.jannot.wiggle;
 
 import java.util.Iterator;
+import java.util.Map;
 
 import gnu.trove.map.hash.TIntFloatHashMap;
 import net.sf.jannot.Global;
@@ -31,30 +32,23 @@ public class TroveArrayWiggle extends AbstractWiggle
 	/**
 	 * 
 	 * @param global the {@link Global}
+	 * @param values a Map<Integer,Float> with the values. All values will be
+	 *               copied into our local copy.
 	 */
-	public TroveArrayWiggle(Global global) {
+	public TroveArrayWiggle(Global global, Map<Integer, Float> values) {
 		super(global);
-	}
-
-	/**
-	 * 
-	 * @param position the position to change. Zero based
-	 * @param value    the new value for position
-	 */
-	public void set(int position, float value) {
-
-		if (value > max) {
-			max = value;
+		for (Integer position : values.keySet()) {
+			Float value = values.get(position);
+			if (value > max) {
+				max = value;
+			}
+			if (value < min) {
+				min = value;
+			}
+			blob.put(position, value);
+			maxposition = Math.max(maxposition, position);
 		}
-		if (value < min) {
-			min = value;
-		}
-		blob.put(position, value);
-		maxposition = Math.max(maxposition, position);
-	}
-
-	public void init() {
-		super.init(this);
+		init();
 	}
 
 	@Override

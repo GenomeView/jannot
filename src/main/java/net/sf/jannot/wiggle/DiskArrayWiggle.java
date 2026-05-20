@@ -34,10 +34,6 @@ public class DiskArrayWiggle extends AbstractWiggle implements Iterable<Float> {
 
 	}
 
-	public void init() {
-		super.init(this);
-	}
-
 	@Override
 	public float[] getRawRange(int start, int end) throws IOException {
 		if (start >= size) {

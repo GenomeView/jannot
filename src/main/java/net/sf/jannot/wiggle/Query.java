@@ -5,7 +5,10 @@ package net.sf.jannot.wiggle;
 
 import java.io.IOException;
 
+import net.sf.jannot.Data;
+
 /**
+ * This seems a data container interface similar to {@link Data}
  * 
  * @author Thomas Abeel
  *
@@ -19,8 +22,8 @@ public interface Query {
 	float[] getRawRange(int start, int end) throws IOException;
 
 	/**
-	 * @return the number of elements contained in the data. 1+the maximum
-	 *         position.
+	 * @return the number of floats contained in the data. 1+the maximum
+	 *         position. end-start (since end is exclusive)
 	 */
 	long size();
 }

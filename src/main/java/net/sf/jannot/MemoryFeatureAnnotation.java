@@ -6,7 +6,7 @@ package net.sf.jannot;
 /**
  * 
  * 
- * Represents the annotation of a single type
+ * Represents the Feature annotation of a single type
  * 
  * All data that is kept in memory, these get added manually
  */

@@ -5,11 +5,11 @@ package net.sf.jannot.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
-import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
@@ -29,13 +29,15 @@ public class WiggleParser extends Parser {
 
 	@Override
 	public EntrySet parse(InputStream is, EntrySet set) {
-		try {
-			LineIterator it = new LineIterator(is);
-			it.setSkipComments(true);
-			it.setCommentIdentifier("#");
-			it.addCommentIdentifier("browser ");
+		final Map<Integer, Float> values = new HashMap<>();
+		final LineIterator it = new LineIterator(is);
+		it.setSkipComments(true);
+		it.setCommentIdentifier("#");
+		it.addCommentIdentifier("browser ");
 
-			TroveArrayWiggle daw = null; // current data container
+		try {
+
+			// TroveArrayWiggle daw = null; // current data container
 			boolean variable = false;
 			int step = 0;
 			int span = 1;
@@ -46,6 +48,7 @@ public class WiggleParser extends Parser {
 			Entry e = null;
 			for (String line : it) {
 				if (line.startsWith("track")) {
+					completeTrack(e, name, values);
 					Map<String, String> lineMap = BEDTools.parseTrack(line);
 					name = lineMap.get("name");
 					if (name == null) {
@@ -60,9 +63,6 @@ public class WiggleParser extends Parser {
 								"variableStep lacks 'chrom' key: " + line);
 					}
 					e = set.getOrCreateEntry(lineMap.get("chrom").trim());
-					daw = new TroveArrayWiggle(getGlobal());
-					add(e, name, daw);
-
 					span = 1;
 					variable = true;
 					if (lineMap.containsKey("span")) {
@@ -86,8 +86,6 @@ public class WiggleParser extends Parser {
 					}
 
 					e = set.getOrCreateEntry(lineMap.get("chrom").trim());
-					daw = new TroveArrayWiggle(getGlobal());
-					add(e, name, daw);
 
 					variable = false;
 					stepOffset = 0;
@@ -105,7 +103,7 @@ public class WiggleParser extends Parser {
 					double val = Double.parseDouble(arr[1]);
 
 					for (int i = s; i < s + span; i++) {
-						daw.set(i, (float) val);
+						values.put(i, (float) val);
 					}
 				} else {
 					// we are in not-variable so in fixed mode
@@ -113,11 +111,13 @@ public class WiggleParser extends Parser {
 
 					for (int i = start + stepOffset; i < start + stepOffset
 							+ span; i++) {
-						daw.set(i, (float) val);
+						values.put(i, (float) val);
 					}
 					stepOffset += step;
 				}
 			}
+			// at end we just fall out of the loop. Finish the last track.
+			completeTrack(e, name, values);
 		} catch (Exception ioex) {
 			ioex.printStackTrace();
 			getLog().log(Level.SEVERE, "Failed to read data", ioex);
@@ -127,18 +127,19 @@ public class WiggleParser extends Parser {
 	}
 
 	/**
-	 * call daw.init() Add daw to entry e
+	 * Add values to entry e under the name. Then cleans out the map
 	 * 
-	 * @param e    the {@link Entry} to be extended
-	 * @param name the key for the new data
-	 * @param daw  the {@link Data} to get, in this case
+	 * @param e      the {@link Entry}. If null/not set, nothing happens.
+	 * @param name   the name to use in the entry
+	 * @param values the Map<Integer,Float> to add
 	 */
-	private void add(Entry e, String name, TroveArrayWiggle daw) {
-		if (daw != null) {
-			daw.init();
+	private void completeTrack(Entry e, String name,
+			Map<Integer, Float> values) {
+		if (e != null) {
+			TroveArrayWiggle daw = new TroveArrayWiggle(getGlobal(), values);
 			e.add(new StringKey(name), daw);
+			values.clear();
 		}
-
 	}
 
 }

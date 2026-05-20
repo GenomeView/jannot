@@ -6,9 +6,10 @@ package net.sf.jannot;
 import java.io.IOException;
 
 /**
- * Data related to genome. Thought of as a 'list with elements of type K.
- * Typically part of an {@link Entry}. Data has a start and end point, a label,
- * and can be iterated over
+ * Data of type K related to genome. data is a value of type K for each
+ * nucleotide position in the sequence (which is usually coming from separate
+ * FASTA). Typically part of an {@link Entry} that collects all related data.
+ * Data has a start and end point, a label, and can be iterated over
  * 
  * @author Thomas Abeel
  */
@@ -24,7 +25,7 @@ public interface Data<K> {
 	 * @param end   the end coordinate, this one will not be included. This is a
 	 *              one-based coordinate.
 	 * @return the selected data. <b>WARNING</b> returned iterable must he
-	 *         thread safe, particularly sobust while the underlying data is
+	 *         thread safe, particularly robust while the underlying data is
 	 *         changing.
 	 * 
 	 * @throws IOException if there is a serious problem
