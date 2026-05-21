@@ -18,7 +18,9 @@ public class FloatArrayWiggle extends AbstractWiggle {
 
 	/**
 	 * 
-	 * @param arr    the data. WARNING FIXME we take ownership of this array.
+	 * @param arr    the data. WARNING FIXME we take ownership of this array. Do
+	 *               not alter the array after calling this. WARNING for sparse
+	 *               arrays this very inefficient.
 	 * @param global the {@link Global}
 	 */
 	public FloatArrayWiggle(float[] arr, Global global) {

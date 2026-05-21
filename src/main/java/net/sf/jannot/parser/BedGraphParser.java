@@ -47,7 +47,7 @@ public class BedGraphParser extends Parser {
 		final Map<String, FloatArrayList> map = new HashMap<>();
 		int row = 1; // current inputstream line, for error messages
 		for (String line : it) {
-			String[] arr = line.replaceAll("\\s+", " ").split("-");
+			String[] arr = line.replaceAll("\\s+", " ").split(" ");
 			if (arr.length < 4) {
 				getLog().log(Level.SEVERE, "Failed to parse row " + row
 						+ ": need at least 4 tab-separated values but found "

@@ -17,7 +17,9 @@ import net.sf.jannot.shortread.ReadGroup;
  * "chromosome" container for a (often short) named nucleotide sequence. If
  * multiple named sequences are loaded (eg through a m-fasta file), each named
  * sequence is kept as separate 'chromosome' and can be selected with the
- * combobox in the top of the viewer.
+ * combobox in the top of the viewer. Other files may contain references to
+ * multiple chromosomes and their data is usually split over the corresponding
+ * {@link Entry}s
  * 
  * each chromosome has an {@link #id} and {@link #description}
  * 
@@ -45,7 +47,7 @@ import net.sf.jannot.shortread.ReadGroup;
 public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 
 	/**
-	 * A key that is used to store the actual sequence in this entry.
+	 * A key that is used to store the actual nucleotide sequence in this entry.
 	 */
 	private static final StringKey seqKey = new StringKey(
 			"SEQ*(^#%(@#%)@#^@#^))^)@#)^(@#%^*()SEQ");
