@@ -33,6 +33,8 @@ public abstract class DataSource implements Comparable<DataSource> {
 
 	@Override
 	public int compareTo(DataSource o) {
+		// FIXME toString is not even implemented!!
+		// this is broken way of comparing memory locations only
 		return this.toString().compareTo(o.toString());
 	}
 
@@ -64,6 +66,7 @@ public abstract class DataSource implements Comparable<DataSource> {
 	}
 
 	/**
+	 * Convenience method.
 	 * 
 	 * @return the {@link Reporter} used for logging issues
 	 */
