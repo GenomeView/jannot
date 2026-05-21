@@ -20,15 +20,18 @@ import tudelft.utilities.logging.Reporter;
  */
 public class URLSource extends AbstractStreamDataSource {
 
-	protected URL url;
+	protected final URL url;
 
-	/*
-	 * Only for internal use by subclasses. The extra object is only to
-	 * distinguish constructors and is ignored
+	/**
+	 * @param url
+	 * @param global the {@link Reporter} to log to
+	 * @throws IOException
 	 */
-	protected URLSource(URL url, Object x, Global global) throws IOException {
+	public URLSource(URL url, Global global) throws IOException {
 		super(new Locator(url.toString(), global.getLog()), global);
 		this.url = url;
+		new SSL(global.getLog()).certify(url);
+		init(global);
 	}
 
 	private void init(Global global) throws MalformedURLException, IOException {
@@ -40,18 +43,6 @@ public class URLSource extends AbstractStreamDataSource {
 				.create(new ByteArrayInputStream(buffer, 0, i), url, global));
 		pis.unread(buffer, 0, i);
 		super.setIos(pis);
-
-	}
-
-	/**
-	 * @param url
-	 * @param global the {@link Reporter} to log to
-	 * @throws IOException
-	 */
-	public URLSource(URL url, Global global) throws IOException {
-		this(url, null, global);
-		new SSL(global.getLog()).certify(url);
-		init(global);
 
 	}
 
