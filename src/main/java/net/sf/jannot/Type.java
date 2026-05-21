@@ -34,7 +34,9 @@ public class Type implements DataKey {
 
 	@Override
 	public int compareTo(DataKey o) {
-		return o.toString().compareTo(this.toString());
+		return this.toString().compareTo(o.toString());
+// CHECK original order was the wrong way round?
+//		return o.toString().compareTo(this.toString());
 	}
 
 }

@@ -16,10 +16,11 @@ public class TypeFactory {
 	private final List<Type> order = new ArrayList<Type>();
 
 	/**
-	 * @return array of declared types
+	 * @return array of declared types, in the current order
 	 */
-	public Type[] values() {
-		return order.toArray(new Type[0]);
+	public List<Type> values() {
+		return Collections.unmodifiableList(order);
+//		return order.toArray(new Type[0]);
 
 	}
 

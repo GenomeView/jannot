@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -255,7 +256,7 @@ public class EMBLParser extends Parser {
 	public boolean storeSequence = true;
 
 	@Override
-	public void write(OutputStream os, Entry e, DataKey[] dks) {
+	public void write(OutputStream os, Entry e, List<? extends DataKey> dks) {
 
 		PrintWriter out = new PrintWriter(new OutputStreamWriter(os));
 		/* ID line */

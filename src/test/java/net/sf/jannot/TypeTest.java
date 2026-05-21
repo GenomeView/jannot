@@ -2,6 +2,8 @@ package net.sf.jannot;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import org.junit.Test;
 
 public class TypeTest {
@@ -9,7 +11,7 @@ public class TypeTest {
 
 	@Test
 	public void smoke() {
-		assertEquals(0, factory.values().length);
+		assertEquals(0, factory.values().size());
 	}
 
 	@Test
@@ -38,11 +40,22 @@ public class TypeTest {
 		assertValues(2, 1, 3, 4);
 	}
 
+	@Test
+	public void compareTest() {
+		Type a = new Type("a");
+		Type b = new Type("b");
+		assertEquals(1, b.compareTo(a));
+		assertEquals(-1, a.compareTo(b));
+		assertEquals(0, a.compareTo(a));
+		assertEquals(0, b.compareTo(b));
+
+	}
+
 	private void assertValues(int... vals) {
 		addSomeTypes();
-		Type[] actualtypes = factory.values();
+		List<Type> actualtypes = factory.values();
 		for (int i = 0; i < vals.length; i++) {
-			assertEquals("" + vals[i], actualtypes[i].toString());
+			assertEquals("" + vals[i], actualtypes.get(i).toString());
 		}
 	}
 
@@ -52,4 +65,5 @@ public class TypeTest {
 		factory.get("3");
 		factory.get("4");
 	}
+
 }

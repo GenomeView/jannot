@@ -6,6 +6,7 @@ package net.sf.jannot.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.stream.Stream;
 
 import net.sf.jannot.DataKey;
@@ -97,7 +98,7 @@ public abstract class Parser {
 		write(os, entry, global.typeFactory().values());
 	}
 
-	public void write(OutputStream os, Entry entry, DataKey[] dk)
+	public void write(OutputStream os, Entry entry, List<? extends DataKey> dk)
 			throws IOException {
 		// Do nothing by default, parser can choose to implement the write
 		// method.
