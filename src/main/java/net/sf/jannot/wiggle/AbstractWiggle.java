@@ -29,7 +29,7 @@ public abstract class AbstractWiggle implements Graph, Query {
 
 	public AbstractWiggle(Global global) {
 		this.global = global;
-		// buffer5 will be initialized laxily because child
+		// buffer5 will be initialized lazily because child
 		// constructor needs to do more work to initialize its data
 	}
 

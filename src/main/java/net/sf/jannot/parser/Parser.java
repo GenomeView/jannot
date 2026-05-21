@@ -34,7 +34,11 @@ public abstract class Parser {
 
 	/**
 	 * 
-	 * @param dataKey
+	 * @param dataKey the datakey to use to store the data. This datakey is
+	 *                usually linked to the type of data being stored and fixed
+	 *                for each parser. If the data refers to multiple
+	 *                chromosomes, the {@link Entry}s corresponding to each
+	 *                chromosome will be extended with data using this dataKey
 	 * @param global  the {@link Global}.
 	 */
 	public Parser(DataKey dataKey, Global global) {
@@ -65,15 +69,18 @@ public abstract class Parser {
 	}
 
 	/**
-	 * Read all data from an input stream. Set the data source for each item to
-	 * the supplied source. If and {@link EntrySet} is supplied the data will be
-	 * added to this set, otherwise a new {@link EntrySet} will be created.
+	 * Read all data from an input stream. The data is pushed to various entries
+	 * in the set, usually based on the "chromosome name".
+	 * <p>
+	 * If an {@link EntrySet} is supplied the data will be added to this set,
+	 * otherwise a new {@link EntrySet} will be created.
 	 * <p>
 	 * The parser needs to figure out which {@link Entry} / {@link DataKey} in
 	 * the {@link EntrySet} to use. This is usually done with data available in
-	 * the parsed file itself, If multiple files are read, all referring to the
-	 * same {@link Entry}, it is assumed that different parsers store their
-	 * results under different keys in the {@link Entry}'s data.
+	 * the parsed file itself, using references to "chromosome names", If
+	 * multiple files are read, all referring to the same {@link Entry}, it is
+	 * assumed that different parsers store their results under different keys
+	 * in the {@link Entry}'s data.
 	 * <p>
 	 * Can not throw because parsers usually run in a separate thread. Just
 	 * return an empty entryset in the worst case.

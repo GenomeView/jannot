@@ -59,7 +59,10 @@ public class TestParserDetection {
 
 	@After
 	public void after() {
+		// check log/2 and log/3 separately
+		verify(log, times(0)).log(eq(Level.WARNING), anyString());
 		verify(log, times(0)).log(eq(Level.WARNING), anyString(), any());
+		verify(log, times(0)).log(eq(Level.SEVERE), anyString());
 		verify(log, times(0)).log(eq(Level.SEVERE), anyString(), any());
 	}
 

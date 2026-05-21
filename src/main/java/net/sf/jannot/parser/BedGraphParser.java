@@ -4,6 +4,8 @@
 package net.sf.jannot.parser;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
@@ -34,34 +36,33 @@ public class BedGraphParser extends Parser {
 		it.addCommentIdentifier("browser");
 		it.addCommentIdentifier("track");
 
-		FloatArrayList values = new FloatArrayList();
-		String last = "";
-		Entry e = null;
-		int row = 1;
+		/**
+		 * The parser assumes that the file handles chromosomes one by one. The
+		 * moment a new chromosome is encountered, the last chromosome is
+		 * complete
+		 */
+
+		// STEP 1. Collect all data for all chromosomes
+		// CHECK why are we using FloatArrayList and not ArrayList?
+		final Map<String, FloatArrayList> map = new HashMap<>();
+		int row = 1; // current inputstream line, for error messages
 		for (String line : it) {
-			String[] arr = line.split("\t");
+			String[] arr = line.replaceAll("\\s+", " ").split("-");
 			if (arr.length < 4) {
 				getLog().log(Level.SEVERE, "Failed to parse row " + row
 						+ ": need at least 4 tab-separated values but found "
 						+ line);
 				break;
 			}
+			String chrom = arr[0];
 			int start = Integer.parseInt(arr[1]);
 			int end = Integer.parseInt(arr[2]);
-			if (!last.equals(arr[0])) {
-				last = arr[0];
-
-				if (e != null) {
-					e.add(dataKey, new FloatArrayWiggle(values.elements(),
-							getGlobal()));
-					getLog().log(Level.INFO,
-							"Adding: " + e + "\t" + values.size());
-					values = new FloatArrayList();
-				}
-				e = set.getOrCreateEntry(arr[0]);
-			}
 			float val = Float.parseFloat(arr[3]);
-			/* Make sure the array is big enough */
+
+			if (!map.containsKey(chrom)) {
+				map.put(chrom, new FloatArrayList());
+			}
+			FloatArrayList values = map.get(chrom);
 			if (end > values.size()) {
 				values.setSize(end);
 			}
@@ -69,6 +70,13 @@ public class BedGraphParser extends Parser {
 				values.set(i, val);
 			}
 			row++;
+		}
+
+		// STEP 2. push the data into the set
+		for (String chrom : map.keySet()) {
+			Entry e = set.getOrCreateEntry(chrom);
+			e.add(dataKey, new FloatArrayWiggle(map.get(chrom).elements(),
+					getGlobal()));
 
 		}
 
