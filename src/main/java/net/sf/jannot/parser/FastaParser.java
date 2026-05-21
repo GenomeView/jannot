@@ -23,7 +23,8 @@ import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.refseq.Sequence;
 
 /**
- * In case of multiple alignments it is strongly advised to set the dataKey
+ * In case of multiple alignments it is strongly advised to set the dataKey Can
+ * also parse MFA files (multiple fasta alignment)
  * 
  * @author Thomas Abeel
  * 

@@ -17,9 +17,14 @@ import net.sf.jannot.alignment.maf.MAFMemoryMultipleAlignment;
 import net.sf.jannot.alignment.maf.MemoryAlignmentBlock;
 import net.sf.jannot.alignment.maf.MemoryAlignmentSequence;
 import net.sf.jannot.refseq.MemorySequence;
-import tudelft.utilities.logging.Reporter;
 
 /**
+ * MAF files are Multiple Alignment Format and are specified on
+ * https://genome.ucsc.edu/FAQ/FAQformat.html#format5
+ * 
+ * . They are plain text files and contain a comment line "## maf" near the top
+ * of the file.
+ * 
  * @author Thomas Abeel
  * 
  */
@@ -27,7 +32,7 @@ public class MAFParser extends Parser {
 
 	/**
 	 * @param dataKey the datakey for the data to parse
-	 * @param global  the {@link Reporter} to log issues to
+	 * @param global  the {@link Global} with globally used objects
 	 */
 	public MAFParser(DataKey dataKey, Global global) {
 		super(dataKey, global);
