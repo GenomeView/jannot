@@ -27,12 +27,13 @@ public class GlobalTest {
 		Reporter listen = mock(Reporter.class);
 		global.getLog().add(listen);
 
-		// WARNING DO NOT USE THIS LOGGING MECHANISM
+		// WARNING use the Reporter, not java Logger.
+		// This is only for testing our log re-routing mechanism
 		// check that the archaic logging to java system logger is intercepted
 		Logger syslogger = Logger.getLogger(getClass().getSimpleName());
 		syslogger.log(Level.WARNING, "test message");
 
-		// Check that the global Reporter received that 
+		// Check that the global Reporter received that
 		verify(listen, times(1)).log(eq(Level.WARNING), eq("test message"),
 				eq(null));
 

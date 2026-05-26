@@ -39,6 +39,7 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
 import support.DataManager;
 import tudelft.utilities.logging.Reporter;
@@ -51,7 +52,8 @@ public class TestTBLParser {
 	public TestTBLParser() throws ReadFailedException, IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
-				new NameService(log));
+				new NameService(log),
+				new DataSourceFactory(mock(SourceCache.class), true));
 	}
 
 	@After
@@ -69,7 +71,8 @@ public class TestTBLParser {
 		File f = DataManager.file("sequin.tbl");
 		// following is copy of another test.
 		// It was expected to fail but apparently works. No idea what it does...
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		DataSource ds = global.getSourceFactory().create(new Locator(f, log),
+				global);
 		EntrySet es = ds.read(new EntrySet(global));
 		double score = es.firstEntry()
 				.getMemoryAnnotation(global.typeFactory().get("gene")).get(0)

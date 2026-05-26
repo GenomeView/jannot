@@ -1,5 +1,7 @@
 package net.sf.jannot.hts;
 
+import static org.mockito.Mockito.mock;
+
 import java.io.IOException;
 
 import org.junit.Test;
@@ -11,10 +13,13 @@ import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
+import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.jannot.source.cache.SourceCache;
+import net.sf.nameservice.NameService;
 import support.DataManager;
 
 /**
@@ -25,11 +30,12 @@ import support.DataManager;
 public class TestMiniBAM {
 
 	private final Global global;
-	private DistributingReporter log;
+	private final DistributingReporter log = mock(DistributingReporter.class);
 
 	public TestMiniBAM() throws IOException, ReadFailedException {
-		this.global = new Global();
-		this.log = global.getLog();
+		global = new Global(log, new JavaLogInterceptor(log),
+				new NameService(log),
+				new DataSourceFactory(mock(SourceCache.class), true));
 	}
 
 	@Test
@@ -38,7 +44,7 @@ public class TestMiniBAM {
 		Locator fData = new Locator(DataManager.file("tworead.bam"), log);
 		Locator fIndex = new Locator(DataManager.file("tworead.bam.bai"), log);
 
-		DataSource ds = DataSourceFactory.create(fData, fIndex, global);
+		DataSource ds = global.getSourceFactory().create(fData, fIndex, global);
 		Assert.assertNotNull(ds);
 		EntrySet entries = ds.read(new EntrySet(global));
 		Entry e = entries.getEntry("chr4");

@@ -1,8 +1,12 @@
 package net.sf.jannot;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 import net.sf.jannot.exception.ReadFailedException;
+import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
 import tudelft.utilities.logging.Reporter;
 
@@ -38,22 +42,48 @@ import tudelft.utilities.logging.Reporter;
 </code>
  */
 public class Global {
+	private static final File DEFAULT_CACHE_DIR = new File(
+			System.getProperty("user.home"), "cache");
+
 	private final DistributingReporter log;
 	private final NameService ns;
 	private final JavaLogInterceptor interceptor;
 	private final TypeFactory typeFactory = new TypeFactory();
+	private final DataSourceFactory sourceFactory;
 
+	/**
+	 * 
+	 * @param log
+	 * @param interceptor
+	 * @param ns
+	 * @param cache       the {@link SourceCache} that stores previously fetched
+	 *                    URLs
+	 */
 	public Global(DistributingReporter log, JavaLogInterceptor interceptor,
-			NameService ns) {
-		this.log = log;
-		this.interceptor = interceptor;
-		this.ns = ns;
+			NameService ns, DataSourceFactory sourceFactory) {
+		this.log = Objects.requireNonNull(log);
+		this.interceptor = Objects.requireNonNull(interceptor);
+		this.ns = Objects.requireNonNull(ns);
+		this.sourceFactory = Objects.requireNonNull(sourceFactory);
 	}
 
+	/**
+	 * Default constructor. Mostly used for testing and debugging
+	 */
 	public Global() throws IOException, ReadFailedException {
 		log = new DistributingReporter();
 		interceptor = new JavaLogInterceptor(log);
 		ns = new NameService(log);
+		SourceCache urlCache = new SourceCache(DEFAULT_CACHE_DIR);
+		sourceFactory = new DataSourceFactory(urlCache, false);
+	}
+
+	/**
+	 * 
+	 * @return the {@link SourceCache}
+	 */
+	public DataSourceFactory getSourceFactory() {
+		return sourceFactory;
 	}
 
 	/**
@@ -79,4 +109,5 @@ public class Global {
 	public TypeFactory typeFactory() {
 		return typeFactory;
 	}
+
 }

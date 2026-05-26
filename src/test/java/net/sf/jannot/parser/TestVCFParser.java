@@ -39,11 +39,13 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Global;
+import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
 import support.DataManager;
 
@@ -59,7 +61,9 @@ public class TestVCFParser {
 
 	public TestVCFParser() throws ReadFailedException, IOException {
 		log = mock(DistributingReporter.class);
-		global = new Global(log, null, new NameService(log));
+		global = new Global(log, new JavaLogInterceptor(log),
+				new NameService(log),
+				new DataSourceFactory(mock(SourceCache.class), true));
 	}
 
 	@After
@@ -75,7 +79,8 @@ public class TestVCFParser {
 	public void testTinySize() throws Exception {
 
 		File f = DataManager.file("tiny.vcf");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		DataSource ds = global.getSourceFactory().create(new Locator(f, log),
+				global);
 		EntrySet es = ds.read(new EntrySet(global));
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("20", es.firstEntry().getID());
@@ -104,7 +109,8 @@ public class TestVCFParser {
 	public void testRegularSize() throws Exception {
 
 		File f = DataManager.file("regular.vcf");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		DataSource ds = global.getSourceFactory().create(new Locator(f, log),
+				global);
 		EntrySet es = ds.read(new EntrySet(global));
 		Assert.assertEquals("gi|395136682|gb|CP003248.1|",
 				es.firstEntry().getID());

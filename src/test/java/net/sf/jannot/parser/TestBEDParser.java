@@ -49,6 +49,7 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
 import support.DataManager;
 
@@ -64,8 +65,10 @@ public class TestBEDParser {
 
 	public TestBEDParser() throws IOException, ReadFailedException {
 		log = mock(DistributingReporter.class);
+		DataSourceFactory factory = new DataSourceFactory(
+				mock(SourceCache.class), true);
 		global = new Global(log, new JavaLogInterceptor(log),
-				new NameService(log));
+				new NameService(log), factory);
 	}
 
 	@After
@@ -80,7 +83,8 @@ public class TestBEDParser {
 	@Test
 	public void testParserMini() throws Exception {
 		File f = DataManager.file("minibed.bed");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		DataSource ds = global.getSourceFactory().create(new Locator(f, log),
+				global);
 		EntrySet es = ds.read(new EntrySet(global));
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("chr7", es.firstEntry().getID());
@@ -100,7 +104,8 @@ public class TestBEDParser {
 	@Test
 	public void testParserBare() throws Exception {
 		File f = DataManager.file("barebed.bed");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		DataSource ds = global.getSourceFactory().create(new Locator(f, log),
+				global);
 		EntrySet es = ds.read(new EntrySet(global));
 		// System.out.println(es.firstEntry());
 		Assert.assertEquals("chr7", es.firstEntry().getID());
@@ -120,7 +125,8 @@ public class TestBEDParser {
 	@Test
 	public void testSave() throws Exception {
 		File f = DataManager.file("barebed.bed");
-		DataSource ds = DataSourceFactory.create(new Locator(f, log), global);
+		DataSource ds = global.getSourceFactory().create(new Locator(f, log),
+				global);
 		EntrySet es = ds.read(new EntrySet(global));
 		BEDParser output = new BEDParser("save.bed", global);
 		FileOutputStream fos = new FileOutputStream("save.bed");

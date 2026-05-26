@@ -3,6 +3,7 @@
  */
 package net.sf.jannot.source.cache;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,14 +20,27 @@ import net.sf.jannot.source.URLSource;
 
 public class CachedURLSource extends URLSource {
 
-	public CachedURLSource(URL url, Global global) throws IOException {
-		super(url, global);
+	private final SourceCache cache;
 
+	/**
+	 * 
+	 * @param url    the URL that we are pointing at and possibly caching
+	 * @param global the {@link Global} vars
+	 * @param cache  the {@link SourceCache}
+	 * @throws IOException
+	 */
+	public CachedURLSource(URL url, Global global, SourceCache cache)
+			throws IOException {
+		super(url, global);
+		if (cache == null) {
+			cache = new SourceCache(new File(System.getProperty("user.home")));
+		}
+		this.cache = cache;
 	}
 
 	@Override
 	public EntrySet read(EntrySet set) {
-		if (!SourceCache.contains(url)) {
+		if (!cache.contains(url)) {
 			new SSL(getLog()).certify(url);
 			try {
 				super.setParser(ParserFactory.create(url.openStream(), url,
@@ -38,7 +52,7 @@ public class CachedURLSource extends URLSource {
 					@Override
 					public void run() {
 						try {
-							OutputStream out = SourceCache.startCaching(url);
+							OutputStream out = cache.startCaching(url);
 							InputStream is = url.openStream();
 							byte[] buffer = new byte[100000];
 							while (true) {
@@ -53,7 +67,7 @@ public class CachedURLSource extends URLSource {
 							}
 							forParser.close();
 							out.close();
-							SourceCache.finish(url);
+							cache.finish(url);
 						} catch (IOException e) {
 							getLog().log(Level.WARNING,
 									"failed caching url " + url, e);
@@ -72,7 +86,7 @@ public class CachedURLSource extends URLSource {
 			return super.read(set);
 		} else {
 			try {
-				return SourceCache.get(url, getGlobal()).read(set);
+				return cache.get(url, getGlobal()).read(set);
 			} catch (IOException e) {
 				// FIXME this shouldn't happen
 				getLog().log(Level.SEVERE, "failed to read " + url, e);

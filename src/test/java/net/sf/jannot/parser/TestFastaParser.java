@@ -28,6 +28,7 @@ import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
 import support.DataManager;
 
@@ -43,8 +44,10 @@ public class TestFastaParser {
 
 	public TestFastaParser() throws ReadFailedException, IOException {
 		log = mock(DistributingReporter.class);
+		DataSourceFactory factory = new DataSourceFactory(
+				mock(SourceCache.class), true);
 		global = new Global(log, new JavaLogInterceptor(log),
-				new NameService(log));
+				new NameService(log), factory);
 	}
 
 	@After
@@ -58,7 +61,7 @@ public class TestFastaParser {
 
 	private void testFile(File file)
 			throws URISyntaxException, IOException, ReadFailedException {
-		DataSource ds = DataSourceFactory
+		DataSource ds = global.getSourceFactory()
 				.create(new Locator(file, global.getLog()), global);
 		EntrySet es = ds.read(new EntrySet(global));
 		// System.out.println(es.firstEntry());
@@ -85,7 +88,7 @@ public class TestFastaParser {
 	@Test
 	public void testWrite() throws Exception {
 		File f = DataManager.file("mini.fasta");
-		DataSource ds = DataSourceFactory
+		DataSource ds = global.getSourceFactory()
 				.create(new Locator(f, global.getLog()), global);
 		EntrySet es = ds.read(new EntrySet(global));
 
@@ -105,7 +108,7 @@ public class TestFastaParser {
 	@Test
 	public void testMFasta() throws Exception {
 
-		DataSource ds = DataSourceFactory.create(new Locator(
+		DataSource ds = global.getSourceFactory().create(new Locator(
 				DataManager.file("10313-CDS.fasta"), global.getLog()), global);
 		EntrySet es = ds.read(new EntrySet(global));
 

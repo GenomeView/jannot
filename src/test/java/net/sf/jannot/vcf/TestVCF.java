@@ -1,5 +1,7 @@
 package net.sf.jannot.vcf;
 
+import static org.mockito.Mockito.mock;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,14 +11,18 @@ import org.junit.Test;
 
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
+import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
+import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.jannot.source.cache.SourceCache;
 import net.sf.jannot.variation.Variation;
+import net.sf.nameservice.NameService;
 import support.DataManager;
 import tudelft.utilities.logging.Reporter;
 
@@ -34,7 +40,11 @@ public class TestVCF {
 	private final Global global;
 
 	public TestVCF() throws IOException, ReadFailedException {
-		global = new Global();
+
+		DistributingReporter log = mock(DistributingReporter.class);
+		global = new Global(log, new JavaLogInterceptor(log),
+				new NameService(log),
+				new DataSourceFactory(mock(SourceCache.class), true));
 	}
 
 	@Test
@@ -49,7 +59,7 @@ public class TestVCF {
 		EntrySet entries = new EntrySet(global);
 		Locator fIndex = new Locator(DataManager.file(indexIdentifier), log);
 		Locator fData = new Locator(DataManager.file(dataIdentifier), log);
-		DataSource ds = DataSourceFactory.create(fData, fIndex, global);
+		DataSource ds = global.getSourceFactory().create(fData, fIndex, global);
 
 		// File fileData = new File(dataFile);
 		// File indexData = new File(indexFile);

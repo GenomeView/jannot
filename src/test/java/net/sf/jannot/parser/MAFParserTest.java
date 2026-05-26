@@ -26,6 +26,7 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.jannot.source.cache.SourceCache;
 import net.sf.jannot.wiggle.FloatArrayWiggle;
 import net.sf.nameservice.NameService;
 import support.DataManager;
@@ -38,7 +39,8 @@ public class MAFParserTest {
 	public MAFParserTest() throws ReadFailedException, IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
-				new NameService(log));
+				new NameService(log),
+				new DataSourceFactory(mock(SourceCache.class), true));
 	}
 
 	private void checkLogs() {
@@ -51,7 +53,8 @@ public class MAFParserTest {
 
 	private void testFile(File file)
 			throws URISyntaxException, IOException, ReadFailedException {
-		DataSource ds = DataSourceFactory
+
+		DataSource ds = global.getSourceFactory()
 				.create(new Locator(file, global.getLog()), global);
 		EntrySet es = ds.read(new EntrySet(global));
 		checkLogs();

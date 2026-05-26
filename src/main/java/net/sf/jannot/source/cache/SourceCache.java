@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import atk.io.ExtensionFileFilter;
@@ -26,14 +27,31 @@ import net.sf.jannot.source.FileSource;
  * {@link #get(URL, Global)}
  */
 public class SourceCache {
-	public static File cacheDir = new File(System.getProperty("user.home"));;
+	private File cacheDir;
+
+	/**
+	 * 
+	 * @param cacheDir a directory where downloaded URLs are cached. not null
+	 */
+	public SourceCache(File cacheDir) {
+		this.cacheDir = Objects.requireNonNull(cacheDir);
+	}
+
+	/**
+	 * bit nasty method to change the cache dir.
+	 * 
+	 * @param cacheDir a directory where downloaded URLs are cached. not null
+	 */
+	public void changeCacheDir(File cacheDir) {
+		this.cacheDir = Objects.requireNonNull(cacheDir);
+	}
 
 	/**
 	 * 
 	 * @param url
 	 * @return true iff the URL has been cached.
 	 */
-	public static boolean contains(URL url) {
+	public boolean contains(URL url) {
 
 		// System.out.println("URL cache: " + cacheDir);
 		if (!cacheDir.exists()) {
@@ -57,7 +75,7 @@ public class SourceCache {
 	 * @return {@link DataSource} constructed from the cached version of the URL
 	 * @throws IOException
 	 */
-	public static DataSource get(URL url, Global global) throws IOException {
+	public DataSource get(URL url, Global global) throws IOException {
 		// System.out.println("Retrieving from cache: " + url);
 		return new FileSource(
 				new File(cacheDir, MD5Tools.md5(url.toString()) + ".url"),
@@ -67,13 +85,12 @@ public class SourceCache {
 	/**
 	 * 
 	 * @param url an {@link URL} that is intended for caching
-	 * @return an OutputStream to the cache file for the URL. The called becomes
-	 *         the owner of the stream and should close it and then call
+	 * @return an OutputStream to the cache file for the URL. The caller becomes
+	 *         the owner of the stream and should flush/close it and then call
 	 *         {@link #finish(URL)} when done.
 	 * @throws FileNotFoundException
 	 */
-	public static OutputStream startCaching(URL url)
-			throws FileNotFoundException {
+	public OutputStream startCaching(URL url) throws FileNotFoundException {
 		return new FileOutputStream(
 				new File(cacheDir, MD5Tools.md5(url.toString()) + ".tmp"));
 	}
@@ -83,10 +100,18 @@ public class SourceCache {
 	 * 
 	 * @param url the {@link URL} for which the cache file is complete
 	 */
-	public static void finish(URL url) {
+	public void finish(URL url) {
 		File f = new File(cacheDir, MD5Tools.md5(url.toString()) + ".tmp");
 		f.renameTo(new File(cacheDir, MD5Tools.md5(url.toString()) + ".url"));
 
+	}
+
+	/**
+	 * 
+	 * @param dir the new cache dir
+	 */
+	public void setDirectory(File dir) {
+		this.cacheDir = dir;
 	}
 
 }

@@ -11,6 +11,7 @@ import net.sf.jannot.Global;
 import net.sf.jannot.bigwig.BigWigDataSource;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.cache.CachedURLSource;
+import net.sf.jannot.source.cache.SourceCache;
 import net.sf.jannot.tabix.IndexedFeatureFile;
 import net.sf.jannot.tdf.TDFDataSource;
 
@@ -20,7 +21,18 @@ import net.sf.jannot.tdf.TDFDataSource;
  * 
  */
 public class DataSourceFactory {
-	public static boolean disableURLCaching = true;
+	public boolean disableURLCaching = true;
+	private final SourceCache cache;
+
+	/**
+	 * 
+	 * @param cache          the {@link SourceCache}
+	 * @param disableCaching false iff the SourceCache should be used
+	 */
+	public DataSourceFactory(SourceCache cache, boolean disableCaching) {
+		this.cache = cache;
+		this.disableURLCaching = disableCaching;
+	}
 
 	public enum Sources {
 		LOCALFILE, URL;// , DAS;
@@ -41,7 +53,7 @@ public class DataSourceFactory {
 		}
 	}
 
-	public static DataSource create(Locator locator, Global log)
+	public DataSource create(Locator locator, Global log)
 			throws URISyntaxException, IOException, ReadFailedException {
 		return create(locator, null, log);
 
@@ -57,7 +69,7 @@ public class DataSourceFactory {
 	 * @throws IOException
 	 * @throws ReadFailedException
 	 */
-	public static DataSource create(Locator data, Locator index, Global global)
+	public DataSource create(Locator data, Locator index, Global global)
 			throws URISyntaxException, IOException, ReadFailedException {
 		global.getLog().log(Level.INFO, "Data: " + data);
 		global.getLog().log(Level.INFO, "Index: " + index);
@@ -83,7 +95,7 @@ public class DataSourceFactory {
 				} else {
 					global.getLog().log(Level.INFO,
 							"Loading as CachedURLSource");
-					return new CachedURLSource(data.url(), global);
+					return new CachedURLSource(data.url(), global, cache);
 				}
 			} else {
 				global.getLog().log(Level.INFO, "Loading as FileSource");
@@ -111,6 +123,25 @@ public class DataSourceFactory {
 						+ index);
 		return null;
 
+	}
+
+	/**
+	 * 
+	 * @return the {@link SourceCache}. Needed to change cache directory if user
+	 *         wants to change it.
+	 */
+	public SourceCache getCache() {
+		return cache;
+	}
+
+	/**
+	 * 
+	 * @param disable true iff caching disabled. Needed to allow user to change
+	 *                caching on/off
+	 * 
+	 */
+	public void setDisableCaching(boolean disable) {
+		this.disableURLCaching = disable;
 	}
 
 }

@@ -39,6 +39,7 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
+import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
 import support.DataManager;
 
@@ -53,8 +54,11 @@ public class TestGFFParser {
 
 	public TestGFFParser() throws ReadFailedException, IOException {
 		log = mock(DistributingReporter.class);
+		DataSourceFactory factory = new DataSourceFactory(
+				mock(SourceCache.class), true);
+
 		global = new Global(log, new JavaLogInterceptor(log),
-				new NameService(log));
+				new NameService(log), factory);
 	}
 
 	@After
@@ -69,7 +73,7 @@ public class TestGFFParser {
 	@Test
 	public void testParserMini() throws Exception {
 		File f = DataManager.file("doubleScore.gff3");
-		DataSource ds = DataSourceFactory
+		DataSource ds = global.getSourceFactory()
 				.create(new Locator(f, global.getLog()), global);
 		EntrySet es = ds.read(new EntrySet(global));
 		double score = es.firstEntry()
