@@ -5,9 +5,12 @@ package net.sf.jannot.source;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 
+import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.parser.Parser;
 import net.sf.jannot.parser.ParserFactory;
@@ -21,6 +24,7 @@ import net.sf.jannot.parser.ParserFactory;
 public class FileSource extends AbstractStreamDataSource {
 
 	private final File file;
+	private final Parser parser;
 
 	public File getFile() {
 		return file;
@@ -28,13 +32,10 @@ public class FileSource extends AbstractStreamDataSource {
 
 	public FileSource(File file, Global global) throws IOException {
 		super(new Locator(file.toString(), global.getLog()), global);
-		InputStream ios1, ios2;
-		ios1 = new FileInputStream(file);
-		ios2 = new FileInputStream(file);
-		Parser p = ParserFactory.create(ios1, file, global);
-		ios1.close();
-		super.setParser(p);
-		super.setIos(ios2);
+		// temp stream to determine the data type
+		InputStream tempstr = new FileInputStream(file);
+		parser = ParserFactory.create(tempstr, file, global);
+		tempstr.close();
 		this.file = file;
 	}
 
@@ -46,27 +47,31 @@ public class FileSource extends AbstractStreamDataSource {
 		} else {
 			return file.getName().toString();
 		}
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.source.DataSource#isIndexed()
-	 */
 	@Override
 	public boolean isIndexed() {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jannot.source.DataSource#size()
-	 */
 	@Override
 	public long size() {
 		return file.length();
+	}
+
+	@Override
+	public Parser getParser() {
+		return parser;
+	}
+
+	@Override
+	public EntrySet read(EntrySet set) {
+		try {
+			set = parser.parse(new FileInputStream(file), set);
+		} catch (FileNotFoundException e) {
+			getLog().log(Level.WARNING, "Failed to parse", e);
+		}
+		return set;
 	}
 
 }

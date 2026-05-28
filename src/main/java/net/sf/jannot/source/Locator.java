@@ -219,7 +219,8 @@ public class Locator {
 
 	/**
 	 * 
-	 * @return available number of chars in file, -1 if file can not be opened
+	 * @return available number of chars in file / url resource, -1 if file can
+	 *         not be opened
 	 */
 	public long length() {
 		return length;

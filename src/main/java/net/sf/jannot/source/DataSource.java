@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
+import net.sf.jannot.parser.Parser;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -28,7 +29,7 @@ public abstract class DataSource implements Comparable<DataSource> {
 	 */
 	protected DataSource(Locator l, Global global) {
 		this.global = Objects.requireNonNull(global);
-		this.locator = l;
+		this.locator = Objects.requireNonNull(l);
 	}
 
 	@Override
@@ -45,6 +46,9 @@ public abstract class DataSource implements Comparable<DataSource> {
 	 * @return the (non-null) entryset to add the data to. This can not throw
 	 *         because it's generally used inside separate threads. If there is
 	 *         a problem, log it and return whatever entryset is now available.
+	 *         Typically this returns
+	 *         {@link Parser#parse(java.io.InputStream, EntrySet)};
+	 * 
 	 * 
 	 */
 	public abstract EntrySet read(EntrySet add);
