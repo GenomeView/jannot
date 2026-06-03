@@ -29,6 +29,8 @@ import tudelft.utilities.logging.Reporter;
  */
 public abstract class ParserFactory {
 
+	private static final String WHITESPACE = "[ \t]+";
+
 	/**
 	 * 
 	 * @param source
@@ -86,16 +88,15 @@ public abstract class ParserFactory {
 	 *               valid File path. Others assume the source to be a "datakey"
 	 * 
 	 * @return an concrete Parser for the input stream, as determined by the
-	 *         headers actually in the input stream. Or null if no suitable
-	 *         parser is found.
-	 * @throws IOException
+	 *         headers actually in the input stream.
+	 * @throws IOException if no suitable parser is found or is fails.
 	 */
 	private static Parser findParser(InputStream is, Object source,
 			Global global) throws IOException {
 		LineIterator it = new LineIterator(is);
 		// it.setSkipComments(true);
 		it.setSkipBlanks(true);
-		String firstLine = it.next();
+		final String firstLine = it.next();
 		String nonCommentLine = firstLine;
 
 		// Skip comments and UCSC browser information lines
@@ -143,10 +144,14 @@ public abstract class ParserFactory {
 			} else if (nonCommentLine.startsWith("track type=bedGraph")) {
 				return new BedGraphParser(new StringKey(source.toString()),
 						global);
-			} else {
-				nonCommentLine = it.next();
 			}
-
+			// possibly a custom MAF
+			final String nextline = it.next();
+			if (nextline.startsWith("##maf")) {
+				return new MAFParser(new StringKey(source.toString()), global);
+			}
+			// then it's probably a BED file.
+			return new BEDParser(source.toString(), global);
 		}
 
 		if (nonCommentLine.startsWith("LOCUS")) {
@@ -180,10 +185,10 @@ public abstract class ParserFactory {
 
 		}
 
-		if (nonCommentLine.split("[ \t]+").length == 8) {
+		if (nonCommentLine.split(WHITESPACE).length == 8) {
 			String[] head = new String[] { "Sequence", "tRNA", "Bounds", "tRNA",
 					"Anti", "Intron", "Bounds", "Cove" };
-			if (Arrays.equals(nonCommentLine.split("[ \t]+"), head)) {
+			if (Arrays.equals(nonCommentLine.split(WHITESPACE), head)) {
 				return new TRNAscanParser(global);
 			}
 		}
@@ -202,8 +207,8 @@ public abstract class ParserFactory {
 		}
 
 		/* Can either be BlastM8 or BED */
-		if (nonCommentLine.split("\t").length == 12) {
-			String[] arr = nonCommentLine.split("\t");
+		if (nonCommentLine.split(WHITESPACE).length == 12) {
+			String[] arr = nonCommentLine.split(WHITESPACE);
 
 			if (isStrand(arr[4].charAt(0))) {
 				return new SyntenicParser(new StringKey(source.toString()),
@@ -231,7 +236,7 @@ public abstract class ParserFactory {
 			return new BlastM8Parser(global);
 		}
 
-		if (nonCommentLine.split("\t").length == 16) {
+		if (nonCommentLine.split(WHITESPACE).length == 16) {
 			return new MapViewParser(new StringKey(source.toString()), global);
 		}
 		if (nonCommentLine.startsWith("ID") || nonCommentLine.startsWith("FT")
@@ -248,8 +253,8 @@ public abstract class ParserFactory {
 			}
 
 		}
+		throw new IOException("No parser found for " + source);
 
-		return null;
 		// if (nonCommentLine.split("\t").length == 1) {
 		// return new ALNParser(new StringKey(source.toString()));
 		// }

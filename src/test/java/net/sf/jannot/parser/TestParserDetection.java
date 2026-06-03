@@ -102,7 +102,7 @@ public class TestParserDetection {
 	@Test
 	public void testPAF() throws Exception {
 		File f = DataManager.file("minibed.bed");
-		Parser p = ParserFactory.create(new FileInputStream(f), "file", global);
+		Parser p = ParserFactory.create(new FileInputStream(f), f, global);
 		assertNotNull(p);
 		Assert.assertTrue("Wrong parser: " + p.getClass(),
 				p instanceof BEDParser);

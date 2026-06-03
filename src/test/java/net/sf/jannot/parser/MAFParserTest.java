@@ -58,11 +58,10 @@ public class MAFParserTest {
 				.create(new Locator(file, global.getLog()), global);
 		EntrySet es = ds.read(new EntrySet(global));
 		checkLogs();
-		assertEquals("anthracis", es.firstEntry().getID());
-
-		// the test file only contains anthracis chromosome data
 		assertEquals(1, es.size());
 		Entry entry = es.firstEntry();
+		assertEquals("hg18.chr7", entry.getID());
+		assertEquals(4, entry.keys().size());
 
 		// the name of the entry is weird, the full filename
 		// src/test/resources/anthracis.bedGraph. Just get first
