@@ -3,11 +3,17 @@
  */
 package net.sf.jannot.alignment.maf;
 
+import java.security.KeyStore.Entry;
+
 import net.sf.jannot.Data;
 import net.sf.jannot.Global;
 import net.sf.jannot.MemoryListData;
 
 /**
+ * A list of {@link AbstractAlignmentBlock}s containing the locations of various
+ * sequences with respect to a reference chromosome. This object is stored in an
+ * {@link Entry} using the name of this chromosome
+ * 
  * @author Thomas Abeel
  * 
  */

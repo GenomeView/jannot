@@ -16,7 +16,7 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.parser.Parser;
 import net.sf.jannot.parser.ParserFactory;
-import net.sf.jannot.source.AbstractStreamDataSource;
+import net.sf.jannot.source.ParserDataSource;
 import net.sf.jannot.source.Locator;
 import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
@@ -24,7 +24,7 @@ import net.sf.jannot.source.URLSource;
 /**
  * previously extended {@link URLSource} but too problematic #100
  */
-public class CachedURLSource extends AbstractStreamDataSource {
+public class CachedURLSource extends ParserDataSource {
 
 	private final URL url;
 	private final SourceCache cache;

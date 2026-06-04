@@ -6,8 +6,8 @@ package net.sf.jannot;
 import net.sf.jannot.event.ChangeEvent;
 
 /**
- * A Location is a range with start, end position. It probably means "locations
- * of a label/tag on a genome".
+ * A Location is a range with start, end position. It usually means nucleotide
+ * position, so locations on a genome.
  */
 public class Location implements Comparable<Location> {
 

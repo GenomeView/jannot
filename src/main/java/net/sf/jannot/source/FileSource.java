@@ -21,7 +21,7 @@ import net.sf.jannot.parser.ParserFactory;
  * @author Thomas Abeel
  *
  */
-public class FileSource extends AbstractStreamDataSource {
+public class FileSource extends ParserDataSource {
 
 	private final File file;
 	private final Parser parser;

@@ -7,6 +7,9 @@ import net.sf.jannot.Located;
 import net.sf.jannot.Location;
 
 /**
+ * contains alignment data {@link Location}s- for some chromosome related to the
+ * reference chromosome See {@link MAFMemoryMultipleAlignment}
+ * 
  * @author Thomas Abeel
  * 
  */
@@ -14,7 +17,7 @@ public abstract class AbstractAlignmentBlock
 		implements Comparable<AbstractAlignmentBlock>, Located,
 		Iterable<AbstractAlignmentSequence> {
 	/* Buffers for finding nucleotides */
-	private Location loc = new Location(0, 0);
+	private final Location loc;
 
 	public AbstractAlignmentBlock(int start, int end) {
 		this.loc = new Location(start, end);

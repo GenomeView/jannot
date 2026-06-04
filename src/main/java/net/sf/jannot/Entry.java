@@ -104,6 +104,8 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	}
 
 	/**
+	 * Stores given data under the key. If the key already contains data, this
+	 * does nothing and your data is NOT stored.
 	 * 
 	 * @param key     the key ID
 	 * @param newData the data to add to this entry. Nothing happens if the key

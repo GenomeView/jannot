@@ -14,6 +14,7 @@ import tudelft.utilities.logging.Reporter;
 /**
  * This is an object from which an {@link EntrySet} can be read.
  * 
+ * 
  * @author Thomas Abeel
  * 
  */

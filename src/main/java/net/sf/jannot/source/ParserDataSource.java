@@ -3,20 +3,22 @@
  */
 package net.sf.jannot.source;
 
+import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.parser.Parser;
 
 /**
- * Extends DataSource.
+ * Extends DataSource. These Data Sources use a Parser to convert the data
+ * stream to an {@link EntrySet}
  * 
  * Contains methods to read
  * 
  * @author Thomas Abeel
  *
  */
-public abstract class AbstractStreamDataSource extends DataSource {
+public abstract class ParserDataSource extends DataSource {
 
-	protected AbstractStreamDataSource(Locator l, Global global) {
+	protected ParserDataSource(Locator l, Global global) {
 		super(l, global);
 	}
 

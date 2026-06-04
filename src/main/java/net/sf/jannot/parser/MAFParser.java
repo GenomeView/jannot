@@ -46,7 +46,7 @@ public class MAFParser extends Parser {
 		MemoryAlignmentBlock a = null;
 		Entry entry = null;
 		MAFMemoryMultipleAlignment ma = null;
-		boolean first = true;
+		boolean first = true;// true iff first line after 'a'
 		int row = 1;
 		for (final String line : it) {
 			if (line.charAt(0) == 'a') {
@@ -60,24 +60,19 @@ public class MAFParser extends Parser {
 					break;
 				}
 
-				String[] name = arr[1].split("\\.");
-
 				if (first) {
-					ma = new MAFMemoryMultipleAlignment(getGlobal());
-					if (set.getEntry(name[name.length - 1]) != null) {
-						entry = set.getOrCreateEntry(name[name.length - 1]);
-					} else {
-						entry = set.getOrCreateEntry(arr[1]);
-					}
+					// first line is reference genome.
+//					final String[] names = arr[1].split("\\.");
+//					final String name = names[names.length - 1];
+					entry = set.getOrCreateEntry(arr[1]);
 					if (entry.get(dataKey) != null) {
 						ma = (MAFMemoryMultipleAlignment) entry.get(dataKey);
 					} else {
+						ma = new MAFMemoryMultipleAlignment(getGlobal());
 						entry.add(dataKey, ma);
 					}
-
 				}
 
-				// }
 				MemorySequence seq = new MemorySequence(arr[6], getGlobal());
 				AbstractAlignmentSequence s = new MemoryAlignmentSequence(
 						arr[1], Integer.parseInt(arr[2]),

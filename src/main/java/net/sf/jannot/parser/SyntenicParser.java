@@ -67,7 +67,7 @@ public class SyntenicParser extends Parser {
 
 		final List<SyntenicBlock> blocks = new ArrayList<>();
 		for (final String line : it) {
-			final String[] arr = line.split("\t");
+			final String[] arr = line.split("[ \\t]+");
 			if (line.length() < 8) {
 				getLog().log(Level.SEVERE,
 						"Expected at least 8 values but got " + line);
@@ -93,7 +93,7 @@ public class SyntenicParser extends Parser {
 
 		// add this data to ALL relevant Entry's
 		for (String ref : data.getReferences()) {
-			// FIXME loading multiple syntenics might overwrite existing
+			// FIXME loading multiple syntenics does not work
 			set.getOrCreateEntry(ref).add(SYNTENIC_KEY, data.get(ref));
 		}
 

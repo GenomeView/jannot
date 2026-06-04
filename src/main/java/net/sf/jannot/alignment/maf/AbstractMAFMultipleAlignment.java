@@ -12,6 +12,8 @@ import net.sf.jannot.Data;
 import net.sf.jannot.Global;
 
 /**
+ * Contains species and list of location info.
+ * 
  * @author Thomas Abeel
  * 
  */
@@ -19,6 +21,7 @@ public abstract class AbstractMAFMultipleAlignment
 		implements Data<AbstractAlignmentBlock> {
 
 	private final Global global;
+	private final Set<String> species = new HashSet<String>();
 
 	public AbstractMAFMultipleAlignment(Global global) {
 		this.global = global;
@@ -34,8 +37,6 @@ public abstract class AbstractMAFMultipleAlignment
 		return "Multiple alignment";
 	}
 
-	private Set<String> species = new HashSet<String>();
-
 	/**
 	 * @param string
 	 */
@@ -45,7 +46,7 @@ public abstract class AbstractMAFMultipleAlignment
 	}
 
 	public Collection<String> species() {
-		return Collections.unmodifiableCollection(species);
+		return Collections.unmodifiableSet(species);
 	}
 
 	@Override

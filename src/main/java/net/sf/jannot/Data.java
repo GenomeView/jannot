@@ -6,10 +6,10 @@ package net.sf.jannot;
 import java.io.IOException;
 
 /**
- * Data of type K related to genome. data is a value of type K for each
- * nucleotide position in the sequence (which is usually coming from separate
- * FASTA). Typically part of an {@link Entry} that collects all related data.
- * Data has a start and end point, a label, and can be iterated over
+ * Data is basically a Map&lt;Location,K&gt;. So it attaches data of type K to
+ * the genome. Additionally there is a label for this data. for each nucleotide
+ * position in the sequence (which is usually coming from separate FASTA).
+ * Typically part of an {@link Entry} that collects all related data.
  * 
  * @author Thomas Abeel
  */

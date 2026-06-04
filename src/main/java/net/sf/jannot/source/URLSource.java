@@ -19,7 +19,7 @@ import tudelft.utilities.logging.Reporter;
  * @author Thomas Abeel
  *
  */
-public class URLSource extends AbstractStreamDataSource {
+public class URLSource extends ParserDataSource {
 
 	protected final URL url;
 	private final long cachedSize;
