@@ -11,7 +11,6 @@ import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,6 +27,7 @@ import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.alignment.maf.AbstractAlignmentBlock;
 import net.sf.jannot.alignment.maf.AbstractAlignmentSequence;
 import net.sf.jannot.alignment.maf.MAFMemoryMultipleAlignment;
+import net.sf.jannot.alignment.maf.MemoryAlignmentSequence;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
@@ -57,11 +57,12 @@ public class MAFParserTest {
 		verify(log, times(0)).log(eq(Level.SEVERE), anyString(), any());
 	}
 
-	private void testFile(File file)
-			throws URISyntaxException, IOException, ReadFailedException {
+	@Test
+	public void testOfficialFile() throws Exception {
 
+		File f = DataManager.file("test.maf");
 		DataSource ds = global.getSourceFactory()
-				.create(new Locator(file, global.getLog()), global);
+				.create(new Locator(f, global.getLog()), global);
 		assertTrue(ds instanceof FileSource);
 		assertTrue(((FileSource) ds).getParser() instanceof MAFParser);
 
@@ -106,8 +107,43 @@ public class MAFParserTest {
 	}
 
 	@Test
-	public void testReadMAF() throws Exception {
-		File f = DataManager.file("test.maf");
-		testFile(f);
+	public void testAnthracisMaf() throws Exception {
+		// actual files look different. Checking 1 to be sure it all works
+		File f = DataManager.file("anthracis_short.maf");
+		DataSource ds = global.getSourceFactory()
+				.create(new Locator(f, global.getLog()), global);
+		assertTrue(ds instanceof FileSource);
+		assertTrue(((FileSource) ds).getParser() instanceof MAFParser);
+
+		EntrySet es = ds.read(new EntrySet(global));
+		checkLogs();
+		assertEquals(1, es.size());
+		Entry entry = es.firstEntry();
+		assertEquals("anthracis", entry.getID());
+
+		// the name of the entry is weird, the full filename
+		// src/test/resources/anthracis.bedGraph. Just get first
+
+		Data<?> data = entry.get(entry.keys().iterator().next());
+		assertTrue(data instanceof MAFMemoryMultipleAlignment);
+
+		MAFMemoryMultipleAlignment maf = (MAFMemoryMultipleAlignment) data;
+		assertEquals(8, maf.species().size());
+
+		// there are 3 alignment blocks in the file
+		assertEquals(6, maf.noAlignmentBlocks());
+
+		// get the first one
+		Iterator<AbstractAlignmentBlock> blockiter = maf.get().iterator();
+		AbstractAlignmentBlock block1 = blockiter.next();
+
+		// it has 7 items: anthracis, licheniformis,..., amylolique
+		assertEquals(7, block1.size());
+		AbstractAlignmentSequence data1 = block1.iterator().next();
+		assertTrue(data1 instanceof MemoryAlignmentSequence);
+		MemoryAlignmentSequence mas = (MemoryAlignmentSequence) data1;
+		assertEquals(19, mas.seq().size());
+
 	}
+
 }
