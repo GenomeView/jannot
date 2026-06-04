@@ -8,6 +8,11 @@ import net.sf.jannot.event.ChangeEvent;
 /**
  * A Location is a range with start, end position. It usually means nucleotide
  * position, so locations on a genome.
+ * 
+ * Location is 1-based: the first item has index 1. Also both start and end are
+ * inclusive.
+ * 
+ * Note that parsers that are 0-based like BED need to convert parsed locations.
  */
 public class Location implements Comparable<Location> {
 
@@ -26,9 +31,11 @@ public class Location implements Comparable<Location> {
 	/**
 	 * The main constructor
 	 * 
-	 * @param start      One endpoint of the interval. Can be negative. If
-	 *                   smaller than end, start is used as end
-	 * @param end        the other endpoint of the interval. Can be negative. If
+	 * @param start      start of the interval. One-based, inclusive. Can be
+	 *                   negative but probably shouldn't. If smaller than end,
+	 *                   start is used as end
+	 * @param end        the other endpoint of the interval. One-based,
+	 *                   inclusive. Can be negative but probably shouldn't. If
 	 *                   smaller than start, end is used as start
 	 * @param fuzzyStart true iff start is fuzzy. NOTE this has no meaning
 	 *                   anywhere excpet for {@link #toString()}
