@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import java.io.IOException;
 import java.util.logging.Level;
 
+import org.junit.After;
 import org.junit.Test;
 
 import net.sf.jannot.exception.ReadFailedException;
@@ -33,6 +34,11 @@ public class EntryTest {
 		entry1a = new Entry("test", global);
 		entry2 = new Entry("other", global);
 
+	}
+
+	@After
+	public void after() {
+		checkLogs();
 	}
 
 	private void checkLogs() {

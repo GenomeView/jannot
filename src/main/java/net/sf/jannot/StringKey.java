@@ -2,14 +2,17 @@ package net.sf.jannot;
 
 import java.util.Objects;
 
+/**
+ * Key to refer to {@link Data} in {@link Entry}
+ */
 public class StringKey implements DataKey {
+
+	private final String key;
 
 	@Override
 	public String toString() {
 		return key;
 	}
-
-	private String key;
 
 	public StringKey(String key) {
 		this.key = key;

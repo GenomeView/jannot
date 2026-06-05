@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.refseq.Sequence;
@@ -109,16 +110,12 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	 */
 	public void add(DataKey key, Data<?> newData) {
 
-		if (!data.containsKey(key)) {
-			data.put(key, newData);
+		if (data.containsKey(key)) {
+			global.getLog().log(Level.WARNING,
+					"ignoring data: key already used " + key);
+			return;
 		}
-		// else {
-		// FIXME implement for feature data
-		// FIXME don't log 'severe' if it's actually ignored.
-		// FIXME maybe do warning, for now just ignore the whole thing
-		// log.severe("Entry already contains data for " + key
-		// + ". new data is ignored");
-		// }
+		data.put(key, newData);
 
 	}
 

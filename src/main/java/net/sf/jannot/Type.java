@@ -4,11 +4,11 @@
 package net.sf.jannot;
 
 /**
- * Class 'Type' contains list of group names which features can be classified.
- * e.g. CDS, intergenic, BED.
- * 
- * new Types are added by parsers and the list may grow during use. It is not
- * clear what this is used for.
+ * contains list of group names which features can be classified. e.g. CDS,
+ * intergenic, BED. Used to look up {@link Data} in {@link Entry} and to create
+ * a sort order of data types.
+ * <p>
+ * new Types are added by parsers and the list may grow during use.
  * 
  * @author Thomas Abeel
  * 

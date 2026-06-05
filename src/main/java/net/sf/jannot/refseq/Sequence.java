@@ -7,7 +7,7 @@ import net.sf.jannot.Data;
 import net.sf.jannot.Global;
 
 /**
- * a Data set with {@link Character}s
+ * a Data set with a sequence of nucleotide {@link Character}s
  * 
  * @author Thomas Abeel
  *
@@ -35,6 +35,10 @@ public abstract class Sequence implements Data<Character> {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @return number of nucleotides in this sequence.
+	 */
 	public abstract int size();
 
 	/**
