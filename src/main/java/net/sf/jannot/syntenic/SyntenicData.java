@@ -14,8 +14,7 @@ import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 
 /**
- * Contains Syntenic Data which is just a set of {@link SyntenicBlock}s. Work in
- * progress, not yet working, part of #34
+ * Contains Syntenic Data which is just a set of {@link SyntenicBlock}s.
  */
 public class SyntenicData implements Data<SyntenicBlock> {
 
