@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
@@ -70,7 +69,7 @@ public class Global {
 	/**
 	 * Default constructor. Mostly used for testing and debugging
 	 */
-	public Global() throws IOException, ReadFailedException {
+	public Global() throws IOException {
 		log = new DistributingReporter();
 		interceptor = new JavaLogInterceptor(log);
 		ns = new NameService(log);

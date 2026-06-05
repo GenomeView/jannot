@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
-import net.sf.jannot.exception.ReadFailedException;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -19,7 +18,7 @@ public class NameService {
 	private final Map<String, String> map = new HashMap<String, String>();
 	private final Reporter log;
 
-	public NameService(Reporter reporter) throws ReadFailedException {
+	public NameService(Reporter reporter) {
 		this.log = reporter;
 		resetDefault();
 	}
@@ -40,7 +39,7 @@ public class NameService {
 		}
 	}
 
-	public void resetDefault() throws ReadFailedException {
+	public void resetDefault() {
 		map.clear();
 		addSynonyms(NameService.class.getResourceAsStream("synonyms.txt"));
 	}
@@ -68,9 +67,8 @@ public class NameService {
 	 * is added with {@link #addSynonym(XX, AA..FF)}
 	 * 
 	 * @param is the {@link InputStream}
-	 * @throws ReadFailedException
 	 */
-	public void addSynonyms(InputStream is) throws ReadFailedException {
+	public void addSynonyms(InputStream is) {
 		for (String line : new LineIterator(is, true, true)) {
 			String[] prim = line.split("=");
 			addSynonym(prim[0], prim[1]);
