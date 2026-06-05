@@ -36,7 +36,6 @@ import org.junit.Test;
 import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.parser.software.BlastM8Parser;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.cache.SourceCache;
@@ -53,7 +52,7 @@ public class TestParserDetection {
 	private final Global global;
 	private final DistributingReporter log;
 
-	public TestParserDetection() throws ReadFailedException, IOException {
+	public TestParserDetection() throws IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),

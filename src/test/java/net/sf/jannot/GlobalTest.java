@@ -11,13 +11,12 @@ import java.util.logging.Logger;
 
 import org.junit.Test;
 
-import net.sf.jannot.exception.ReadFailedException;
 import tudelft.utilities.logging.Reporter;
 
 public class GlobalTest {
 	private final Global global;
 
-	public GlobalTest() throws IOException, ReadFailedException {
+	public GlobalTest() throws IOException {
 		global = new Global();
 
 	}

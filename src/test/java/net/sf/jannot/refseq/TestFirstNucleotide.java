@@ -10,7 +10,6 @@ import org.junit.Test;
 import net.sf.jannot.Cleaner;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.IndexedFastaDataSource;
 import net.sf.jannot.source.Locator;
 
@@ -22,13 +21,13 @@ import net.sf.jannot.source.Locator;
 public class TestFirstNucleotide {
 	private final Global global;
 
-	public TestFirstNucleotide() throws ReadFailedException, IOException {
+	public TestFirstNucleotide() throws IOException {
 		global = new Global();
 	}
 
 	@Test
-	public void testNucleotide() throws MalformedURLException, IOException,
-			ReadFailedException, URISyntaxException {
+	public void testNucleotide()
+			throws MalformedURLException, IOException, URISyntaxException {
 
 		global.getLog().log(Level.INFO, "Loading source");
 		Locator l = new Locator("http://genomeview.org/frigg/genome.fasta",

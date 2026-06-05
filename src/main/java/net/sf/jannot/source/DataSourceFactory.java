@@ -9,7 +9,6 @@ import java.util.logging.Level;
 
 import net.sf.jannot.Global;
 import net.sf.jannot.bigwig.BigWigDataSource;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.cache.CachedURLSource;
 import net.sf.jannot.source.cache.SourceCache;
 import net.sf.jannot.tabix.IndexedFeatureFile;
@@ -54,7 +53,7 @@ public class DataSourceFactory {
 	}
 
 	public DataSource create(Locator locator, Global log)
-			throws URISyntaxException, IOException, ReadFailedException {
+			throws URISyntaxException, IOException {
 		return create(locator, null, log);
 
 	}

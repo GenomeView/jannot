@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import junit.framework.Assert;
 import net.sf.jannot.Global;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.refseq.MemorySequence;
 
 /**
@@ -21,7 +20,7 @@ public class TestSequenceTools {
 
 	private final Global global;
 
-	public TestSequenceTools() throws IOException, ReadFailedException {
+	public TestSequenceTools() throws IOException {
 		global = new Global();
 	}
 

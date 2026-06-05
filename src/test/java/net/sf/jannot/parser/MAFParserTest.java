@@ -28,7 +28,6 @@ import net.sf.jannot.alignment.maf.AbstractAlignmentBlock;
 import net.sf.jannot.alignment.maf.AbstractAlignmentSequence;
 import net.sf.jannot.alignment.maf.MAFMemoryMultipleAlignment;
 import net.sf.jannot.alignment.maf.MemoryAlignmentSequence;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.FileSource;
@@ -42,7 +41,7 @@ public class MAFParserTest {
 	private final DistributingReporter log;
 	private final Global global;
 
-	public MAFParserTest() throws ReadFailedException, IOException {
+	public MAFParserTest() throws IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),

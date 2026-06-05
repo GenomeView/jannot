@@ -17,7 +17,6 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.StringKey;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;

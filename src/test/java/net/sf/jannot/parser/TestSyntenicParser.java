@@ -37,7 +37,6 @@ import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
@@ -52,7 +51,7 @@ public class TestSyntenicParser {
 	private final Global global;
 	private final DistributingReporter log;
 
-	public TestSyntenicParser() throws ReadFailedException, IOException {
+	public TestSyntenicParser() throws IOException {
 		log = mock(DistributingReporter.class);
 		DataSourceFactory factory = new DataSourceFactory(
 				mock(SourceCache.class), true);

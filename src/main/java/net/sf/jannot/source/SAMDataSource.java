@@ -26,7 +26,6 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.shortread.BAMreads;
 import tudelft.utilities.logging.Reporter;
@@ -70,7 +69,7 @@ public class SAMDataSource extends DataSource {
 			} else {
 				init(data.file(), index.file());
 			}
-		} catch (IOException | ReadFailedException | URISyntaxException e) {
+		} catch (IOException | URISyntaxException e) {
 			global.getLog().log(Level.WARNING, "failed to init SAMDataSource",
 					e);
 		}
@@ -199,8 +198,7 @@ public class SAMDataSource extends DataSource {
 	 * @throws ReadFailedException
 	 * @throws URISyntaxException
 	 */
-	private void init(URL url, URL idx)
-			throws IOException, ReadFailedException, URISyntaxException {
+	private void init(URL url, URL idx) throws IOException, URISyntaxException {
 		setSourceKey(new SAMKey(url.toString()));
 		/* BAM file */
 		// content =new SeekableHTTPStream(url);
@@ -227,7 +225,7 @@ public class SAMDataSource extends DataSource {
 	 * @throws URISyntaxException
 	 */
 	private void init(URL url, File idx)
-			throws IOException, ReadFailedException, URISyntaxException {
+			throws IOException, URISyntaxException {
 		setSourceKey(new SAMKey(url.toString()));
 		/* BAM file */
 		// content =new SeekableHTTPStream(url);

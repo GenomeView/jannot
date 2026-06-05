@@ -23,7 +23,6 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
@@ -42,7 +41,7 @@ public class TestFastaParser {
 	private final DistributingReporter log;
 	private final Global global;
 
-	public TestFastaParser() throws ReadFailedException, IOException {
+	public TestFastaParser() throws IOException {
 		log = mock(DistributingReporter.class);
 		DataSourceFactory factory = new DataSourceFactory(
 				mock(SourceCache.class), true);
@@ -59,8 +58,7 @@ public class TestFastaParser {
 		verify(log, times(0)).log(eq(Level.SEVERE), anyString(), any());
 	}
 
-	private void testFile(File file)
-			throws URISyntaxException, IOException, ReadFailedException {
+	private void testFile(File file) throws URISyntaxException, IOException {
 		DataSource ds = global.getSourceFactory()
 				.create(new Locator(file, global.getLog()), global);
 		EntrySet es = ds.read(new EntrySet(global));

@@ -23,7 +23,6 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.StringKey;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
@@ -37,7 +36,7 @@ public class TestWigParser {
 	private final DistributingReporter log;
 	private final Global global;
 
-	public TestWigParser() throws ReadFailedException, IOException {
+	public TestWigParser() throws IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),
@@ -52,8 +51,7 @@ public class TestWigParser {
 		verify(log, times(0)).log(eq(Level.SEVERE), anyString(), any());
 	}
 
-	private void testFile(File file)
-			throws URISyntaxException, IOException, ReadFailedException {
+	private void testFile(File file) throws URISyntaxException, IOException {
 		DataSource ds = global.getSourceFactory()
 				.create(new Locator(file, global.getLog()), global);
 		EntrySet es = ds.read(new EntrySet(global));

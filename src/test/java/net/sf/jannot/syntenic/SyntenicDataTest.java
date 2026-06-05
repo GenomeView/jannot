@@ -11,7 +11,6 @@ import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
@@ -34,7 +33,7 @@ public class SyntenicDataTest {
 	private final static SyntenicBlock block2 = new SyntenicBlock(id1, id3,
 			loc2, loc3, Strand.FORWARD, Strand.REVERSE);
 
-	public SyntenicDataTest() throws ReadFailedException {
+	public SyntenicDataTest() {
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),
 				new DataSourceFactory(mock(SourceCache.class), true));

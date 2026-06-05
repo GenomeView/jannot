@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import org.junit.Test;
 import org.mockito.exceptions.verification.NeverWantedButInvoked;
 
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.source.DataSourceFactory;
@@ -43,7 +42,7 @@ public class EntryTest {
 	private final Global global;
 	private final Entry entry1, entry1a, entry2;
 
-	public EntryTest() throws ReadFailedException, IOException {
+	public EntryTest() throws IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),

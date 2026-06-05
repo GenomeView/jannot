@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import net.sf.jannot.Global;
-import net.sf.jannot.exception.ReadFailedException;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -19,7 +18,7 @@ public class NameServiceTest {
 	private final Reporter log;
 	private NameService ns;
 
-	public NameServiceTest() throws ReadFailedException, IOException {
+	public NameServiceTest() throws IOException {
 		Global global = new Global();
 		log = global.getLog();
 		ns = global.getNameService();

@@ -17,7 +17,6 @@ import org.junit.Test;
 import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
@@ -27,7 +26,7 @@ public class TestParserList {
 	private final Global global;
 	private final DistributingReporter log;
 
-	public TestParserList() throws ReadFailedException, IOException {
+	public TestParserList() throws IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),

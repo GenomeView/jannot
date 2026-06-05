@@ -14,7 +14,6 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
@@ -32,7 +31,7 @@ public class TestMiniBAM {
 	private final Global global;
 	private final DistributingReporter log = mock(DistributingReporter.class);
 
-	public TestMiniBAM() throws IOException, ReadFailedException {
+	public TestMiniBAM() throws IOException {
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),
 				new DataSourceFactory(mock(SourceCache.class), true));

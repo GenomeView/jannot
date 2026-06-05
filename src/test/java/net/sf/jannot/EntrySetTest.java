@@ -6,8 +6,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import net.sf.jannot.exception.ReadFailedException;
-
 /**
  * 
  * @author Thomas Abeel
@@ -17,7 +15,7 @@ public class EntrySetTest {
 
 	private final Global global;
 
-	public EntrySetTest() throws IOException, ReadFailedException {
+	public EntrySetTest() throws IOException {
 
 		global = new Global();
 	}

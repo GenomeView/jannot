@@ -41,7 +41,6 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.MemoryFeatureAnnotation;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
@@ -59,7 +58,7 @@ public class TestVCFParser {
 	private final DistributingReporter log;
 	private final Global global;
 
-	public TestVCFParser() throws ReadFailedException, IOException {
+	public TestVCFParser() throws IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),

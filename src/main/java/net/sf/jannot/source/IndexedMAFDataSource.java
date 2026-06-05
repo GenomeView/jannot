@@ -16,7 +16,6 @@ import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.mafix.IndexedMAF;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 

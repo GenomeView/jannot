@@ -14,7 +14,6 @@ import org.junit.Test;
 
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.IndexedFastaDataSource;
 import net.sf.jannot.source.Locator;
 import tudelft.utilities.logging.Reporter;
@@ -23,14 +22,14 @@ public class TestSequence {
 
 	private final Global global;
 
-	public TestSequence() throws IOException, ReadFailedException {
+	public TestSequence() throws IOException {
 		this.global = new Global();
 	}
 
 	@Ignore // urls give access denied
 	@Test
-	public void testFaidx() throws URISyntaxException, MalformedURLException,
-			ReadFailedException, IOException {
+	public void testFaidx()
+			throws URISyntaxException, MalformedURLException, IOException {
 		Reporter log = global.getLog();
 		Locator l = new Locator(
 				"http://bioinformatics.psb.ugent.be/downloads/genomeview/genomes/hg19/genome.fasta",

@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import net.sf.jannot.Entry;
 import net.sf.jannot.Global;
-import net.sf.jannot.exception.ReadFailedException;
 
 /**
  * 
@@ -22,7 +21,7 @@ public class TestMemorySequence {
 
 	private final Global global;
 
-	public TestMemorySequence() throws IOException, ReadFailedException {
+	public TestMemorySequence() throws IOException {
 		global = new Global();
 
 	}
