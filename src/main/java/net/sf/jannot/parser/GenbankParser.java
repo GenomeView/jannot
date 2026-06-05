@@ -92,7 +92,7 @@ public class GenbankParser extends Parser {
 //				e = set.getOrCreateEntry(arr[1]);
 				version = arr[1];
 //				if(version!=null)
-				e.description.put("VERSION", version);
+				e.getDescription().put("VERSION", version);
 
 			}
 			if (line.startsWith("ACCESSION")) {
@@ -106,10 +106,10 @@ public class GenbankParser extends Parser {
 				e = set.getOrCreateEntry(arr[1]);
 //				
 				if (locus != null) {
-					e.description.put("LOCUS", locus);
+					e.getDescription().put("LOCUS", locus);
 				}
 				if (definition != null) {
-					e.description.put("DEFINITION", definition);
+					e.getDescription().put("DEFINITION", definition);
 				}
 
 			}

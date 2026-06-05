@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
@@ -25,13 +26,13 @@ public class NameService {
 
 	/**
 	 * 
-	 * @param key an un-cleaned key
+	 * @param key a non-null un-cleaned key
 	 * @return a cleaned key, with all leading and trailing spaces removed. But
 	 *         if the cleaned key in all-upper-case is a known key, the value
 	 *         stored for that key is returned.
 	 */
 	public String getPrimaryName(String key) {
-		key = key.trim();
+		key = Objects.requireNonNull(key).trim();
 		if (map.containsKey(key.toUpperCase())) {
 			return map.get(key.toUpperCase());
 		} else {

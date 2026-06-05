@@ -15,6 +15,7 @@ import java.util.logging.Level;
 
 import be.abeel.io.LineIterator;
 import net.sf.jannot.DataKey;
+import net.sf.jannot.Description;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
@@ -178,26 +179,26 @@ public class EMBLParser extends Parser {
 	}
 
 	private void processLine(String line, Entry entry) {
-
+		Description description = entry.getDescription();
 		if (line.startsWith("AC")) {
 			String[] arr = line.substring(5).split(";");
 			for (String s : arr) {
-				entry.description.add("acc", s.trim());
+				description.add("acc", s.trim());
 			}
 
 		} else if (line.startsWith("PR")) {
-			entry.description.put("project identifier", line.substring(5));
+			description.put("project identifier", line.substring(5));
 
 		} else if (line.startsWith("DT")) {
 			processDate(line, entry);
 		} else if (line.startsWith("DE")) {
-			entry.description.add("description", line.substring(5));
+			description.add("description", line.substring(5));
 		} else if (line.startsWith("KW")) {
-			entry.description.add("kw", line.substring(5));
+			description.add("kw", line.substring(5));
 		} else if (line.startsWith("OS")) {
-			entry.description.add("os", line.substring(5));
+			description.add("os", line.substring(5));
 		} else if (line.startsWith("OC")) {
-			entry.description.add("oc", line.substring(5));
+			description.add("oc", line.substring(5));
 		} else if (line.startsWith("R")) {
 			// TODO implement reference stuff
 			// System.out.println("Ignoring reference line: " + line);
@@ -224,10 +225,10 @@ public class EMBLParser extends Parser {
 
 	private void processDate(String line, Entry entry) {
 		if (firstDateLine) {
-			entry.description.put("first date", line.substring(5));
+			entry.getDescription().put("first date", line.substring(5));
 			firstDateLine = false;
 		} else {
-			entry.description.put("second date", line.substring(5));
+			entry.getDescription().put("second date", line.substring(5));
 		}
 
 	}
@@ -243,10 +244,11 @@ public class EMBLParser extends Parser {
 			return set.getOrCreateEntry(emergencyID);
 		}
 		Entry out = set.getOrCreateEntry(arr[0].trim());
-		out.description.put("seqversion", arr[1].substring(3).trim());
-		out.description.put("moleculeType", arr[3].trim());
-		out.description.put("dataClass", arr[4].trim());
-		out.description.put("taxDivision", arr[5].trim());
+		Description description = out.getDescription();
+		description.put("seqversion", arr[1].substring(3).trim());
+		description.put("moleculeType", arr[3].trim());
+		description.put("dataClass", arr[4].trim());
+		description.put("taxDivision", arr[5].trim());
 		return out;
 	}
 
@@ -257,22 +259,23 @@ public class EMBLParser extends Parser {
 
 	@Override
 	public void write(OutputStream os, Entry e, List<? extends DataKey> dks) {
+		Description description = e.getDescription();
 
 		PrintWriter out = new PrintWriter(new OutputStreamWriter(os));
 		/* ID line */
 		out.println("ID" + spacer + e.getID() + "; SV "
-				+ e.description.get("seqversion") + "; linear; "
-				+ e.description.get("moleculeType") + "; "
-				+ e.description.get("dataClass") + "; "
-				+ e.description.get("taxDivision") + "; " + e.sequence().size()
+				+ description.get("seqversion") + "; linear; "
+				+ description.get("moleculeType") + "; "
+				+ description.get("dataClass") + "; "
+				+ description.get("taxDivision") + "; " + e.sequence().size()
 				+ " BP.");
 		out.println("XX");
 
 		/* Accession line */
 		String primaryAcc = e.getID();
 		out.print("AC" + spacer + primaryAcc + "; ");
-		if (e.description.get("acc") != null) {
-			for (String acc : e.description.get("acc").split("\n")) {
+		if (description.get("acc") != null) {
+			for (String acc : description.get("acc").split("\n")) {
 				if (!acc.equals(primaryAcc)) {
 					out.print(acc + "; ");
 				}
@@ -281,30 +284,30 @@ public class EMBLParser extends Parser {
 		out.println();
 		out.println("XX");
 		/* Date lines */
-		out.println("DT" + spacer + e.description.get("first date"));
-		out.println("DT" + spacer + e.description.get("second date"));
+		out.println("DT" + spacer + description.get("first date"));
+		out.println("DT" + spacer + description.get("second date"));
 		out.println("XX");
 
 		/* Description lines */
-		if (e.description.get("description") != null) {
+		if (description.get("description") != null) {
 			for (String line : new LineIterator(new StringReader(
-					e.description.get("description").toString()))) {
+					description.get("description").toString()))) {
 				out.println("DE" + spacer + line);
 			}
 			out.println("XX");
 		}
 
 		/* O lines */
-		if (e.description.get("os") != null) {
-			out.println("OS" + spacer + e.description.get("os"));
+		if (description.get("os") != null) {
+			out.println("OS" + spacer + description.get("os"));
 			out.println("XX");
 		}
-		if (e.description.get("oc") != null) {
-			out.println("OC" + spacer + e.description.get("oc"));
+		if (description.get("oc") != null) {
+			out.println("OC" + spacer + description.get("oc"));
 			out.println("XX");
 		}
-		if (e.description.get("kw") != null) {
-			out.println("KW" + spacer + e.description.get("kw"));
+		if (description.get("kw") != null) {
+			out.println("KW" + spacer + description.get("kw"));
 			out.println("XX");
 		}
 		/* Feature header */

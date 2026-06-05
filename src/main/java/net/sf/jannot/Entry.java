@@ -52,7 +52,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	private static final StringKey seqKey = new StringKey(
 			"SEQ*(^#%(@#%)@#^@#^))^)@#)^(@#%^*()SEQ");
 
-	public final Description description = new Description();
+	private final Description description = new Description();
 
 	// map itself is mutable
 	private final Map<DataKey, Data<?>> data = new HashMap<DataKey, Data<?>>();
@@ -68,11 +68,7 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	 * @param global the {@link Global} structures
 	 */
 	public Entry(String id, Global global) {
-		id = global.getNameService().getPrimaryName(id);
-		if (id == null) {
-			throw new RuntimeException("id is null");
-		}
-		this.id = id;
+		this.id = global.getNameService().getPrimaryName(id);
 		this.global = global;
 
 	}
@@ -237,7 +233,14 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	 */
 	public void remove(DataKey dataKey) {
 		data.remove(dataKey);
+	}
 
+	/**
+	 * @return the description map. The original map is returned and any
+	 *         modifications in it will change this entry
+	 */
+	public Description getDescription() {
+		return description;
 	}
 
 }

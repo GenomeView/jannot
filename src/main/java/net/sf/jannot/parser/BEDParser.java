@@ -80,9 +80,9 @@ public class BEDParser extends Parser {
 			if (entry.get(data) instanceof FeatureAnnotation) {
 				String headerLine = "track name=\"" + entry.get(data).label()
 						+ "\"";
-				if (entry.description.keys().size() > 0) {
+				if (entry.getDescription().keys().size() > 0) {
 					headerLine += " description=\""
-							+ entry.description.toString() + "\"";
+							+ entry.getDescription().toString() + "\"";
 				}
 				out.println(headerLine);
 				FeatureAnnotation fa = (FeatureAnnotation) entry.get(data);

@@ -113,8 +113,8 @@ public class FastaParser extends Parser {
 	@Override
 	public void write(OutputStream os, Entry entry) {
 		PrintWriter out = new PrintWriter(new BufferedOutputStream(os));
-		if (entry.description.get("header") != null) {
-			out.println(">" + entry.description.get("header"));
+		if (entry.getDescription().get("header") != null) {
+			out.println(">" + entry.getDescription().get("header"));
 		} else {
 			out.println(">" + entry.getID());
 		}
