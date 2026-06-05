@@ -13,7 +13,6 @@ import java.util.BitSet;
 
 import htsjdk.samtools.seekablestream.SeekableHTTPStream;
 import net.sf.jannot.Cleaner;
-import net.sf.jannot.exception.ReadFailedException;
 
 /**
  * @author Thomas Abeel
@@ -25,8 +24,7 @@ public class SeekableFileCachedHTTPStream
 
 	private Cache cache;
 
-	public SeekableFileCachedHTTPStream(URL url)
-			throws IOException, ReadFailedException {
+	public SeekableFileCachedHTTPStream(URL url) throws IOException {
 		super(url);
 		cache = new Cache(url);
 
@@ -37,10 +35,12 @@ public class SeekableFileCachedHTTPStream
 		this.cache = c;
 	}
 
+	@Override
 	public void seek(long position) {
 		this.position = position;
 	}
 
+	@Override
 	public synchronized int read(byte[] buffer, int offset, int length)
 			throws IOException {
 		int n = cache.read(position, buffer, offset, length);
@@ -56,8 +56,9 @@ public class SeekableFileCachedHTTPStream
 	 */
 	public void closeAll() {
 		try {
-			for (RandomAccessFile raf : cache.rafs)
+			for (RandomAccessFile raf : cache.rafs) {
 				raf.close();
+			}
 		} catch (IOException e) {
 			// can't do much. print ends up nowhere and use can't do anything
 			// with it
@@ -82,7 +83,7 @@ class Cache {
 	// private URL url;
 	private SeekableHTTPStream urlstream;
 
-	Cache(URL url) throws IOException, ReadFailedException {
+	Cache(URL url) throws IOException {
 		urlstream = new SeekableHTTPStream(url);
 		long len = urlstream.length();
 //		log.fine("Reported size " + len + " for " + url);
@@ -166,8 +167,9 @@ class Cache {
 
 		/* Available bytes in first file */
 		long avail = BLOCKSIZE * BLOCKSPERFILE - position;
-		if (avail > length)
+		if (avail > length) {
 			avail = length;
+		}
 
 		// /--> read first chunk
 		while (n < avail) {

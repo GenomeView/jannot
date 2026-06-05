@@ -70,7 +70,7 @@ public class DataSourceFactory {
 	 * @throws ReadFailedException
 	 */
 	public DataSource create(Locator data, Locator index, Global global)
-			throws URISyntaxException, IOException, ReadFailedException {
+			throws URISyntaxException, IOException {
 		global.getLog().log(Level.INFO, "Data: " + data);
 		global.getLog().log(Level.INFO, "Index: " + index);
 		if (data.isURL()) {

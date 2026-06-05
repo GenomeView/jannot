@@ -16,7 +16,6 @@ import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.picard.SeekableFileCachedHTTPStream;
 import net.sf.jannot.refseq.FaidxData;
 import net.sf.jannot.refseq.FaidxIndex;
@@ -39,8 +38,7 @@ public class IndexedFastaDataSource extends DataSource {
 	 * @param global the {@link Reporter} to log issues to
 	 */
 	public IndexedFastaDataSource(Locator data, Locator index, Global global)
-			throws MalformedURLException, IOException, ReadFailedException,
-			URISyntaxException {
+			throws MalformedURLException, IOException, URISyntaxException {
 		super(data, global);
 		if (data.isURL()) {
 			content = new SeekableFileCachedHTTPStream(data.url());

@@ -40,8 +40,7 @@ public class IndexedMAFDataSource extends DataSource {
 	 * @throws MalformedURLException
 	 */
 	public IndexedMAFDataSource(Locator data, Locator index, Global global)
-			throws MalformedURLException, IOException, ReadFailedException,
-			URISyntaxException {
+			throws MalformedURLException, IOException, URISyntaxException {
 		super(data, global);
 		if (data.isURL()) {
 			content = new SeekableFileCachedHTTPStream(data.url());

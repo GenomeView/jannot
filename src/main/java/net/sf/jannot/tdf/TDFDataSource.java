@@ -42,8 +42,8 @@ public class TDFDataSource extends DataSource {
 	 * @throws IOException
 	 * @throws MalformedURLException
 	 */
-	public TDFDataSource(Locator l, Global global) throws ReadFailedException,
-			URISyntaxException, MalformedURLException, IOException {
+	public TDFDataSource(Locator l, Global global)
+			throws URISyntaxException, MalformedURLException, IOException {
 		super(l, global);
 		if (!l.isURL()) {
 			s = new SeekableFileStream(l.file());
