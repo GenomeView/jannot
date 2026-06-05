@@ -75,7 +75,9 @@ public class Entry implements Comparable<Entry>, Iterable<DataKey> {
 	}
 
 	/**
-	 * @return the highest position for which there is data
+	 * @return the highest position for which there is data. Only
+	 *         {@link Sequence} and {@link FeatureAnnotation} data is
+	 *         considered.
 	 */
 	public int getMaximumLength() {
 		// FIXME think of a more efficient way
