@@ -21,12 +21,12 @@ import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
 
-public class TestParserList {
+public class ParserListTest {
 
 	private final Global global;
 	private final DistributingReporter log;
 
-	public TestParserList() throws IOException {
+	public ParserListTest() throws IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),

@@ -25,7 +25,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -33,11 +32,18 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import net.sf.jannot.Data;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.DistributingReporter;
+import net.sf.jannot.Entry;
+import net.sf.jannot.EntrySet;
+import net.sf.jannot.Feature;
 import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
-import net.sf.jannot.parser.software.BlastM8Parser;
+import net.sf.jannot.MemoryFeatureAnnotation;
+import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.source.Locator;
 import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
 import support.DataManager;
@@ -47,12 +53,12 @@ import support.DataManager;
  * @author Thomas Abeel
  * 
  */
-public class TestParserDetection {
-	private static final String PAF = "YJM1447_vs_R64.paf";
-	private final Global global;
-	private final DistributingReporter log;
+public class VCFParserTest {
 
-	public TestParserDetection() throws IOException {
+	private final DistributingReporter log;
+	private final Global global;
+
+	public VCFParserTest() throws IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),
@@ -69,52 +75,61 @@ public class TestParserDetection {
 	}
 
 	@Test
-	public void testBED() throws Exception {
-		File f = DataManager.file("minibed.bed");
-		Parser p = ParserFactory.create(new FileInputStream(f), "file", global);
-		assertNotNull(p);
-		Assert.assertTrue("Wrong parser: " + p.getClass(),
-				p instanceof BEDParser);
+	public void testTinySize() throws Exception {
 
-	}
-
-	@Test
-	public void testVCF() throws Exception {
 		File f = DataManager.file("tiny.vcf");
-		Parser p = ParserFactory.create(new FileInputStream(f), "file", global);
-		assertNotNull(p);
-		Assert.assertTrue("Wrong parser: " + p.getClass(),
-				p instanceof VCFParser);
+		DataSource ds = global.getSourceFactory().create(new Locator(f, log),
+				global);
+		EntrySet es = ds.read(new EntrySet(global));
+		// System.out.println(es.firstEntry());
+		Assert.assertEquals("20", es.firstEntry().getID());
+		int count = 0;
+		for (Entry e : es) {
+			count++;
+		}
+		Assert.assertEquals(1, count);
+		Data d = es.firstEntry().get(global.typeFactory().get("tiny.vcf"));
+		for (DataKey dk : es.firstEntry()) {
+			assertNotNull(dk);
+
+		}
+		Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
+		MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
+
+		for (Feature feat : mfa.get()) {
+			assertNotNull(feat);
+		}
+
+		assertNotNull(d);
 
 	}
 
 	@Test
-	public void testBlast() throws Exception {
-		File f = DataManager.file("testblast.m8");
-		Parser p = ParserFactory.create(new FileInputStream(f), "file", global);
-		assertNotNull(p);
-		Assert.assertTrue("Wrong parser: " + p.getClass(),
-				p instanceof BlastM8Parser);
+	public void testRegularSize() throws Exception {
+
+		File f = DataManager.file("regular.vcf");
+		DataSource ds = global.getSourceFactory().create(new Locator(f, log),
+				global);
+		EntrySet es = ds.read(new EntrySet(global));
+		Assert.assertEquals("gi|395136682|gb|CP003248.1|",
+				es.firstEntry().getID());
+		int count = 0;
+		for (Entry e : es) {
+			count++;
+		}
+		Assert.assertEquals(1, count);
+		Data d = es.firstEntry().get(global.typeFactory().get("regular.vcf"));
+		for (DataKey dk : es.firstEntry()) {
+			assertNotNull(dk);
+		}
+		Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
+		MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
+
+		for (Feature feat : mfa.get()) {
+			assertNotNull(feat.type());
+		}
+
+		Assert.assertNotNull(d);
 
 	}
-
-	@Test
-	public void testPAF() throws Exception {
-		File f = DataManager.file("minibed.bed");
-		Parser p = ParserFactory.create(new FileInputStream(f), f, global);
-		assertNotNull(p);
-		Assert.assertTrue("Wrong parser: " + p.getClass(),
-				p instanceof BEDParser);
-
-	}
-
-	@Test
-	public void testSyntenic() throws Exception {
-		File f = DataManager.file(PAF);
-		Parser p = ParserFactory.create(new FileInputStream(f), "file", global);
-		assertNotNull(p);
-		Assert.assertTrue("Wrong parser: " + p.getClass(),
-				p instanceof SyntenicParser);
-	}
-
 }

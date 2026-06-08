@@ -57,12 +57,12 @@ import support.DataManager;
  * @author Thomas Abeel
  * 
  */
-public class TestBEDParser {
+public class BEDParserTest {
 
 	private final Global global;
 	private final DistributingReporter log;
 
-	public TestBEDParser() throws IOException {
+	public BEDParserTest() throws IOException {
 		log = mock(DistributingReporter.class);
 		DataSourceFactory factory = new DataSourceFactory(
 				mock(SourceCache.class), true);

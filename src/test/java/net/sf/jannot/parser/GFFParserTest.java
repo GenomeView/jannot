@@ -16,8 +16,6 @@
  */
 package net.sf.jannot.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -30,9 +28,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 
-import net.sf.jannot.Data;
 import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
@@ -41,17 +39,19 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import net.sf.jannot.source.cache.SourceCache;
-import net.sf.jannot.syntenic.SyntenicData;
 import net.sf.nameservice.NameService;
 import support.DataManager;
 
-public class TestSyntenicParser {
-	private static final String SYN_FILE = "test.syn";
-
+/**
+ * 
+ * @author Thomas Abeel
+ * 
+ */
+public class GFFParserTest {
 	private final Global global;
 	private final DistributingReporter log;
 
-	public TestSyntenicParser() throws IOException {
+	public GFFParserTest() throws IOException {
 		log = mock(DistributingReporter.class);
 		DataSourceFactory factory = new DataSourceFactory(
 				mock(SourceCache.class), true);
@@ -71,24 +71,14 @@ public class TestSyntenicParser {
 
 	@Test
 	public void testParserMini() throws Exception {
-		File f = DataManager.file(SYN_FILE);
-		DataSource ds = global.getSourceFactory().create(new Locator(f, log),
-				global);
+		File f = DataManager.file("doubleScore.gff3");
+		DataSource ds = global.getSourceFactory()
+				.create(new Locator(f, global.getLog()), global);
 		EntrySet es = ds.read(new EntrySet(global));
-
-		Data<?> data = es.getOrCreateEntry("anthracis")
-				.get(SyntenicParser.SYNTENIC_KEY);
-		assertTrue(data instanceof SyntenicData);
-		assertEquals(6, data.get().spliterator().getExactSizeIfKnown());
-		assertEquals(3, ((SyntenicData) data).getReferences().size());
-
-		data = es.getOrCreateEntry("info1").get(SyntenicParser.SYNTENIC_KEY);
-		assertTrue(data instanceof SyntenicData);
-		assertEquals(4, data.get().spliterator().getExactSizeIfKnown());
-
-		data = es.getOrCreateEntry("info2").get(SyntenicParser.SYNTENIC_KEY);
-		assertTrue(data instanceof SyntenicData);
-		assertEquals(2, data.get().spliterator().getExactSizeIfKnown());
+		double score = es.firstEntry()
+				.getMemoryAnnotation(global.typeFactory().get("gene")).get(0)
+				.getScore();
+		Assert.assertEquals(0, score, 0.0001);
 	}
 
 }

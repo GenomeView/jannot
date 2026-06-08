@@ -47,12 +47,12 @@ import support.DataManager;
  * @author Thomas Abeel
  * 
  */
-public class TestGTFParser {
+public class GTFParserTest {
 
 	private final Global global;
 	private final DistributingReporter log;
 
-	public TestGTFParser() throws IOException {
+	public GTFParserTest() throws IOException {
 		log = mock(DistributingReporter.class);
 		DataSourceFactory factory = new DataSourceFactory(
 				mock(SourceCache.class), true);

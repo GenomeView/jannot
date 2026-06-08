@@ -16,7 +16,6 @@
  */
 package net.sf.jannot.parser;
 
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -32,33 +31,24 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.sf.jannot.Data;
-import net.sf.jannot.DataKey;
 import net.sf.jannot.DistributingReporter;
-import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
-import net.sf.jannot.Feature;
 import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
-import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
 import support.DataManager;
+import tudelft.utilities.logging.Reporter;
 
-/**
- * 
- * @author Thomas Abeel
- * 
- */
-public class TestVCFParser {
+public class TBLParserTest {
 
-	private final DistributingReporter log;
 	private final Global global;
+	private final DistributingReporter log;
 
-	public TestVCFParser() throws IOException {
+	public TBLParserTest() throws IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),
@@ -75,61 +65,19 @@ public class TestVCFParser {
 	}
 
 	@Test
-	public void testTinySize() throws Exception {
-
-		File f = DataManager.file("tiny.vcf");
+	public void testParserMini() throws Exception {
+		Reporter log = global.getLog();
+		File f = DataManager.file("sequin.tbl");
+		// following is copy of another test.
+		// It was expected to fail but apparently works. No idea what it does...
 		DataSource ds = global.getSourceFactory().create(new Locator(f, log),
 				global);
 		EntrySet es = ds.read(new EntrySet(global));
-		// System.out.println(es.firstEntry());
-		Assert.assertEquals("20", es.firstEntry().getID());
-		int count = 0;
-		for (Entry e : es) {
-			count++;
-		}
-		Assert.assertEquals(1, count);
-		Data d = es.firstEntry().get(global.typeFactory().get("tiny.vcf"));
-		for (DataKey dk : es.firstEntry()) {
-			assertNotNull(dk);
-
-		}
-		Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
-		MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
-
-		for (Feature feat : mfa.get()) {
-			assertNotNull(feat);
-		}
-
-		assertNotNull(d);
+		double score = es.firstEntry()
+				.getMemoryAnnotation(global.typeFactory().get("gene")).get(0)
+				.getScore();
+		Assert.assertEquals(0, score, 0.0001);
 
 	}
 
-	@Test
-	public void testRegularSize() throws Exception {
-
-		File f = DataManager.file("regular.vcf");
-		DataSource ds = global.getSourceFactory().create(new Locator(f, log),
-				global);
-		EntrySet es = ds.read(new EntrySet(global));
-		Assert.assertEquals("gi|395136682|gb|CP003248.1|",
-				es.firstEntry().getID());
-		int count = 0;
-		for (Entry e : es) {
-			count++;
-		}
-		Assert.assertEquals(1, count);
-		Data d = es.firstEntry().get(global.typeFactory().get("regular.vcf"));
-		for (DataKey dk : es.firstEntry()) {
-			assertNotNull(dk);
-		}
-		Assert.assertTrue(d instanceof MemoryFeatureAnnotation);
-		MemoryFeatureAnnotation mfa = (MemoryFeatureAnnotation) d;
-
-		for (Feature feat : mfa.get()) {
-			assertNotNull(feat.type());
-		}
-
-		Assert.assertNotNull(d);
-
-	}
 }

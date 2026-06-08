@@ -31,12 +31,12 @@ import net.sf.jannot.wiggle.TroveArrayWiggle;
 import net.sf.nameservice.NameService;
 import support.DataManager;
 
-public class TestWigParser {
+public class WigParserTest {
 
 	private final DistributingReporter log;
 	private final Global global;
 
-	public TestWigParser() throws IOException {
+	public WigParserTest() throws IOException {
 		log = mock(DistributingReporter.class);
 		global = new Global(log, new JavaLogInterceptor(log),
 				new NameService(log),

@@ -41,12 +41,12 @@ import support.DataManager;
  * @author Thomas Abeel
  * 
  */
-public class TestFastaParser {
+public class FastaParserTest {
 
 	private final DistributingReporter log;
 	private final Global global;
 
-	public TestFastaParser() throws IOException {
+	public FastaParserTest() throws IOException {
 		log = mock(DistributingReporter.class);
 		DataSourceFactory factory = new DataSourceFactory(
 				mock(SourceCache.class), true);
