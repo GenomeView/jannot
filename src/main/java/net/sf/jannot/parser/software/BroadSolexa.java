@@ -15,7 +15,8 @@ import net.sf.jannot.parser.Parser;
 import net.sf.jannot.shortread.MemoryReadSet;
 
 /**
- * A short read parser for Broad data
+ * A short read parser for Broad data. FIXME this parser seems broken. No data
+ * from the parsed file is ever inserted
  * 
  * @author Thomas Abeel
  * 
