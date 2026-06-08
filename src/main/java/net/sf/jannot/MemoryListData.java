@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Data that is stored in memory in a list of a particular type
  */
 @SuppressWarnings("serial")
-public abstract class MemoryListData<T> extends ArrayList<T>
+public abstract class MemoryListData<T extends Located> extends ArrayList<T>
 		implements Data<T> {
 
 	private final Global global;
@@ -36,7 +36,7 @@ public abstract class MemoryListData<T> extends ArrayList<T>
 
 	@Override
 	public Iterable<T> get(int start, int end) {
-		return new LocatedListIterable(this, new Location(start, end));
+		return new LocatedListIterable<T>(this, new Location(start, end));
 
 	}
 

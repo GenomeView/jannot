@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -25,7 +26,10 @@ public class MemoryListDataTest {
 
 	private final DistributingReporter log;
 	private final Global global;
-	private final MemoryListData<Integer> mld;
+	private final MemoryListData<Located> mld;
+
+	private final Loc L1 = new Loc(1), L2 = new Loc(2), L3 = new Loc(3),
+			L5 = new Loc(5);
 
 	public MemoryListDataTest() throws IOException {
 		log = mock(DistributingReporter.class);
@@ -33,7 +37,7 @@ public class MemoryListDataTest {
 				new NameService(log),
 				new DataSourceFactory(mock(SourceCache.class), true));
 
-		mld = new MemoryListData<Integer>(global) {
+		mld = new MemoryListData<Located>(global) {
 			@Override
 			public String label() {
 				return "label";
@@ -56,17 +60,68 @@ public class MemoryListDataTest {
 	}
 
 	@Test
-	public void testAdd() {
-		List<Integer> list = Arrays.asList(1, 2, 3);
+	public void testAddGet() {
+		List<Loc> list = Arrays.asList(L1, L2, L3);
+
+		List<Located> all = StreamSupport.stream(mld.get().spliterator(), false)
+				.collect(Collectors.toList());
+		assertEquals(list, all);
+
 		mld.addAll((Iterable) list);
 		assertEquals(list, mld);
-		mld.add(5);
-		assertEquals(Arrays.asList(1, 2, 3, 5), mld);
-		List<Integer> sublist = StreamSupport
-				.stream(mld.get(1, 4).spliterator(), false)
-				.collect(Collectors.toList());
-		;
-		assertEquals(Arrays.asList(2, 3, 5), sublist);
+		mld.add(L5);
+		assertEquals(Arrays.asList(L1, L2, L3, L5), mld);
 
+		List<Located> sublist = StreamSupport
+				.stream(mld.get(2, 5).spliterator(), false)
+				.collect(Collectors.toList());
+		assertEquals(Arrays.asList(L2, L3, L5), sublist);
+
+	}
+}
+
+/**
+ * Stupid Located object for testing the iterators
+ */
+class Loc implements Located {
+	private int n;
+
+	public Loc(int n) {
+		this.n = n;
+	}
+
+	@Override
+	public int start() {
+		return n;
+	}
+
+	@Override
+	public int end() {
+		return n;
+	}
+
+	@Override
+	public String toString() {
+		return "" + n;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(n);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Loc other = (Loc) obj;
+		return n == other.n;
 	}
 }
