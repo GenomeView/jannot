@@ -12,7 +12,6 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.parser.Parser;
-import net.sf.jannot.parser.ParserError;
 import net.sf.jannot.shortread.MemoryReadSet;
 
 /**
@@ -37,7 +36,7 @@ public class BroadSolexa extends Parser {
 		LineIterator it = new LineIterator(is);
 
 		/* This parser assumes that header and sequences lines alternate */
-		int mapStart = -1;
+		// int mapStart = -1;
 		Entry entry = null;
 
 		for (String line : it) {
@@ -50,14 +49,9 @@ public class BroadSolexa extends Parser {
 					 * correct for it
 					 */
 					String[] arr3 = arr[3].split("\\.");
-					mapStart = Integer.parseInt(arr3[1]);
+					// mapStart = Integer.parseInt(arr3[1]);
 
 					entry = set.getOrCreateEntry(arr3[0]);
-					if (entry == null) {
-						throw new ParserError(
-								"There is no reference sequence loaded for this short read: "
-										+ arr[3]);
-					}
 					if (!entry.contains(dataKey)) {
 						entry.add(dataKey, new MemoryReadSet(getGlobal()));
 					}
@@ -70,7 +64,6 @@ public class BroadSolexa extends Parser {
 				MemoryReadSet mrs = (MemoryReadSet) entry.get(dataKey);
 			}
 		}
-//		set.setMute(false);
 
 		return set;
 	}
