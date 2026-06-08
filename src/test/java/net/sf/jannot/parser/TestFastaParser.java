@@ -1,6 +1,7 @@
 package net.sf.jannot.parser;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -18,11 +19,15 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import net.sf.jannot.Data;
 import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
+import net.sf.jannot.StringKey;
+import net.sf.jannot.alignment.mfa.Alignment;
+import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
@@ -105,7 +110,8 @@ public class TestFastaParser {
 
 	@Test
 	public void testMFasta() throws Exception {
-
+		// CHECK this test does NOT trigger the m-fasta part of the FastaParser
+		// (line 72ev). Is this bug in parser ?
 		DataSource ds = global.getSourceFactory().create(new Locator(
 				DataManager.file("10313-CDS.fasta"), global.getLog()), global);
 		EntrySet es = ds.read(new EntrySet(global));
@@ -118,4 +124,22 @@ public class TestFastaParser {
 				es.firstEntry().getID());
 	}
 
+	@Test
+	public void testMultialignFasta() throws Exception {
+		// this test triggers the m-fasta part in FastaParser.
+		DataSource ds = global.getSourceFactory().create(
+				new Locator(DataManager.file("apoex.fa"), global.getLog()),
+				global);
+		EntrySet es = ds.read(new EntrySet(global));
+
+		assertEquals(1, es.size());
+		// first entry contains all data.
+		Entry entry = es.firstEntry();
+		Data<?> data = entry.get(new StringKey("src/test/resources/apoex.fa"));
+		assertTrue(data instanceof AlignmentAnnotation);
+		AlignmentAnnotation aligns = (AlignmentAnnotation) data;
+		assertEquals(11, aligns.size());
+		Alignment align = aligns.get(0);
+		assertEquals("APE_BOVIN", align.name());
+	}
 }
