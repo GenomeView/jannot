@@ -14,26 +14,13 @@ package net.sf.jannot;
 @SuppressWarnings("serial")
 public class MemoryFeatureAnnotation extends MemoryListData<Feature>
 		implements FeatureAnnotation {
+	private double minStart = Integer.MAX_VALUE;
+	private double maxEnd = 0;
+	private String label = null;
 
 	public MemoryFeatureAnnotation(Global global) {
 		super(global);
 	}
-
-	@Override
-	public Iterable<Feature> get(int start, int end) {
-		return new LocatedListIterable<Feature>(this, new Location(start, end));
-
-	}
-
-	@Override
-	public Iterable<Feature> get() {
-		return super.get();
-	}
-
-	private double minStart = Integer.MAX_VALUE;
-	private double maxEnd = 0;
-
-	private String label = null;
 
 	/**
 	 * @param f
@@ -55,23 +42,6 @@ public class MemoryFeatureAnnotation extends MemoryListData<Feature>
 	}
 
 	/**
-	 * @param f
-	 */
-	public synchronized void remove(Feature f) {
-		super.remove(f);
-
-	}
-
-	/**
-	 * Returns the number of features that resides in memory.
-	 * 
-	 * @return
-	 */
-	public int cachedCount() {
-		return super.size();
-	}
-
-	/**
 	 * @param row
 	 * @return
 	 */
@@ -80,19 +50,19 @@ public class MemoryFeatureAnnotation extends MemoryListData<Feature>
 	}
 
 	/**
-	 * @param first
-	 * @return
+	 * @param f the feature
+	 * @return the index of f in the list
 	 */
-	public int getCachedIndexOf(Feature first) {
-		return super.indexOf(first);
+	public int getCachedIndexOf(Feature f) {
+		return super.indexOf(f);
 	}
 
 	@Override
 	public int getEstimateCount(Location l) {
-		if (cachedCount() < 200) {
+		if (size() < 200) {
 			return 0;
 		}
-		double d = cachedCount() / (maxEnd - minStart);
+		double d = size() / (maxEnd - minStart);
 
 		int estMemory = (int) (l.length() * d);
 

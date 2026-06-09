@@ -6,7 +6,8 @@ package net.sf.jannot;
 import java.util.ArrayList;
 
 /**
- * Data that is stored in memory in a list of a particular type
+ * Data that is stored in memory in a list of a particular type. Basiccaly
+ * ArrayList<T> with Data (iterable) functionality added.
  */
 @SuppressWarnings("serial")
 public abstract class MemoryListData<T extends Located> extends ArrayList<T>
