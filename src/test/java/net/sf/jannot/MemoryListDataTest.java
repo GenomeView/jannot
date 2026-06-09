@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.junit.After;
 import org.junit.Test;
 
 import net.sf.jannot.source.DataSourceFactory;
@@ -30,6 +31,11 @@ public class MemoryListDataTest {
 
 	private final Loc L1 = new Loc(1), L2 = new Loc(2), L3 = new Loc(3),
 			L5 = new Loc(5);
+
+	@After
+	public void after() {
+		checkLogs();
+	}
 
 	public MemoryListDataTest() throws IOException {
 		log = mock(DistributingReporter.class);
@@ -62,12 +68,12 @@ public class MemoryListDataTest {
 	@Test
 	public void testAddGet() {
 		List<Loc> list = Arrays.asList(L1, L2, L3);
+		mld.addAll((Iterable) list);
 
 		List<Located> all = StreamSupport.stream(mld.get().spliterator(), false)
 				.collect(Collectors.toList());
 		assertEquals(list, all);
 
-		mld.addAll((Iterable) list);
 		assertEquals(list, mld);
 		mld.add(L5);
 		assertEquals(Arrays.asList(L1, L2, L3, L5), mld);
@@ -76,6 +82,15 @@ public class MemoryListDataTest {
 				.stream(mld.get(2, 5).spliterator(), false)
 				.collect(Collectors.toList());
 		assertEquals(Arrays.asList(L2, L3, L5), sublist);
+
+		MemoryListData<Located> m2 = new MemoryListData<Located>(global) {
+			@Override
+			public String label() {
+				return "label2";
+			}
+		};
+		m2.addAll(mld);
+		assertEquals(mld, m2); // using ArrayList.equal
 
 	}
 }
